@@ -39,21 +39,22 @@ export async function loadSummary(onSelectTransect) {
     const link = (x) => (x ? `<a href="#" data-transect="${x.id}">${x.transect_code}</a> (${num(x.lrr_m_per_year)} m/năm)` : UPDATING);
     const hotLen = s.hotspots.length_m >= 1000 ? `${(s.hotspots.length_m / 1000).toFixed(2)} km` : `${s.hotspots.length_m} m`;
 
+    const fact = (label, value, id = '') => `<div><dt>${label}</dt><dd${id ? ` id="${id}"` : ''}>${value}</dd></div>`;
     body.innerHTML = `
         <div class="kpis">
             <div class="kpi"><b id="kpi-transects">${t.total}</b><span>transect</span></div>
-            <div class="kpi"><b id="kpi-erosion">${pct(erosion, t.total)}%</b><span>đang lùi bờ</span></div>
+            <div class="kpi${erosion ? ' is-alert' : ''}"><b id="kpi-erosion">${pct(erosion, t.total)}%</b><span>đang lùi bờ</span></div>
             <div class="kpi"><b id="kpi-years">${s.shorelines.count || '—'}</b><span>năm có đường bờ</span></div>
         </div>
         <div class="class-bar" aria-hidden="true">${bar}</div>
         <ul class="class-counts">${rows}</ul>
-        <dl class="summary-dl">
-            <dt>LRR trung bình</dt><dd id="kpi-mean-lrr">${num(t.mean_lrr_m_per_year)} m/năm</dd>
-            <dt>Có ý nghĩa thống kê</dt><dd>${t.significant}/${t.total} transect</dd>
-            <dt>Lùi mạnh nhất</dt><dd id="kpi-max-erosion">${link(t.max_erosion)}</dd>
-            <dt>Bồi mạnh nhất</dt><dd>${link(t.max_accretion)}</dd>
-            <dt>Hotspot</dt><dd>${s.hotspots.count ? `${s.hotspots.count} đoạn · ${hotLen}` : UPDATING}</dd>
-            <dt>Sạt lở tham chiếu</dt><dd>${s.reference_events.count ? `${s.reference_events.count} sự kiện` : UPDATING}</dd>
+        <dl class="facts">
+            ${fact('LRR trung bình', `${num(t.mean_lrr_m_per_year)} m/năm`, 'kpi-mean-lrr')}
+            ${fact('Có ý nghĩa thống kê', `${t.significant}/${t.total} transect`)}
+            ${fact('Lùi mạnh nhất', link(t.max_erosion), 'kpi-max-erosion')}
+            ${fact('Bồi mạnh nhất', link(t.max_accretion))}
+            ${fact('Hotspot', s.hotspots.count ? `${s.hotspots.count} đoạn · ${hotLen}` : UPDATING)}
+            ${fact('Sạt lở tham chiếu', s.reference_events.count ? `${s.reference_events.count} sự kiện` : UPDATING)}
         </dl>`;
 
     body.querySelectorAll('[data-transect]').forEach((a) => a.addEventListener('click', (e) => {

@@ -9,19 +9,22 @@
 <body class="page">
 @include('partials.nav')
 <main class="admin">
-    <h1>Quản trị ngưỡng hiển thị</h1>
-    <p id="admin-message" role="status"></p>
+    <div class="admin-card">
+        <h1>Quản trị ngưỡng hiển thị</h1>
+        <p class="lead">Ngưỡng dùng để lọc hotspot trên bản đồ. Chỉ tài khoản admin được sửa.</p>
+        <p id="admin-message" role="status"></p>
 
-    <form id="login-form">
-        <label>Email <input type="email" name="email" required></label>
-        <label>Mật khẩu <input type="password" name="password" required></label>
-        <button type="submit">Đăng nhập</button>
-    </form>
+        <form id="login-form">
+            <label>Email <input type="email" name="email" autocomplete="username" required></label>
+            <label>Mật khẩu <input type="password" name="password" autocomplete="current-password" required></label>
+            <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+        </form>
 
-    <section id="admin-panel" hidden>
-        <p>Đăng nhập: <strong id="admin-user"></strong> <button type="button" id="logout">Đăng xuất</button></p>
-        <div id="thresholds"></div>
-    </section>
+        <section id="admin-panel" hidden>
+            <div class="admin-user"><span>Đăng nhập: <strong id="admin-user"></strong></span> <button type="button" class="btn btn-ghost" id="logout">Đăng xuất</button></div>
+            <div id="thresholds"></div>
+        </section>
+    </div>
 </main>
 </body>
 </html>

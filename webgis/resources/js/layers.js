@@ -50,7 +50,10 @@ function warnOnTileError(layer) {
     });
 }
 
+let mapRef = null;
+
 export function initLayers(map) {
+    mapRef = map;
     layers.transects = warnOnTileError(wms('transects', { styles: '' })).addTo(map);
     layers.hotspots.addTo(map);
 
@@ -88,8 +91,12 @@ function initYearList(map) {
     const list = document.getElementById('year-list');
     years.all.forEach((year, i) => {
         const label = document.createElement('label');
-        label.innerHTML = `<input type="checkbox" id="year-${year}" data-year="${year}"><span class="year-swatch" style="background:${YEAR_COLORS[i % YEAR_COLORS.length]}"></span>${year}`;
-        if (!hasData(year)) label.title = `Năm ${year}: ${UPDATING.toLowerCase()}`;
+        label.className = 'year-chip';
+        label.innerHTML = `<input type="checkbox" id="year-${year}" data-year="${year}">${year}<span class="year-swatch" style="background:${YEAR_COLORS[i % YEAR_COLORS.length]}"></span>`;
+        if (!hasData(year)) {
+            label.classList.add('is-empty');
+            label.title = `Năm ${year}: ${UPDATING.toLowerCase()}`;
+        }
         list.appendChild(label);
         label.querySelector('input').addEventListener('change', (e) => {
             if (!e.target.checked) {
@@ -118,6 +125,9 @@ function initCompare(map) {
     b.innerHTML = opts;
     a.value = String(years.all[0]);
     b.value = String(years.all[years.all.length - 1]);
+    document.querySelectorAll('[data-compare]').forEach((el) => {
+        el.style.background = COMPARE_COLORS[el.dataset.compare];
+    });
 
     const clear = () => {
         for (const k of ['a', 'b']) {
@@ -151,16 +161,34 @@ function initCompare(map) {
 export async function loadHotspots(minRate) {
     const fc = await api.hotspots(minRate);
     layers.hotspots.clearLayers();
+    const drawn = [];
     L.geoJSON(fc, {
         style: (f) => ({ color: colors.severe_erosion, weight: 3 + Math.min(Number(f.properties.severity) || 0, 8), opacity: 0.85 }),
         onEachFeature: (f, layer) => layer.bindPopup(`<strong>${f.properties.notes ?? 'Hotspot'}</strong><br>Tốc độ lùi bờ: ${f.properties.severity} m/năm`),
-    }).eachLayer((l) => layers.hotspots.addLayer(l));
+    }).eachLayer((l) => {
+        drawn.push(l);
+        layers.hotspots.addLayer(l);
+    });
 
     const count = `${fc.features.length} đoạn từ ${minRate ?? 0} m/năm`;
     document.getElementById('hotspot-count').textContent = fc.features.length ? count : `${count} — ${UPDATING.toLowerCase()}.`;
-    document.getElementById('hotspot-list').innerHTML = fc.features
-        .map((f) => `<li data-severity="${f.properties.severity}">${f.properties.notes ?? 'Hotspot'} — ${f.properties.severity} m/năm</li>`)
+    const list = document.getElementById('hotspot-list');
+    list.innerHTML = fc.features
+        .map((f, i) => `<li data-severity="${f.properties.severity}"><button type="button" data-index="${i}">
+            <span>${f.properties.notes ?? 'Hotspot'}</span><span class="rate">${f.properties.severity} m/năm</span></button></li>`)
         .join('');
+    // Bấm một đoạn trong danh sách → phóng tới và mở popup trên bản đồ.
+    list.querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => {
+        const layer = drawn[Number(btn.dataset.index)];
+        if (!layer || !mapRef) return;
+        if (!mapRef.hasLayer(layers.hotspots)) {
+            layers.hotspots.addTo(mapRef);
+            document.getElementById('layer-hotspots').checked = true;
+        }
+        if (layer.getBounds) mapRef.fitBounds(layer.getBounds(), { maxZoom: 16, padding: [40, 40] });
+        else mapRef.setView(layer.getLatLng(), 16);
+        layer.openPopup();
+    }));
     return fc;
 }
 

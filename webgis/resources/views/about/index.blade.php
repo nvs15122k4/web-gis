@@ -8,17 +8,25 @@
 </head>
 <body class="page">
 @include('partials.nav')
+<div class="doc-layout">
+<nav class="doc-toc" aria-label="Mục lục">
+    <p>Mục lục</p>
+    <a href="#muc-tieu">Mục tiêu</a>
+    <a href="#du-lieu">Dữ liệu</a>
+    <a href="#phuong-phap">Phương pháp</a>
+    <a href="#phan-loai">Phân loại</a>
+    <a href="#bat-dinh">Độ bất định</a>
+    <a href="#sat-lo">Sạt lở tham chiếu</a>
+    <a href="#han-che">Hạn chế</a>
+    <a href="#tai-du-lieu">Tải dữ liệu</a>
+    <a href="#tham-khao">Tham khảo</a>
+</nav>
 <main class="doc" id="about">
     <h1>Giới thiệu &amp; phương pháp</h1>
     <p class="lead">WebGIS giám sát biến động bờ sông Hậu tại xã Bình Mỹ, tỉnh An Giang, giai đoạn
         {{ $years[0] }}–{{ end($years) }}. Kết quả được tính sẵn bằng pipeline Python từ ảnh vệ tinh; web chỉ đọc và hiển thị,
         không tính lại các chỉ số.</p>
 
-    <nav class="toc" aria-label="Mục lục">
-        <a href="#muc-tieu">Mục tiêu</a> · <a href="#du-lieu">Dữ liệu</a> · <a href="#phuong-phap">Phương pháp</a> ·
-        <a href="#phan-loai">Phân loại</a> · <a href="#bat-dinh">Độ bất định</a> · <a href="#sat-lo">Sạt lở tham chiếu</a> ·
-        <a href="#han-che">Hạn chế</a> · <a href="#tai-du-lieu">Tải dữ liệu</a> · <a href="#tham-khao">Tham khảo</a>
-    </nav>
 
     <section id="muc-tieu">
         <h2>Mục tiêu</h2>
@@ -29,7 +37,7 @@
 
     <section id="du-lieu">
         <h2>Dữ liệu</h2>
-        <table>
+        <div class="table-wrap"><table>
             <tr><th>Lớp</th><th>Nội dung</th><th>Trạng thái</th></tr>
             <tr><td>Ảnh vệ tinh</td><td>Composite mùa khô (tháng 1–3) mỗi năm, lọc mây theo lớp SCL</td><td class="updating">Đang cập nhật</td></tr>
             <tr><td>Đường bờ theo năm</td><td>Ranh giới nước–đất trích từ chỉ số nước NDWI / MNDWI / AWEI (ngưỡng Otsu)</td><td data-layer="shorelines"></td></tr>
@@ -37,7 +45,7 @@
             <tr><td>Hotspot lùi bờ</td><td>Đoạn bờ gộp từ các transect lùi bờ mạnh liên tiếp</td><td data-layer="hotspots"></td></tr>
             <tr><td>Sạt lở tham chiếu</td><td>Sự kiện 2019–2020 từ nguồn công bố chính thức, chỉ dùng để đối chiếu</td><td data-layer="reference_events"></td></tr>
             <tr><td>Ranh giới xã Bình Mỹ</td><td>Hiện là khung tạm</td><td class="updating">Đang cập nhật</td></tr>
-        </table>
+        </table></div>
     </section>
 
     <section id="phuong-phap">
@@ -61,21 +69,21 @@
     <section id="phan-loai">
         <h2>Tiêu chí phân loại mức biến động (Mục 2.5 đề cương)</h2>
         <p>Transect có xu hướng biến động thực sự khi <strong>|LRR| &gt; 1,96 × SE(LRR)</strong>, tức khoảng tin cậy 95% không chứa 0.</p>
-        <table>
+        <div class="table-wrap"><table>
             <tr><th>Mức</th><th>Điều kiện</th></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-accretion)"></span> Bồi</td><td>Có ý nghĩa thống kê và LRR &gt; 0</td></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-stable)"></span> Ổn định</td><td>|LRR| ≤ 1,96 × SE(LRR), chưa đủ cơ sở kết luận biến động</td></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-mild-erosion)"></span> Lùi nhẹ</td><td>Lùi bờ có ý nghĩa thống kê nhưng không đủ cả hai điều kiện "lùi mạnh"</td></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-severe-erosion)"></span> Lùi mạnh</td><td>LRR ≤ M − S (M, S là trung bình và độ lệch chuẩn LRR của các transect lùi bờ có ý nghĩa)
                 <em>và</em> khoảng cách giảm liên tục ở ít nhất 3 mốc năm liên tiếp</td></tr>
-        </table>
+        </table></div>
         <p>R² không phải ngưỡng loại trừ. Transect có <strong>R² &lt; 0,3</strong> vẫn giữ nếu có ý nghĩa thống kê, nhưng được ghi chú
             "xu hướng tuyến tính chưa rõ ràng, cần diễn giải thận trọng".</p>
     </section>
 
     <section id="bat-dinh">
         <h2>Độ bất định</h2>
-        <p>U<sub>shoreline</sub> = √(U<sub>pixel</sub>² + U<sub>georef</sub>² + U<sub>classify</sub>²), với U<sub>pixel</sub> = 5 m
+        <p class="formula">U<sub>shoreline</sub> = √(U<sub>pixel</sub>² + U<sub>georef</sub>² + U<sub>classify</sub>²), với U<sub>pixel</sub> = 5 m
             (nửa pixel 10 m), U<sub>georef</sub> theo thông số ESA, U<sub>classify</sub> = RMSE so với đường bờ số hóa thủ công.
             Độ bất định LRR = 1,96 × SE(LRR); độ bất định EPR = √(U(t1)² + U(t2)²) / |t2 − t1|.</p>
     </section>
@@ -120,6 +128,7 @@
         </ul>
     </section>
 </main>
+</div>
 <script type="module">
     // Điền trạng thái từng lớp từ /api/status.
     const cells = document.querySelectorAll('[data-layer]');

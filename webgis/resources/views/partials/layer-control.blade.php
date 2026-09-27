@@ -1,23 +1,39 @@
-<section id="layer-control">
-    <h2>Lớp dữ liệu</h2>
-    <label><input type="checkbox" id="layer-transects" checked> Transect (màu theo mức biến động)</label>
-    <label class="sub"><input type="checkbox" id="only-significant"> Chỉ transect có ý nghĩa thống kê (95%)</label>
-    <label><input type="checkbox" id="layer-hotspots" checked> Hotspot lùi bờ mạnh</label>
-    <label><input type="checkbox" id="layer-reference"> Sạt lở tham chiếu 2019–2020</label>
-    <p id="reference-status" class="hint"></p>
+<section id="layer-control" class="card">
+    <h2 class="section-title">Lớp chuyên đề</h2>
+    <label class="switch-row">
+        <span><b>Transect</b><small>Màu theo mức biến động</small></span>
+        <input type="checkbox" class="switch" id="layer-transects" checked>
+    </label>
+    <label class="switch-row sub">
+        <span>Chỉ transect có ý nghĩa thống kê (95%)</span>
+        <input type="checkbox" class="switch" id="only-significant">
+    </label>
+    <label class="switch-row">
+        <span><b>Hotspot lùi bờ mạnh</b><small>Đoạn bờ gộp từ transect lùi mạnh</small></span>
+        <input type="checkbox" class="switch" id="layer-hotspots" checked>
+    </label>
+    <label class="switch-row">
+        <span><b>Sạt lở tham chiếu 2019–2020</b><small>Theo mức độ QĐ 01/2011/QĐ-TTg</small></span>
+        <input type="checkbox" class="switch" id="layer-reference">
+    </label>
+    <p id="reference-status" class="hint" role="status"></p>
 </section>
-<section id="years">
-    <h2>Đường bờ theo năm</h2>
-    <div id="year-list"></div>
+
+<section id="years" class="card">
+    <h2 class="section-title">Đường bờ theo năm</h2>
+    <p class="hint">Bật nhiều năm để xem dịch chuyển; năm mờ là chưa có ảnh hợp lệ.</p>
+    <div id="year-list" class="year-grid"></div>
 </section>
-<section id="compare">
-    <h2>So sánh 2 năm</h2>
-    <div class="row">
-        <select id="compare-a" aria-label="Năm A"></select>
-        <select id="compare-b" aria-label="Năm B"></select>
+
+<section id="compare" class="card">
+    <h2 class="section-title">So sánh hai năm</h2>
+    <div class="compare-row">
+        <label class="field"><span><i class="line-key" data-compare="a"></i>Năm A</span><select id="compare-a" aria-label="Năm A"></select></label>
+        <span class="compare-arrow" aria-hidden="true">→</span>
+        <label class="field"><span><i class="line-key" data-compare="b"></i>Năm B</span><select id="compare-b" aria-label="Năm B"></select></label>
     </div>
-    <div class="row">
-        <button type="button" id="compare-apply">So sánh</button>
-        <button type="button" id="compare-clear">Bỏ so sánh</button>
+    <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="compare-apply">So sánh</button>
+        <button type="button" class="btn btn-ghost" id="compare-clear">Bỏ so sánh</button>
     </div>
 </section>

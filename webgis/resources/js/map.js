@@ -3,6 +3,7 @@ import { initBasemaps } from './basemaps';
 import { initLayers, layers } from './layers';
 import { initPermalink, readPermalink } from './permalink';
 import { loadSummary } from './summary';
+import { initTabs } from './tabs';
 import { initTransectPanel, showTransect, zoomToTransect } from './transect-panel';
 
 const DEFAULT_CENTER = [10.578, 105.208];
@@ -33,9 +34,13 @@ export function initMap() {
     const permalink = initPermalink(map);
     initLayers(map);
     initTransectPanel(map, permalink);
-    initSidebarToggle(map);
+    initTabs(document.getElementById('sidebar'));
+    const sidebar = initSidebarToggle(map);
 
-    const select = (id) => showTransect(id).then(() => zoomToTransect(map, id)).catch(() => {});
+    const select = (id) => {
+        sidebar.collapseOnMobile(); // màn hình nhỏ: nhường chỗ cho bản đồ và thẻ chi tiết
+        return showTransect(id).then(() => zoomToTransect(map, id)).catch(() => {});
+    };
     loadSummary(select);
     if (link.transectId) showTransect(link.transectId).catch(() => {});
 
@@ -48,10 +53,17 @@ function initSidebarToggle(map) {
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('sidebar-toggle');
     const mobile = window.matchMedia('(max-width: 640px)');
-    if (mobile.matches) sidebar.classList.add('collapsed');
-    toggle.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        toggle.setAttribute('aria-expanded', String(!sidebar.classList.contains('collapsed')));
-    });
+    const setCollapsed = (collapsed) => {
+        sidebar.classList.toggle('collapsed', collapsed);
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+    };
+    if (mobile.matches) {
+        setCollapsed(true);
+        document.getElementById('legend')?.removeAttribute('open');
+    }
+    toggle.addEventListener('click', () => setCollapsed(!sidebar.classList.contains('collapsed')));
     map.invalidateSize();
+    return {
+        collapseOnMobile: () => mobile.matches && setCollapsed(true),
+    };
 }

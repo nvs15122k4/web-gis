@@ -1,5 +1,8 @@
 import Chart from 'chart.js/auto';
 
+Chart.defaults.font.family = "'Be Vietnam Pro', system-ui, sans-serif";
+Chart.defaults.color = '#5a6876';
+
 /**
  * Vẽ khoảng cách baseline→bờ theo năm. Trục X là số thực (năm) nên năm thiếu dữ liệu chỉ tạo khoảng trống,
  * không có điểm bịa; đoạn nối qua chỗ thiếu vẽ nét đứt để không gây hiểu nhầm là đo đủ.
@@ -21,16 +24,19 @@ export function renderHistoryChart(canvas, history) {
             datasets: [{
                 label: 'Khoảng cách tới baseline (m)',
                 data: history.map((h) => ({ x: h.year, y: h.distance_m })),
-                borderColor: '#1f6feb',
-                backgroundColor: '#1f6feb',
+                borderColor: '#0f6e8c',
+                backgroundColor: '#0f6e8c',
+                pointRadius: 3.5,
+                tension: 0,
                 segment: { borderDash: (ctx) => (ctx.p1.parsed.x - ctx.p0.parsed.x > 1 ? [6, 4] : undefined) },
             }],
         },
         options: {
             maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
             scales: {
-                x: { type: 'linear', ticks: { stepSize: 1, precision: 0, callback: (v) => String(v) }, title: { display: true, text: 'Năm' } },
-                y: { title: { display: true, text: 'm' } },
+                x: { type: 'linear', ticks: { stepSize: 1, precision: 0, maxRotation: 0, autoSkipPadding: 6, callback: (v) => String(v) }, title: { display: true, text: 'Năm' } },
+                y: { title: { display: true, text: 'Cách baseline (m)' } },
             },
         },
     });
