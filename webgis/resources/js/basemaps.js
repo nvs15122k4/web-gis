@@ -1,6 +1,11 @@
 import L from 'leaflet';
 
 const STORAGE_KEY = 'webgis_basemap';
+/**
+ * Pane riêng dưới tilePane: nền được thêm sau cùng (tải bất đồng bộ) mà vẫn nằm dưới các lớp WMS chuyên đề.
+ * Chung pane mặc định thì lớp thêm sau đè lên, che mất transect/đường bờ.
+ */
+export const BASEMAP_PANE = 'basemap';
 
 // Ẩn điểm quan tâm (chợ, cửa hàng…) để không lấn át lớp chuyên đề.
 const HIDE_POI = encodeURIComponent('s.t:2|p.v:off');
@@ -10,12 +15,14 @@ const google = (lyrs) => L.tileLayer(`https://mt{s}.google.com/vt/lyrs=${lyrs}&h
     attribution: 'Bản đồ &copy; Google',
     subdomains: '0123',
     maxZoom: 20,
+    pane: BASEMAP_PANE,
 });
 
 const esri = (service, attribution) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`, {
     attribution: `Tiles &copy; Esri &mdash; ${attribution}`,
     maxNativeZoom: 19,
     maxZoom: 20,
+    pane: BASEMAP_PANE,
 });
 
 /**
@@ -51,6 +58,7 @@ function remembered() {
 }
 
 export async function initBasemaps(map, vietmapKey = null) {
+    map.createPane(BASEMAP_PANE).style.zIndex = 150;
     L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
     initCoordinates(map);
 

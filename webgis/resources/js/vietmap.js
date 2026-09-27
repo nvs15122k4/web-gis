@@ -1,6 +1,7 @@
 import L from 'leaflet';
 import '@vietmap/vietmap-gl-js/dist/vietmap-gl.css';
 import '@vietmap/vietmap-gl-leaflet';
+import { BASEMAP_PANE } from './basemaps';
 
 const ATTRIBUTION = 'Bản đồ &copy; <a href="https://maps.vietmap.vn" rel="noopener">VIETMAP</a>';
 
@@ -14,6 +15,7 @@ export function vietmapBasemaps(key) {
     const vector = (style) => () => L.vietmapGL({
         style: `https://maps.vietmap.vn/maps/styles/${style}/style.json?apikey=${apikey}`,
         attribution: ATTRIBUTION,
+        pane: BASEMAP_PANE,
     });
     return {
         'Bản đồ đường (Vietmap)': vector('tm'),
@@ -21,6 +23,7 @@ export function vietmapBasemaps(key) {
         'Ảnh vệ tinh (Vietmap)': () => L.tileLayer(`https://maps.vietmap.vn/maps/tiles/st/{z}/{x}/{y}.png?apikey=${apikey}`, {
             attribution: ATTRIBUTION,
             maxZoom: 20,
+            pane: BASEMAP_PANE,
         }),
     };
 }

@@ -6,7 +6,7 @@ import { loadSummary } from './summary';
 import { initTabs } from './tabs';
 import { initTransectPanel, showTransect, zoomToTransect } from './transect-panel';
 
-const DEFAULT_CENTER = [10.578, 105.208];
+const DEFAULT_CENTER = [10.545, 105.29];
 const DEFAULT_ZOOM = 13;
 /** Thu nhỏ tối đa ra cả khu vực Đông Nam Á; không cho lặp nhiều bản sao thế giới. */
 const MIN_ZOOM = 3;
@@ -23,14 +23,21 @@ export function initMap() {
         moved = true;
     });
 
-    // Ranh giới AOI (khung tạm, xem public/data/aoi.geojson).
+    // AOI do pipeline sinh (pipeline/s6_reference.py): ranh giới xã + vùng nghiên cứu dọc bờ sông.
     fetch('/data/aoi.geojson')
         .then((r) => r.json())
         .then((aoi) => {
-            const layer = L.geoJSON(aoi, { style: { color: '#333', weight: 2, dashArray: '6 4', fill: false }, interactive: false }).addTo(map);
+            const layer = L.geoJSON(aoi, {
+                style: (f) => (f.properties.role === 'commune'
+                    ? { color: '#555', weight: 1.5, dashArray: '2 5', fill: false }
+                    : { color: '#333', weight: 2, dashArray: '6 4', fill: false }),
+                interactive: false,
+            }).addTo(map);
+            const study = aoi.features.filter((f) => f.properties.role !== 'commune');
+            const bounds = (study.length ? L.geoJSON({ type: 'FeatureCollection', features: study }) : layer).getBounds();
             // Không animate: hiệu ứng zoom dở dang sẽ ghi đè khung nhìn nếu người dùng di chuyển ngay sau đó.
-            if (!moved) map.fitBounds(layer.getBounds(), { animate: false });
-            addHomeControl(map, layer.getBounds());
+            if (!moved) map.fitBounds(bounds, { animate: false });
+            addHomeControl(map, bounds);
         })
         .catch(() => {});
 

@@ -2,7 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 import path from 'node:path';
 
 const laravel = path.resolve(__dirname, '../webgis');
-const BASE = 'http://127.0.0.1:8000';
+// Cổng riêng: không bao giờ tái sử dụng nhầm server dev (:8000, CSDL phát triển; artisan serve tự nhảy sang 8001, 8002… khi cổng bận) khi đang chạy song song.
+const BASE = 'http://127.0.0.1:8010';
 
 /**
  * E2E chạy trên CSDL riêng (`*_e2e`, nạp bởi E2eFixtureSeeder) và workspace GeoServer riêng `songhau_e2e`,
@@ -19,7 +20,7 @@ export default defineConfig({
     use: { baseURL: BASE, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
     globalSetup: './global-setup.ts',
     webServer: {
-        command: 'php artisan serve --env=e2e --host=127.0.0.1 --port=8000',
+        command: 'php artisan serve --env=e2e --host=127.0.0.1 --port=8010',
         cwd: laravel,
         url: `${BASE}/up`,
         reuseExistingServer: !process.env.CI,
