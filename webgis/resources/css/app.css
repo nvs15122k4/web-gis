@@ -1,0 +1,100 @@
+@import 'leaflet/dist/leaflet.css';
+@import './colors.css';
+
+:root {
+    --sidebar-w: 340px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; font-size: 14px; }
+
+.app { display: flex; height: 100%; }
+.sidebar { width: var(--sidebar-w); overflow-y: auto; padding: 1rem; border-right: 1px solid #ddd; background: #fafafa; }
+.sidebar h1 { font-size: 1.15rem; margin: 0 0 .5rem; }
+.sidebar h2 { font-size: .95rem; margin: 1rem 0 .4rem; }
+.sidebar h3 { font-size: .85rem; margin: .7rem 0 .3rem; color: #444; }
+.subtitle { margin: 0 0 .3rem; color: #555; font-size: .85rem; }
+.sidelinks { margin: 0 0 .4rem; font-size: .85rem; }
+.sidebar label.sub { margin-left: 1.4rem; font-size: .85rem; color: #444; }
+.disclaimer { margin-top: 1.2rem; color: #666; font-size: .78rem; font-style: italic; }
+.note { margin: .3rem 0; padding: .35rem .5rem; border-left: 3px solid #f0a020; background: #fff8e1; font-size: .82rem; }
+.dot { display: inline-block; width: .75rem; height: .75rem; border-radius: 50%; margin-right: .35rem; vertical-align: middle; }
+
+/* tổng quan */
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+.kpi { background: #fff; border: 1px solid #e3e3e3; border-radius: 6px; padding: .4rem; text-align: center; }
+.kpi b { display: block; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.kpi span { font-size: .72rem; color: #666; }
+.class-bar { display: flex; height: .55rem; border-radius: 3px; overflow: hidden; margin: .5rem 0 .3rem; gap: 1px; }
+.class-counts { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .1rem .8rem; font-size: .82rem; }
+.class-counts li { display: flex; align-items: center; gap: .35rem; }
+.class-counts b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.class-counts small { color: #777; width: 2.4rem; text-align: right; }
+.summary-dl { display: grid; grid-template-columns: auto 1fr; gap: .15rem .6rem; margin: .5rem 0 0; font-size: .85rem; }
+.summary-dl dt { color: #555; }
+.summary-dl dd { margin: 0; }
+
+.downloads { padding-left: 1.1rem; margin: .4rem 0; font-size: .85rem; }
+.popup-table th { text-align: left; color: #555; font-weight: normal; padding-right: .6rem; }
+.leaflet-control.coords { background: rgba(255, 255, 255, .85); padding: 0 .4rem; font: 12px/1.6 ui-monospace, monospace; min-width: 11rem; }
+.sidebar label { display: flex; align-items: center; gap: .4rem; margin: .2rem 0; }
+#map { flex: 1; min-width: 0; }
+
+#status { min-height: 1.2rem; margin: .25rem 0; color: #8a4b00; }
+.banner { margin: .4rem 0; padding: .5rem .6rem; border: 1px solid #f0c36d; border-radius: 4px; background: #fff8e1; color: #6d4c00; font-size: .85rem; }
+.hint { color: #666; font-size: .85rem; }
+.updating { color: #8a4b00; font-style: italic; }
+.empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; color: #8a4b00; font-style: italic; }
+.empty[hidden] { display: none; }
+#year-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 .5rem; }
+.year-swatch { width: .8rem; height: .8rem; border-radius: 2px; display: inline-block; }
+.row { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+.row select, .row input { flex: 1; min-width: 0; padding: .3rem; }
+button, .btn { padding: .35rem .7rem; cursor: pointer; }
+#hotspot-list { padding-left: 1.1rem; margin: .4rem 0; }
+
+.legend-item { display: flex; align-items: center; gap: .5rem; margin: .25rem 0; }
+.legend-swatch { width: 1rem; height: 1rem; border-radius: 2px; }
+
+#transect-detail dl { display: grid; grid-template-columns: auto 1fr; gap: .15rem .6rem; margin: .3rem 0; }
+#transect-detail dt { color: #555; }
+#transect-detail dd { margin: 0; font-variant-numeric: tabular-nums; }
+.class-badge { display: inline-block; padding: .05rem .5rem; border-radius: 1rem; color: #fff; font-size: .8rem; }
+.chart-box { position: relative; height: 220px; }
+
+#sidebar-toggle { display: none; }
+
+@media (max-width: 640px) {
+    .app { position: relative; }
+    #map { width: 100%; }
+    .sidebar { position: absolute; z-index: 1000; inset: 0 auto 0 0; width: min(88vw, 340px); transition: transform .2s; box-shadow: 2px 0 8px rgba(0, 0, 0, .25); }
+    .sidebar.collapsed { transform: translateX(-105%); }
+    #sidebar-toggle { display: block; position: absolute; z-index: 1100; top: .6rem; right: .6rem; font-size: 1.2rem; }
+    .leaflet-top.leaflet-right { margin-top: 2.8rem; } /* chừa chỗ cho nút mở sidebar */
+    .leaflet-control.coords { display: none; }
+}
+
+/* trang quản trị */
+.admin { max-width: 32rem; margin: 2rem auto; padding: 0 1rem; }
+.admin form { display: grid; gap: .6rem; margin: 1rem 0; }
+.admin input { padding: .4rem; }
+.msg-error { color: #b00020; } .msg-ok { color: #1b6e2f; }
+
+/* thanh điều hướng + trang nội dung */
+body.page { height: auto; background: #fff; color: #222; }
+.topnav { display: flex; gap: 1rem; flex-wrap: wrap; padding: .7rem 1rem; border-bottom: 1px solid #ddd; background: #fafafa; }
+.topnav a { color: #1f4f8a; text-decoration: none; }
+.topnav a.active { font-weight: 600; color: #111; }
+.doc { max-width: 52rem; margin: 1.5rem auto 3rem; padding: 0 1rem; line-height: 1.6; }
+.doc h1 { font-size: 1.6rem; margin-bottom: .3rem; }
+.doc h2 { font-size: 1.15rem; margin-top: 2rem; border-bottom: 1px solid #eee; padding-bottom: .2rem; }
+.doc .lead { font-size: 1.02rem; color: #333; }
+.doc .toc { font-size: .9rem; margin: 1rem 0; }
+.doc table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+.doc th, .doc td { border: 1px solid #e3e3e3; padding: .35rem .5rem; text-align: left; vertical-align: top; }
+.doc th { background: #f6f6f6; }
+.doc .defs { display: grid; grid-template-columns: auto 1fr; gap: .2rem .8rem; }
+.doc .defs dd { margin: 0; }
+.doc .levels { list-style: none; padding-left: 0; }
+.legend-swatch.inline { display: inline-block; vertical-align: middle; margin-right: .3rem; }
+@media (max-width: 640px) { .doc table { font-size: .82rem; } }

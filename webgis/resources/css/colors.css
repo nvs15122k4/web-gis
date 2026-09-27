@@ -1,0 +1,7 @@
+/* SINH TỰ ĐỘNG từ resources/js/colors.json bằng scripts/build-colors.mjs — không sửa tay */
+:root {
+    --c-accretion: #2e9d4f;
+    --c-stable: #8a8a8a;
+    --c-mild-erosion: #b8862b;
+    --c-severe-erosion: #d0312d;
+}
