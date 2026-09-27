@@ -1,16 +1,20 @@
-<section id="legend">
-    <h2>Chú giải</h2>
-    <div class="legend-item"><span class="legend-swatch" style="background:var(--c-accretion)"></span> Bồi</div>
-    <div class="legend-item"><span class="legend-swatch" style="background:var(--c-stable)"></span> Ổn định</div>
-    <div class="legend-item"><span class="legend-swatch" style="background:var(--c-mild-erosion)"></span> Lùi nhẹ</div>
-    <div class="legend-item"><span class="legend-swatch" style="background:var(--c-severe-erosion)"></span> Lùi mạnh</div>
-    <h3>Sạt lở tham chiếu (QĐ 01/2011/QĐ-TTg)</h3>
-    <div class="legend-item"><span class="dot" style="background:#b71c1c"></span> Đặc biệt nguy hiểm</div>
-    <div class="legend-item"><span class="dot" style="background:#ef6c00"></span> Nguy hiểm</div>
-    <div class="legend-item"><span class="dot" style="background:#7b3fe4"></span> Bình thường</div>
-    <div class="legend-item"><span class="dot" style="background:#9e9e9e"></span> Chưa phân loại</div>
-</section>
-<section>
-    <h2>Chi tiết transect</h2>
-    <div id="transect-detail"><p class="hint">Chọn một transect trên bản đồ.</p></div>
+<section class="inspector" id="inspector" aria-labelledby="inspector-title" hidden>
+    <header class="inspector-head">
+        <div>
+            <p class="eyebrow">Chi tiết transect</p>
+            <h2 id="inspector-title" class="inspector-title"><span id="transect-code">—</span><span class="class-badge" id="stat-class"></span></h2>
+        </div>
+        <button type="button" class="icon-btn" id="inspector-close" aria-label="Đóng chi tiết transect">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+    </header>
+    <div class="inspector-body">
+        <div id="transect-detail"><p class="hint">Chọn một transect trên bản đồ.</p></div>
+        <h3 class="subhead">Lịch sử vị trí đường bờ</h3>
+        <div class="chart-box">
+            <canvas id="history-chart"></canvas>
+            <p id="chart-empty" class="empty">Chọn một transect để xem biểu đồ.</p>
+        </div>
+        <p class="hint chart-note">Nét đứt: nối qua năm thiếu dữ liệu, không nội suy.</p>
+    </div>
 </section>

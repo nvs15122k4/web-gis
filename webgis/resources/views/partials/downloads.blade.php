@@ -1,8 +1,11 @@
 <ul class="downloads">
     @foreach (['transects' => 'Transect + chỉ số NSM/EPR/LRR', 'shorelines' => 'Đường bờ theo năm', 'hotspots' => 'Hotspot lùi bờ', 'reference' => 'Sạt lở tham chiếu'] as $layer => $label)
-        <li>{{ $label }}:
-            <a href="/api/export/{{ $layer }}.geojson" download>GeoJSON</a> ·
-            <a href="/api/export/{{ $layer }}.csv" download>CSV</a>
+        <li>
+            <span>{{ $label }}</span>
+            <span class="download-links">
+                <a class="pill" href="/api/export/{{ $layer }}.geojson" download>GeoJSON</a>
+                <a class="pill" href="/api/export/{{ $layer }}.csv" download>CSV</a>
+            </span>
         </li>
     @endforeach
 </ul>

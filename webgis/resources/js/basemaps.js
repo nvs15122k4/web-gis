@@ -2,21 +2,21 @@ import L from 'leaflet';
 
 const STORAGE_KEY = 'webgis_basemap';
 
-/** Nền bản đồ chọn được (như DEA Maps/USGS): bản đồ đường, ảnh vệ tinh, nền sáng làm nổi lớp chuyên đề. */
+const esri = (service, attribution) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`, {
+    attribution: `Tiles &copy; Esri &mdash; ${attribution}`,
+    maxNativeZoom: 19,
+    maxZoom: 20,
+});
+
+/**
+ * Nền bản đồ chọn được (như DEA Maps/USGS): bản đồ đường, địa hình, ảnh vệ tinh.
+ * Không dùng nền OpenStreetMap/CARTO vì ở mức thu nhỏ chúng vẽ ranh giới yêu sách "đường lưỡi bò"
+ * và tên chữ Hán trên Biển Đông; các nền Esri dưới đây không vẽ ranh giới đó.
+ */
 const BASEMAPS = {
-    'Bản đồ đường (OSM)': () => L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 19,
-    }),
-    'Ảnh vệ tinh (Esri)': () => L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Esri, Maxar, Earthstar Geographics',
-        maxZoom: 19,
-    }),
-    'Nền sáng (CARTO)': () => L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19,
-    }),
+    'Bản đồ đường (Esri)': () => esri('World_Street_Map', 'Esri, HERE, Garmin, USGS, NGA'),
+    'Bản đồ địa hình (Esri)': () => esri('World_Topo_Map', 'Esri, HERE, Garmin, FAO, NOAA, USGS'),
+    'Ảnh vệ tinh (Esri)': () => esri('World_Imagery', 'Esri, Maxar, Earthstar Geographics'),
 };
 
 function remembered() {

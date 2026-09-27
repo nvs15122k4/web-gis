@@ -11,6 +11,11 @@ export async function openMap(page: Page) {
     return errors;
 }
 
+/** Mở một tab trong sidebar (overview | layers | hotspots | share). */
+export async function openTab(page: Page, name: string) {
+    await page.click(`[role=tab][data-tab="${name}"]`);
+}
+
 export const API = {
     transect: async (page: Page, code: string) => {
         const fc = await (await page.request.get('/api/transects')).json();
