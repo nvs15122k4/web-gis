@@ -1,0 +1,24 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "node scripts/build-colors.mjs && vite build",
+        "dev": "node scripts/build-colors.mjs && vite",
+        "colors": "node scripts/build-colors.mjs"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.0.0",
+        "concurrently": "^10.0.3",
+        "laravel-vite-plugin": "^3.1",
+        "tailwindcss": "^4.0.0",
+        "vite": "^8.0.0"
+    },
+    "optionalDependencies": {
+        "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "chart.js": "^4.5.1",
+        "leaflet": "^1.9.4"
+    }
+}
