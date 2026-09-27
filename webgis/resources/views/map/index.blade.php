@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WebGIS giám sát bờ sông Hậu — xã Bình Mỹ</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script>window.WEBGIS = @json(['geoserver' => $geoserver, 'years' => $years]);</script>
+    <script>window.WEBGIS = @json(['geoserver' => $geoserver, 'years' => $years, 'vietmapKey' => $vietmapKey]);</script>
 </head>
 <body class="map-page">
 @include('partials.nav', ['withSidebarToggle' => true])

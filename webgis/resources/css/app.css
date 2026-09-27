@@ -260,6 +260,8 @@ body.map-page { height: 100vh; height: 100dvh; display: flex; flex-direction: co
 .leaflet-control-layers-expanded { padding: .5rem .8rem; font: .85rem var(--font); }
 .leaflet-control.coords { background: rgba(255, 255, 255, .88); padding: 0 .5rem; border-radius: 4px 0 0 0; font: 11px/1.8 var(--mono); min-width: 11rem; margin: 0 !important; }
 .leaflet-right { transition: right .2s; }
+.home-control { display: grid !important; place-items: center; color: var(--text) !important; }
+.home-control svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .map-wrap.inspecting .leaflet-top.leaflet-right { right: calc(var(--inspector-w) + 16px); }
 
 /* chú giải nổi */

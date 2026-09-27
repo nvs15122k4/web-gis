@@ -15,6 +15,7 @@ class MapController extends Controller
     {
         return view('map.index', [
             'geoserver' => config('services.geoserver'),
+            'vietmapKey' => config('services.vietmap.key'),
             'years' => [
                 'all' => range(...self::STUDY_YEARS),
                 'available' => $this->availableYears(),

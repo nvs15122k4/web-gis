@@ -23,6 +23,10 @@ cp .env.example .env && php artisan key:generate   # chỉnh DB_* (MySQL) và DB
 Tạo sẵn 2 CSDL rỗng: MySQL `webgis_app`, PostgreSQL `webgis_spatial` (migration tự `CREATE EXTENSION postgis`,
 tài khoản cần đủ quyền).
 
+**Bản đồ nền VIETMAP:** đăng ký API key tại [maps.vietmap.vn](https://maps.vietmap.vn) rồi điền `VIETMAP_API_KEY=` trong `.env`
+(nên giới hạn key theo domain/referer trong trang quản lý của Vietmap vì key lộ ra trình duyệt). Để trống thì web dùng nền
+dự phòng Google (Việt Nam). Không dùng OpenStreetMap/CARTO vì các nền này vẽ "đường lưỡi bò" ở mức thu nhỏ.
+
 ## 2. Migrate & seed
 
 ```bash

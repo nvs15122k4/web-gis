@@ -40,4 +40,9 @@ return [
         'workspace' => env('GEOSERVER_WORKSPACE', 'songhau'),
     ],
 
+    // Khoá API bản đồ nền VIETMAP (https://maps.vietmap.vn). Để trống thì web dùng nền dự phòng.
+    'vietmap' => [
+        'key' => env('VIETMAP_API_KEY'),
+    ],
+
 ];

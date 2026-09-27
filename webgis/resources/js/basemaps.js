@@ -2,6 +2,16 @@ import L from 'leaflet';
 
 const STORAGE_KEY = 'webgis_basemap';
 
+// Ẩn điểm quan tâm (chợ, cửa hàng…) để không lấn át lớp chuyên đề.
+const HIDE_POI = encodeURIComponent('s.t:2|p.v:off');
+
+/** Nền Google phiên bản Việt Nam (gl=VN, hl=vi): nhãn tiếng Việt, ghi "quần đảo Hoàng Sa/Trường Sa", không vẽ "đường lưỡi bò". */
+const google = (lyrs) => L.tileLayer(`https://mt{s}.google.com/vt/lyrs=${lyrs}&hl=vi&gl=VN&x={x}&y={y}&z={z}&apistyle=${HIDE_POI}`, {
+    attribution: 'Bản đồ &copy; Google',
+    subdomains: '0123',
+    maxZoom: 20,
+});
+
 const esri = (service, attribution) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`, {
     attribution: `Tiles &copy; Esri &mdash; ${attribution}`,
     maxNativeZoom: 19,
@@ -9,15 +19,28 @@ const esri = (service, attribution) => L.tileLayer(`https://server.arcgisonline.
 });
 
 /**
- * Nền bản đồ chọn được (như DEA Maps/USGS): bản đồ đường, địa hình, ảnh vệ tinh.
- * Không dùng nền OpenStreetMap/CARTO vì ở mức thu nhỏ chúng vẽ ranh giới yêu sách "đường lưỡi bò"
- * và tên chữ Hán trên Biển Đông; các nền Esri dưới đây không vẽ ranh giới đó.
+ * Nền dự phòng khi chưa cấu hình VIETMAP_API_KEY. Không dùng OpenStreetMap/CARTO vì ở mức thu nhỏ chúng vẽ
+ * ranh giới yêu sách "đường lưỡi bò" và tên chữ Hán trên Biển Đông.
  */
-const BASEMAPS = {
-    'Bản đồ đường (Esri)': () => esri('World_Street_Map', 'Esri, HERE, Garmin, USGS, NGA'),
-    'Bản đồ địa hình (Esri)': () => esri('World_Topo_Map', 'Esri, HERE, Garmin, FAO, NOAA, USGS'),
-    'Ảnh vệ tinh (Esri)': () => esri('World_Imagery', 'Esri, Maxar, Earthstar Geographics'),
+const FALLBACK = {
+    'Bản đồ đường (Google)': () => google('m'),
+    'Ảnh vệ tinh + nhãn (Google)': () => google('y'),
 };
+
+const ESRI_IMAGERY = { 'Ảnh vệ tinh (Esri)': () => esri('World_Imagery', 'Esri, Maxar, Earthstar Geographics') };
+
+/** Có API key thì dùng nền VIETMAP (tải thư viện GL theo nhu cầu); lỗi tải thì quay về nền dự phòng. */
+async function basemapDefs(vietmapKey) {
+    if (vietmapKey) {
+        try {
+            const { vietmapBasemaps } = await import('./vietmap');
+            return { ...vietmapBasemaps(vietmapKey), ...ESRI_IMAGERY };
+        } catch (e) {
+            console.warn('Không tải được nền VIETMAP, dùng nền dự phòng.', e);
+        }
+    }
+    return { ...FALLBACK, ...ESRI_IMAGERY };
+}
 
 function remembered() {
     try {
@@ -27,8 +50,12 @@ function remembered() {
     }
 }
 
-export function initBasemaps(map) {
-    const layers = Object.fromEntries(Object.entries(BASEMAPS).map(([name, make]) => [name, make()]));
+export async function initBasemaps(map, vietmapKey = null) {
+    L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
+    initCoordinates(map);
+
+    const defs = await basemapDefs(vietmapKey);
+    const layers = Object.fromEntries(Object.entries(defs).map(([name, make]) => [name, make()]));
     const names = Object.keys(layers);
     const current = names.includes(remembered()) ? remembered() : names[0];
     layers[current].addTo(map);
@@ -41,9 +68,6 @@ export function initBasemaps(map) {
             /* trình duyệt chặn storage: bỏ qua */
         }
     });
-
-    L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
-    initCoordinates(map);
 }
 
 /** Toạ độ con trỏ (WGS84) ở góc dưới phải. */
