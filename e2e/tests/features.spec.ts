@@ -67,7 +67,11 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         await openMap(page);
         await page.locator('.leaflet-control-layers').hover();
         await page.getByLabel('Ảnh vệ tinh (Esri)').check();
-        await expect(page.locator('.leaflet-tile-pane img[src*="World_Imagery"]').first()).toBeAttached();
+        await expect(page.locator('.leaflet-basemap-pane img[src*="World_Imagery"]').first()).toBeAttached();
+        // Nền tải bất đồng bộ (thêm sau lớp WMS) nhưng phải luôn nằm dưới, không che transect/đường bờ.
+        const z = await page.evaluate(() => ['.leaflet-basemap-pane', '.leaflet-tile-pane']
+            .map((s) => Number(getComputedStyle(document.querySelector(s)!).zIndex)));
+        expect(z[0]).toBeLessThan(z[1]);
     });
 
     test('19 trang giới thiệu & tải dữ liệu', async ({ page }) => {
