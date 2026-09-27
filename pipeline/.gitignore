@@ -3,3 +3,4 @@ __pycache__/
 data/composite/
 data/water/
 data/*.log
+data/ground_truth/img/
