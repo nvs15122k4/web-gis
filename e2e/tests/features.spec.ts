@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openMap, API } from './helpers';
+import { openMap, openTab, API } from './helpers';
 
 /** Các tính năng tham khảo từ DEA Coastlines, USGS Coastal Change Hazards Portal và bản đồ sạt lở ĐBSCL. */
 test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
@@ -14,6 +14,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
 
     test('14 lọc ý nghĩa thống kê: WMS transect gửi CQL_FILTER is_significant=true', async ({ page }) => {
         await openMap(page);
+        await openTab(page, 'layers');
         const req = page.waitForRequest((r) => /transects/.test(r.url()) && /cql_filter=is_significant%3Dtrue/i.test(r.url()));
         await page.locator('#only-significant').check();
         await req;
@@ -47,6 +48,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         const fc = await (await page.request.get('/api/reference-events')).json();
         const [lng, lat] = fc.features[0].geometry.coordinates;
         await page.evaluate(([lat, lng]) => (window as any).__webgis.map.setView([lat, lng], 14, { animate: false }), [lat, lng]);
+        await openTab(page, 'layers');
         await page.locator('#layer-reference').check();
         await expect(page.locator('#reference-status')).toContainText('2 sự kiện');
 

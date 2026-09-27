@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openMap, centerOnTransect, clickAt } from './helpers';
+import { openMap, openTab, centerOnTransect, clickAt } from './helpers';
 
 const fmt = (v: number | null, d = 2) => (v == null ? '—' : Number(v).toFixed(d));
 
@@ -17,6 +17,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
 
     test('02 layer control: bật/tắt lớp Đường bờ 2020', async ({ page }) => {
         await openMap(page);
+        await openTab(page, 'layers');
         const req = page.waitForRequest((r) => /shorelines/.test(r.url()) && /year%3D2020|year=2020/i.test(r.url()));
         await page.locator('#year-2020').check();
         await req;
@@ -30,6 +31,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
 
     test('03 so sánh năm: 2019 & 2024 hiển thị đồng thời, hai màu khác nhau', async ({ page }) => {
         await openMap(page);
+        await openTab(page, 'layers');
         await page.selectOption('#compare-a', '2019');
         await page.selectOption('#compare-b', '2024');
         await page.click('#compare-apply');
@@ -67,6 +69,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
 
     test('06 lọc ngưỡng: danh sách hotspot cập nhật theo API', async ({ page }) => {
         await openMap(page);
+        await openTab(page, 'hotspots');
         await expect(page.locator('#hotspot-list li')).toHaveCount(2); // ngưỡng mặc định 1.0
         await page.fill('#min-rate', '3');
         await page.click('#apply-filter');
@@ -83,6 +86,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         const api = await (await page.request.get('/api/reference-events')).json();
         const [lng, lat] = api.features[0].geometry.coordinates;
         await page.evaluate(([lat, lng]) => (window as any).__webgis.map.setView([lat, lng], 15, { animate: false }), [lat, lng]);
+        await openTab(page, 'layers');
         await page.locator('#layer-reference').check();
         await expect(page.locator('#reference-status')).toContainText('sự kiện trong khung nhìn');
         const first = await page.evaluate(() => {
@@ -100,6 +104,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
 
     test('08 biên: năm không có composite → báo không có dữ liệu, không crash', async ({ page }) => {
         const errors = await openMap(page);
+        await openTab(page, 'layers');
         await page.locator('#year-2022').click(); // ứng dụng tự bỏ chọn nên không dùng check()
         await expect(page.locator('#status')).toContainText('Không có dữ liệu');
         await expect(page.locator('#year-2022')).not.toBeChecked();
@@ -122,6 +127,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
     test('10 biên: vùng không có sạt lở tham chiếu → rỗng hợp lệ, không lỗi', async ({ page }) => {
         const errors = await openMap(page);
         await page.evaluate(() => (window as any).__webgis.map.setView([10.597, 105.21], 16, { animate: false }));
+        await openTab(page, 'layers');
         await page.locator('#layer-reference').check();
         await expect(page.locator('#reference-status')).toContainText('Không có sự kiện');
         expect(await page.evaluate(() => (window as any).__webgis.layers.reference.getLayers().length)).toBe(0);
@@ -142,6 +148,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         // mở sidebar bằng nút, dùng được điều khiển bên trong
         await page.click('#sidebar-toggle');
         await expect(page.locator('#sidebar')).not.toHaveClass(/collapsed/);
+        await openTab(page, 'layers');
         await page.locator('#year-2020').check();
         await expect(page.locator('#year-2020')).toBeChecked();
     });
