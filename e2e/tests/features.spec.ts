@@ -92,6 +92,6 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         await expect(page.locator('#data-banner')).toContainText('đang cập nhật');
         await expect(page.locator('#summary-body')).toContainText('đang cập nhật');
         await expect(page.locator('#hotspot-count')).toContainText('đang cập nhật');
-        expect(errors.filter((e) => !/tile\.openstreetmap|ERR_|Failed to load resource/i.test(e))).toEqual([]);
+        expect(errors.filter((e) => !/arcgisonline|ERR_|Failed to load resource/i.test(e))).toEqual([]);
     });
 });

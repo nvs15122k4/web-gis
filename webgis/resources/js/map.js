@@ -8,10 +8,16 @@ import { initTransectPanel, showTransect, zoomToTransect } from './transect-pane
 
 const DEFAULT_CENTER = [10.578, 105.208];
 const DEFAULT_ZOOM = 13;
+/**
+ * Khung xem giới hạn quanh An Giang: WebGIS cấp xã không cần thu nhỏ ra toàn khu vực, và nhờ đó bản đồ
+ * không bao giờ hiển thị vùng Biển Đông (tránh mọi nền bản đồ có vẽ "đường lưỡi bò").
+ */
+const MAX_BOUNDS = [[9.9, 104.4], [11.3, 106.0]];
+const MIN_ZOOM = 10;
 
 export function initMap() {
     const link = readPermalink();
-    const map = L.map('map').setView(link.view?.center ?? DEFAULT_CENTER, link.view?.zoom ?? DEFAULT_ZOOM);
+    const map = L.map('map', { minZoom: MIN_ZOOM, maxBounds: MAX_BOUNDS, maxBoundsViscosity: 1 }).setView(link.view?.center ?? DEFAULT_CENTER, link.view?.zoom ?? DEFAULT_ZOOM);
 
     initBasemaps(map);
 
