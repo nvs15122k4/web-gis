@@ -1,23 +1,25 @@
 """Bước 7 — Đánh giá độ chính xác (Mục 2.4) trên bộ dữ liệu kiểm chứng số hoá thủ công.
 
-Chuẩn bị (QGIS, số hoá trên ảnh composite hoặc ảnh độ phân giải cao, ĐỘC LẬP với kết quả tự động):
-  data/ground_truth/<năm>_water.geojson     Polygon vùng nước tham chiếu
-  data/ground_truth/<năm>_extent.geojson    Polygon vùng đã số hoá (chỉ đánh giá pixel trong vùng này)
-  data/ground_truth/<năm>_shoreline.geojson LineString đường bờ tham chiếu
-Đầu ra: output/evaluation.json — Precision/Recall/F1/IoU từng chỉ số, sai số khoảng cách (mean, RMSE) dọc transect.
-RMSE của chỉ số được chọn chính là U_classify cần điền vào config.U_CLASSIFY (Mục 2.5b).
+Chuẩn bị: `python gt_kit.py` rồi số hoá trong QGIS (xem data/ground_truth/HUONG_DAN_SO_HOA.md) vào
+data/ground_truth/ground_truth.gpkg, lớp water_<năm>: polygon MỌI mặt nước trong ô mẫu, trường `loai` = song | khac.
+  - Precision/Recall/F1/IoU: so pixel nước (ảnh raster từng chỉ số) với vùng nước tham chiếu, trong các ô mẫu.
+  - Sai số đường bờ: đường bờ tham chiếu = viền polygon `song` (bỏ phần trùng cạnh ô mẫu); đo chênh khoảng cách
+    từ gốc transect tới đường bờ tự động và tới đường bờ tham chiếu (mean, mean |.|, RMSE).
+Chỉ đánh giá ô mẫu đã số hoá (có ít nhất 1 polygon) — ô chưa vẽ bị bỏ qua, không bị tính là "toàn đất".
+Đầu ra: output/evaluation.json. RMSE của chỉ số được chọn là U_classify cần điền vào config.U_CLASSIFY (Mục 2.5b).
 """
 import json
 
 import geopandas as gpd
 import numpy as np
+import pyogrio
 import rioxarray
 from rasterio.features import geometry_mask
 from shapely.geometry import Point
 
 import config as C
 
-GT = C.DATA / "ground_truth"
+GPKG = C.DATA / "ground_truth" / "ground_truth.gpkg"
 
 
 def pixel_metrics(pred, ref):
@@ -29,18 +31,31 @@ def pixel_metrics(pred, ref):
             "iou": round(tp / (tp + fp + fn), 4) if tp + fp + fn else 0.0, "pixels": int(pred.size)}
 
 
-def shoreline_error(year, transects):
-    auto_f = C.DATA / "shoreline" / f"{year}.geojson"
-    ref_f = GT / f"{year}_shoreline.geojson"
-    if not (auto_f.exists() and ref_f.exists()):
+def reference_shoreline(water, windows):
+    river = water[water["loai"].fillna("").str.strip().str.lower() == "song"]
+    if river.empty:
         return None
-    auto = gpd.read_file(auto_f).to_crs(C.CRS).geometry.union_all()
-    ref = gpd.read_file(ref_f).to_crs(C.CRS).geometry.union_all()
+    edge = windows.boundary.union_all().buffer(C.RESOLUTION / 2)  # mép ô mẫu không phải bờ thật
+    return river.union_all().intersection(windows.union_all()).boundary.difference(edge)
+
+
+def nearest_hit(transect, line):
+    x = transect.intersection(line)
+    pts = [q for q in getattr(x, "geoms", [x]) if q.geom_type == "Point"]
+    o = Point(transect.coords[0])
+    return min((o.distance(q) for q in pts), default=None)
+
+
+def shoreline_error(year, ref, transects, zone):
+    f = C.DATA / "shoreline" / f"{year}.geojson"
+    if ref is None or ref.is_empty or not f.exists():
+        return None
+    auto = gpd.read_file(f).geometry.union_all()
     diffs = []
     for t in transects:
-        o = Point(t.coords[0])
-        da, dr = [min((o.distance(q) for q in getattr(x, "geoms", [x]) if q.geom_type == "Point"), default=None)
-                  for x in (t.intersection(auto), t.intersection(ref))]
+        if not t.intersects(zone):
+            continue
+        da, dr = nearest_hit(t, auto), nearest_hit(t, ref)
         if da is not None and dr is not None:
             diffs.append(da - dr)
     if not diffs:
@@ -51,30 +66,41 @@ def shoreline_error(year, transects):
 
 
 def main():
-    years = sorted({int(f.name[:4]) for f in GT.glob("*_water.geojson")}) if GT.exists() else []
-    if not years:
-        raise SystemExit(f"Chưa có dữ liệu kiểm chứng trong {GT} — xem docstring để chuẩn bị.")
-    tr_f = C.DATA / "transects.geojson"
-    transects = list(gpd.read_file(tr_f).geometry) if tr_f.exists() else []
+    if not GPKG.exists():
+        raise SystemExit("Chưa có bộ số hoá — chạy `python gt_kit.py` trước.")
+    windows = gpd.read_file(GPKG, layer="windows").to_crs(C.CRS)
+    layers = [name for name, _ in pyogrio.list_layers(GPKG) if name.startswith("water_")]
+    transects = list(gpd.read_file(C.DATA / "transects.geojson").geometry)
     report = {}
-    for y in years:
-        report[y] = {}
+    for layer in sorted(layers):
+        y = int(layer.split("_")[1])
+        water = gpd.read_file(GPKG, layer=layer).to_crs(C.CRS)
+        water = water[water.geometry.notna() & ~water.geometry.is_empty]
+        if water.empty:
+            continue
+        done = windows[windows.intersects(water.union_all())]
+        zone = done.union_all()
+        report[y] = {"windows": sorted(done["name"].tolist())}
         for idx in C.WATER_INDICES:
             a = rioxarray.open_rasterio(C.DATA / "water" / f"{y}_{idx}.tif").isel(band=0)
-            shp = a.shape
-            tf = a.rio.transform()
-            extent = geometry_mask(gpd.read_file(GT / f"{y}_extent.geojson").to_crs(C.CRS).geometry,
-                                   out_shape=shp, transform=tf, invert=True)
-            ref = geometry_mask(gpd.read_file(GT / f"{y}_water.geojson").to_crs(C.CRS).geometry,
-                                out_shape=shp, transform=tf, invert=True)
+            kw = {"out_shape": a.shape, "transform": a.rio.transform(), "invert": True}
+            extent = geometry_mask(done.geometry, **kw)
+            ref = geometry_mask(water.geometry.intersection(zone), **kw)
             valid = extent & (a.values != 255)
             report[y][idx] = pixel_metrics(a.values[valid] == 1, ref[valid])
-        report[y]["shoreline_error"] = shoreline_error(y, transects)
+        report[y]["shoreline_error"] = shoreline_error(y, reference_shoreline(water, done), transects, zone)
+    if not report:
+        raise SystemExit("Các lớp water_<năm> còn trống — số hoá trong QGIS trước.")
+    years = list(report)
     best = max(C.WATER_INDICES, key=lambda i: np.mean([report[y][i]["f1"] for y in years]))
-    out = {"by_year": report, "best_index_by_mean_f1": best}
+    rmse = {y: report[y]["shoreline_error"]["rmse_m"] for y in years if report[y]["shoreline_error"]}
+    out = {"by_year": report, "best_index_by_mean_f1": best,
+           "u_classify_suggestion": rmse,
+           "note": f"Đổi config.DEFAULT_INDEX = '{best}' và điền config.U_CLASSIFY = {rmse}, rồi chạy lại "
+                   "`run.py --skip-download` (nếu đổi chỉ số, chạy lại gt RMSE vì đường bờ tự động đổi theo)."}
     C.OUTPUT.mkdir(parents=True, exist_ok=True)
-    (C.OUTPUT / "evaluation.json").write_text(json.dumps(out, indent=1))
-    print(json.dumps(out, indent=1))
+    (C.OUTPUT / "evaluation.json").write_text(json.dumps(out, indent=1, ensure_ascii=False))
+    print(json.dumps(out, indent=1, ensure_ascii=False))
 
 
 if __name__ == "__main__":

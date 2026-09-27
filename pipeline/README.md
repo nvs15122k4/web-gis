@@ -26,14 +26,14 @@ cd ../webgis && php artisan webgis:import ../pipeline/output
 | `s4_transects.py` | Baseline = đường bờ năm đầu làm trơn, dịch 250 m vào đất; transect vuông góc mỗi 50 m, dài 600 m; bỏ transect cắt nhau ở chỗ cong gắt; khoảng cách tới giao điểm gần baseline nhất | `data/transects.geojson`, `data/baseline.geojson` |
 | `s5_stats.py` | Despike (lệch > 50 m so với trung vị chuỗi); NSM, EPR, LRR (OLS), SE, R², Unc; phân loại Mục 2.5a; gom transect lùi mạnh liền kề thành hotspot | `output/*.geojson`, `output/summary.json` |
 | `s6_reference.py` | Số hoá vùng sạt lở tham chiếu 2019–2020 (nguồn báo chí/UBND tỉnh), AOI cho web | `output/reference.geojson`, `output/aoi.geojson` |
-| `s7_evaluate.py` | Precision/Recall/F1/IoU từng chỉ số nước, RMSE đường bờ — **cần bộ ground truth số hoá thủ công** | `output/evaluation.json` |
+| `gt_kit.py`, `gt_qgis_project.py` | Bộ số hoá ground truth: 5 ô mẫu × 2018/2022/2026, ảnh màu giả, project QGIS — xem `data/ground_truth/HUONG_DAN_SO_HOA.md` | `data/ground_truth/` |
+| `s7_evaluate.py` | Precision/Recall/F1/IoU từng chỉ số nước, RMSE đường bờ trên ô mẫu đã số hoá | `output/evaluation.json` |
 
 Mọi tham số nằm trong `config.py`.
 
 ## Việc còn phải làm (ghi rõ trong báo cáo)
 
-1. **Ground truth (Mục 2.4)** — số hoá thủ công vùng nước + đường bờ cho vài năm đại diện trong QGIS
-   (xem docstring `s7_evaluate.py`), chạy `s7_evaluate.py`, rồi:
+1. **Ground truth (Mục 2.4)** — số hoá thủ công theo `data/ground_truth/HUONG_DAN_SO_HOA.md`, chạy `s7_evaluate.py`, rồi:
    - đổi `DEFAULT_INDEX` sang chỉ số có F1 cao nhất;
    - điền `U_CLASSIFY` = RMSE từng năm. Hiện đang dùng tạm `U_CLASSIFY_DEFAULT = 10 m` (`summary.json` có cờ `u_classify_is_placeholder`).
 2. **U_georef** — hiện lấy 11 m; đối chiếu Sentinel-2 Data Quality Report của lô ảnh đã dùng.
