@@ -47,7 +47,7 @@ jobs:
       DB_PGSQL_USERNAME: postgres
       DB_PGSQL_PASSWORD: postgres
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -55,7 +55,7 @@ jobs:
           extensions: pdo_mysql, pdo_pgsql
           coverage: none
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -84,9 +84,9 @@ jobs:
     name: Pipeline (Python)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
