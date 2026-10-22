@@ -3,7 +3,7 @@ import path from 'node:path';
 
 /** Nạp lại dữ liệu cố định vào CSDL E2E trước mỗi lần chạy, để test không phụ thuộc lần chạy trước. */
 export default async function globalSetup() {
-    const cwd = path.resolve(__dirname, '../webgis');
+    const cwd = path.resolve(__dirname, '../web');
     execSync('php artisan migrate --env=e2e --force', { cwd, stdio: 'inherit' });
     execSync('php artisan db:seed --class=E2eFixtureSeeder --env=e2e --force', { cwd, stdio: 'inherit' });
 
