@@ -1,17 +1,13 @@
-# WebGIS giám sát biến động bờ sông Hậu (xã Bình Mỹ, An Giang)
+# Web — ứng dụng WebGIS (Laravel)
 
-Đồ án tốt nghiệp — Laravel (MVC) · PostgreSQL/PostGIS · MySQL · GeoServer (WMS) · Leaflet + Chart.js · Playwright.
-Kế hoạch chi tiết: [`../docs/KE_HOACH_TRIEN_KHAI_WEBGIS.md`](../docs/KE_HOACH_TRIEN_KHAI_WEBGIS.md).
-
-**Các WebGIS tham khảo (DEA Coastlines, USGS, Deltares, bản đồ sạt lở ĐBSCL) và tính năng đã áp dụng:** [`../docs/THAM_KHAO_WEBGIS.md`](../docs/THAM_KHAO_WEBGIS.md).
-
-**Cách chạy web từng bước (kể cả khi chưa có dữ liệu, dùng Docker):** [`../docs/HUONG_DAN_CHAY_WEB.md`](../docs/HUONG_DAN_CHAY_WEB.md).
+Thành phần web của dự án (xem [README gốc](../README.md)): Laravel (MVC) · PostgreSQL/PostGIS · MySQL · GeoServer (WMS) ·
+Leaflet + Chart.js. Dịch vụ nền chạy nhanh bằng `docker compose up -d` (MySQL :3307, PostGIS :5432, GeoServer :8080).
 
 Hệ thống **chỉ đọc**: NSM/EPR/LRR/R² và mức biến động được pipeline Python tính sẵn; Laravel không tính lại.
 
 ## Yêu cầu
 
-PHP ≥ 8.3 (`pdo_mysql`, `pdo_pgsql`), Composer, Node ≥ 20, MySQL 8+, PostgreSQL 14+ với **PostGIS**, Java 17 + GeoServer 2.27, `curl`.
+PHP ≥ 8.4 (`pdo_mysql`, `pdo_pgsql`), Composer, Node ≥ 20, MySQL 8+, PostgreSQL 14+ với **PostGIS**, Java 17 + GeoServer 2.27, `curl`.
 
 ## 1. Cài đặt
 
