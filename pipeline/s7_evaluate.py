@@ -1,6 +1,6 @@
 """Bước 7 — Đánh giá độ chính xác (Mục 2.4) trên bộ dữ liệu kiểm chứng số hoá thủ công.
 
-Chuẩn bị: `python gt_kit.py` rồi số hoá trong QGIS (xem data/ground_truth/HUONG_DAN_SO_HOA.md) vào
+Chuẩn bị: `python gt_kit.py` rồi số hoá trong QGIS (chọn lớp water_<năm> trong so_hoa_ground_truth.qgz) vào
 data/ground_truth/ground_truth.gpkg, lớp water_<năm>: polygon MỌI mặt nước trong ô mẫu, trường `loai` = song | khac.
   - Precision/Recall/F1/IoU: so pixel nước (ảnh raster từng chỉ số) với vùng nước tham chiếu, trong các ô mẫu.
   - Sai số đường bờ: đường bờ tham chiếu = viền polygon `song` (bỏ phần trùng cạnh ô mẫu); đo chênh khoảng cách

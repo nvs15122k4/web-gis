@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'node:path';
 
-const laravel = path.resolve(__dirname, '../webgis');
+const laravel = path.resolve(__dirname, '../web');
 // Cổng riêng: không bao giờ tái sử dụng nhầm server dev (:8000, CSDL phát triển; artisan serve tự nhảy sang 8001, 8002… khi cổng bận) khi đang chạy song song.
 const BASE = 'http://127.0.0.1:8010';
 

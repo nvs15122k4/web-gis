@@ -1,0 +1,32 @@
+name: Báo lỗi
+description: Báo một lỗi của web hoặc pipeline
+labels: [bug]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Thành phần
+      options: [Web, Pipeline, E2E, Khác]
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Mô tả lỗi
+      description: Chuyện gì xảy ra và bạn mong đợi điều gì.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Các bước tái hiện
+      placeholder: |
+        1. Mở ...
+        2. Bấm ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Môi trường
+      description: Trình duyệt, hệ điều hành, phiên bản PHP/Python nếu liên quan.

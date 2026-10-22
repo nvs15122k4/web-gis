@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web (PHPUnit)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: webgis_app_test
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+      postgis:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: webgis_spatial_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: webgis_app_test
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_PGSQL_HOST: 127.0.0.1
+      DB_PGSQL_PORT: 5432
+      DB_PGSQL_DATABASE: webgis_spatial_test
+      DB_PGSQL_USERNAME: postgres
+      DB_PGSQL_PASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: pdo_mysql, pdo_pgsql
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Cài dependency
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+          npm ci
+
+      - name: Chuẩn bị môi trường
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Build front-end
+        run: npm run build
+
+      - name: Migrate
+        run: php artisan migrate --force
+
+      - name: PHPUnit
+        run: php artisan test
+
+  pipeline:
+    name: Pipeline (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Kiểm tra cú pháp
+        run: python -m compileall -q pipeline
+
+      - name: Kiểm tra GeoJSON đầu ra
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          files = sorted(pathlib.Path("pipeline").rglob("*.geojson"))
+          for f in files:
+              assert json.loads(f.read_text())["type"] == "FeatureCollection", f
+          print(f"{len(files)} file GeoJSON hợp lệ")
+          PY
