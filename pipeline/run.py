@@ -1,5 +1,5 @@
 """Chạy toàn bộ pipeline: python run.py [--skip-download]. Xong thì nạp vào web:
-    cd ../webgis && php artisan webgis:import ../pipeline/output
+    cd ../web && php artisan webgis:import ../pipeline/output
 """
 import sys
 import warnings
@@ -17,4 +17,4 @@ if __name__ == "__main__":
     s4_transects.main()
     s5_stats.main()
     s6_reference.main()
-    print(f"\nXong. Nạp vào web: cd ../webgis && php artisan webgis:import {C.OUTPUT}")
+    print(f"\nXong. Nạp vào web: cd ../web && php artisan webgis:import {C.OUTPUT}")
