@@ -1,5 +1,5 @@
 # Dịch vụ nền cho WebGIS: MySQL (dữ liệu ứng dụng), PostGIS (dữ liệu không gian), GeoServer (WMS).
-# Laravel vẫn chạy trên máy host bằng `php artisan serve`. Xem HUONG_DAN_CHAY_WEB.md.
+# Laravel vẫn chạy trên máy host bằng `php artisan serve`. Xem README.md.
 #   docker compose up -d
 # Cổng MySQL là 3307 để không đụng MySQL cài sẵn trên máy (3306).
 services:
