@@ -63,8 +63,10 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         expect(texts.find((s: string) => s.includes('2020-03-02'))).toContain('Đang cập nhật');
     });
 
-    test('18 nền bản đồ: chuyển sang ảnh vệ tinh', async ({ page }) => {
+    test('18 nền bản đồ: mặc định nền tự phục vụ, chuyển sang ảnh vệ tinh', async ({ page }) => {
         await openMap(page);
+        // Nền mặc định lấy từ GeoServer của dự án (không có "đường lưỡi bò"), không phải tile bên thứ ba.
+        await expect(page.locator('.leaflet-basemap-pane img[src*="nen_ban_do"]').first()).toBeAttached();
         await page.locator('.leaflet-control-layers').hover();
         await page.getByLabel('Ảnh vệ tinh (Esri)').check();
         await expect(page.locator('.leaflet-basemap-pane img[src*="World_Imagery"]').first()).toBeAttached();
