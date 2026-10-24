@@ -18,39 +18,81 @@ json() { curl -s -u "$AUTH" -H 'Content-Type: application/json' "$@"; }
 echo "→ workspace $WS"
 [ "$(rest "$GS/rest/workspaces/$WS")" = 200 ] || json -X POST -d "{\"workspace\":{\"name\":\"$WS\"}}" "$GS/rest/workspaces" >/dev/null
 
-echo "→ PostGIS store ($DB)"
-STORE_JSON=$(cat <<JSON
-{"dataStore":{"name":"$STORE","type":"PostGIS","enabled":true,"connectionParameters":{"entry":[
+# store <tên> <schema>: tạo hoặc cập nhật PostGIS store trỏ tới một schema.
+store() {
+  local body
+  body=$(cat <<JSON
+{"dataStore":{"name":"$1","type":"PostGIS","enabled":true,"connectionParameters":{"entry":[
  {"@key":"host","$":"$PGHOST"},{"@key":"port","$":"$PGPORT"},{"@key":"database","$":"$DB"},
- {"@key":"schema","$":"public"},{"@key":"user","$":"$PGUSER"},{"@key":"passwd","$":"$PGPASS"},
+ {"@key":"schema","$":"$2"},{"@key":"user","$":"$PGUSER"},{"@key":"passwd","$":"$PGPASS"},
  {"@key":"dbtype","$":"postgis"},{"@key":"Expose primary keys","$":"true"}]}}}
 JSON
 )
-if [ "$(rest "$GS/rest/workspaces/$WS/datastores/$STORE")" = 200 ]; then
-  json -X PUT -d "$STORE_JSON" "$GS/rest/workspaces/$WS/datastores/$STORE" >/dev/null
-else
-  json -X POST -d "$STORE_JSON" "$GS/rest/workspaces/$WS/datastores" >/dev/null
-fi
+  if [ "$(rest "$GS/rest/workspaces/$WS/datastores/$1")" = 200 ]; then
+    json -X PUT -d "$body" "$GS/rest/workspaces/$WS/datastores/$1" >/dev/null
+  else
+    json -X POST -d "$body" "$GS/rest/workspaces/$WS/datastores" >/dev/null
+  fi
+}
 
-echo "→ styles"
-for sld in change_class shoreline hotspot reference; do
-  if [ "$(rest "$GS/rest/workspaces/$WS/styles/$sld")" != 200 ]; then
-    json -X POST -d "{\"style\":{\"name\":\"$sld\",\"filename\":\"$sld.sld\"}}" "$GS/rest/workspaces/$WS/styles" >/dev/null
+# style <tên>: tạo (nếu chưa có) rồi nạp lại nội dung từ styles/<tên>.sld.
+style() {
+  if [ "$(rest "$GS/rest/workspaces/$WS/styles/$1")" != 200 ]; then
+    json -X POST -d "{\"style\":{\"name\":\"$1\",\"filename\":\"$1.sld\"}}" "$GS/rest/workspaces/$WS/styles" >/dev/null
   fi
   curl -s -u "$AUTH" -X PUT -H 'Content-Type: application/vnd.ogc.sld+xml' \
-    --data-binary "@$HERE/styles/$sld.sld" "$GS/rest/workspaces/$WS/styles/$sld" >/dev/null
-done
+    --data-binary "@$HERE/styles/$1.sld" "$GS/rest/workspaces/$WS/styles/$1" >/dev/null
+}
+
+# publish <store> <layer> <bảng nguồn> <style mặc định>
+publish() {
+  if [ "$(rest "$GS/rest/workspaces/$WS/datastores/$1/featuretypes/$2")" != 200 ]; then
+    json -X POST -d "{\"featureType\":{\"name\":\"$2\",\"nativeName\":\"$3\",\"srs\":\"EPSG:4326\",\"projectionPolicy\":\"REPROJECT_TO_DECLARED\",\"enabled\":true}}" \
+      "$GS/rest/workspaces/$WS/datastores/$1/featuretypes" >/dev/null
+  fi
+  json -X PUT -d "{\"layer\":{\"defaultStyle\":{\"name\":\"$WS:$4\"}}}" "$GS/rest/workspaces/$WS/layers/$2" >/dev/null
+}
+
+echo "→ PostGIS store ($DB)"
+store "$STORE" public
+
+echo "→ styles"
+for sld in change_class shoreline hotspot reference; do style "$sld"; done
 
 # layer:bảng nguồn:style mặc định
 echo "→ publish layers"
 for spec in shorelines:shorelines:shoreline transects:transects_styled:change_class \
             erosion_hotspots:erosion_hotspots:hotspot reference_landslide_events:reference_landslide_events:reference; do
-  IFS=: read -r name native style <<<"$spec"
-  if [ "$(rest "$GS/rest/workspaces/$WS/datastores/$STORE/featuretypes/$name")" != 200 ]; then
-    json -X POST -d "{\"featureType\":{\"name\":\"$name\",\"nativeName\":\"$native\",\"srs\":\"EPSG:4326\",\"projectionPolicy\":\"REPROJECT_TO_DECLARED\",\"enabled\":true}}" \
-      "$GS/rest/workspaces/$WS/datastores/$STORE/featuretypes" >/dev/null
-  fi
-  json -X PUT -d "{\"layer\":{\"defaultStyle\":{\"name\":\"$WS:$style\"}}}" "$GS/rest/workspaces/$WS/layers/$name" >/dev/null
-  echo "   $WS:$name ← $native (style $style)"
+  IFS=: read -r name native sld <<<"$spec"
+  publish "$STORE" "$name" "$native" "$sld"
+  echo "   $WS:$name ← $native (style $sld)"
 done
+
+# Nền bản đồ tự phục vụ (không lấy tile bên thứ ba, không có "đường lưỡi bò"): dữ liệu do
+# geoserver/basemap/build_basemap.py nạp vào schema basemap. Thứ tự dưới đây là thứ tự vẽ (dưới → trên).
+BASEMAP="ocean countries ne_water ne_rivers osm_residential osm_water osm_waterways provinces borders osm_roads
+         sea_labels archipelagos country_labels province_labels cities osm_places"
+store basemap basemap
+if curl -s -u "$AUTH" "$GS/rest/workspaces/$WS/datastores/basemap/featuretypes.json?list=all" | grep -q '"ocean"'; then
+  echo "→ nền bản đồ (layer group $WS:nen_ban_do)"
+  published=(); styles=()
+  for t in $BASEMAP; do
+    style "nen_$t"
+    publish basemap "nen_$t" "$t" "nen_$t"
+    published+=("{\"@type\":\"layer\",\"name\":\"$WS:nen_$t\"}"); styles+=("{\"name\":\"$WS:nen_$t\"}")
+  done
+  group=$(IFS=,; echo "{\"layerGroup\":{\"name\":\"nen_ban_do\",\"mode\":\"SINGLE\",\"title\":\"Nền bản đồ (Natural Earth quan điểm VN + OSM)\",
+    \"publishables\":{\"published\":[${published[*]}]},\"styles\":{\"style\":[${styles[*]}]}}}")
+  if [ "$(rest "$GS/rest/workspaces/$WS/layergroups/nen_ban_do")" = 200 ]; then
+    json -X PUT -d "$group" "$GS/rest/workspaces/$WS/layergroups/nen_ban_do" >/dev/null
+  else
+    json -X POST -d "$group" "$GS/rest/workspaces/$WS/layergroups" >/dev/null
+  fi
+  # Xoá tile cũ trong GeoWebCache để style mới có hiệu lực ngay.
+  curl -s -u "$AUTH" -X POST -H 'Content-Type: text/xml' \
+    -d "<truncateLayer><layerName>$WS:nen_ban_do</layerName></truncateLayer>" "$GS/gwc/rest/masstruncate" >/dev/null
+  echo "   $WS:nen_ban_do ← $(echo $BASEMAP | wc -w) lớp"
+else
+  echo "→ bỏ qua nền bản đồ: chưa có schema basemap (chạy geoserver/basemap/build_basemap.py trước)"
+fi
 echo "Xong. Kiểm tra: $GS/$WS/wms?service=WMS&request=GetCapabilities"

@@ -1,0 +1,64 @@
+ne_name,iso_3166_2,old_code,old_name,new_code,new_name
+Ha Noi,VN-HN,1,Thành phố Hà Nội,1,Thành phố Hà Nội
+Cao Bằng,VN-04,4,Tỉnh Cao Bằng,4,Tỉnh Cao Bằng
+Hà Giang,VN-03,2,Tỉnh Hà Giang,8,Tỉnh Tuyên Quang
+Tuyên Quang,VN-07,8,Tỉnh Tuyên Quang,8,Tỉnh Tuyên Quang
+Điện Biên,VN-71,11,Tỉnh Điện Biên,11,Tỉnh Điện Biên
+Lai Chau,VN-01,12,Tỉnh Lai Châu,12,Tỉnh Lai Châu
+Son La,VN-05,14,Tỉnh Sơn La,14,Tỉnh Sơn La
+Lào Cai,VN-02,10,Tỉnh Lào Cai,15,Tỉnh Lào Cai
+Yên Bái,VN-06,15,Tỉnh Yên Bái,15,Tỉnh Lào Cai
+Đông Bắc,VN-53,6,Tỉnh Bắc Kạn,19,Tỉnh Thái Nguyên
+Thái Nguyên,VN-69,19,Tỉnh Thái Nguyên,19,Tỉnh Thái Nguyên
+Lạng Sơn,VN-09,20,Tỉnh Lạng Sơn,20,Tỉnh Lạng Sơn
+Quảng Ninh,VN-13,22,Tỉnh Quảng Ninh,22,Tỉnh Quảng Ninh
+Bắc Giang,VN-54,24,Tỉnh Bắc Giang,24,Tỉnh Bắc Ninh
+Bắc Ninh,VN-56,27,Tỉnh Bắc Ninh,24,Tỉnh Bắc Ninh
+Hòa Bình,VN-14,17,Tỉnh Hoà Bình,25,Tỉnh Phú Thọ
+Phú Thọ,VN-68,25,Tỉnh Phú Thọ,25,Tỉnh Phú Thọ
+Vĩnh Phúc,VN-70,26,Tỉnh Vĩnh Phúc,25,Tỉnh Phú Thọ
+Hải Dương,VN-61,30,Tỉnh Hải Dương,31,Thành phố Hải Phòng
+Hải Phòng,VN-HP,31,Thành phố Hải Phòng,31,Thành phố Hải Phòng
+Đồng Bằng Sông Hồng,VN-66,33,Tỉnh Hưng Yên,33,Tỉnh Hưng Yên
+Thái Bình,VN-20,34,Tỉnh Thái Bình,33,Tỉnh Hưng Yên
+Hà Nam,VN-63,35,Tỉnh Hà Nam,37,Tỉnh Ninh Bình
+Nam Định,VN-67,36,Tỉnh Nam Định,37,Tỉnh Ninh Bình
+Ninh Bình,VN-18,37,Tỉnh Ninh Bình,37,Tỉnh Ninh Bình
+Thanh Hóa,VN-21,38,Tỉnh Thanh Hóa,38,Tỉnh Thanh Hóa
+Nghệ An,VN-22,40,Tỉnh Nghệ An,40,Tỉnh Nghệ An
+Ha Tinh,VN-23,42,Tỉnh Hà Tĩnh,42,Tỉnh Hà Tĩnh
+Quảng Bình,VN-24,44,Tỉnh Quảng Bình,44,Tỉnh Quảng Trị
+Quảng Trị,VN-25,45,Tỉnh Quảng Trị,44,Tỉnh Quảng Trị
+Thừa Thiên - Huế,VN-26,46,Thành phố Huế,46,Thành phố Huế
+Đà Nẵng,VN-DN,48,Thành phố Đà Nẵng,48,Thành phố Đà Nẵng
+Quàng Nam,VN-27,49,Tỉnh Quảng Nam,48,Thành phố Đà Nẵng
+Quảng Ngãi,VN-29,51,Tỉnh Quảng Ngãi,51,Tỉnh Quảng Ngãi
+Kon Tum,VN-28,62,Tỉnh Kon Tum,51,Tỉnh Quảng Ngãi
+Bình Định,VN-31,52,Tỉnh Bình Định,52,Tỉnh Gia Lai
+Gia Lai,VN-30,64,Tỉnh Gia Lai,52,Tỉnh Gia Lai
+Khánh Hòa,VN-34,56,Tỉnh Khánh Hòa,56,Tỉnh Khánh Hòa
+Ninh Thuận,VN-36,58,Tỉnh Ninh Thuận,56,Tỉnh Khánh Hòa
+Phú Yên,VN-32,54,Tỉnh Phú Yên,66,Tỉnh Đắk Lắk
+Đắk Lắk,VN-33,66,Tỉnh Đắk Lắk,66,Tỉnh Đắk Lắk
+Bình Thuận,VN-40,60,Tỉnh Bình Thuận,68,Tỉnh Lâm Đồng
+Đắk Nông,VN-72,67,Tỉnh Đắk Nông,68,Tỉnh Lâm Đồng
+Lâm Đồng,VN-35,68,Tỉnh Lâm Đồng,68,Tỉnh Lâm Đồng
+Bình Phước,VN-58,70,Tỉnh Bình Phước,75,Tỉnh Đồng Nai
+Đông Nam Bộ,VN-39,75,Tỉnh Đồng Nai,75,Tỉnh Đồng Nai
+Bình Dương,VN-57,74,Tỉnh Bình Dương,79,Thành phố Hồ Chí Minh
+Bà Rịa - Vũng Tàu,VN-43,77,Tỉnh Bà Rịa - Vũng Tàu,79,Thành phố Hồ Chí Minh
+Hồ Chí Minh city,VN-SG,79,Thành phố Hồ Chí Minh,79,Thành phố Hồ Chí Minh
+Tây Ninh,VN-37,72,Tỉnh Tây Ninh,80,Tỉnh Tây Ninh
+Long An,VN-41,80,Tỉnh Long An,80,Tỉnh Tây Ninh
+Tiền Giang,VN-46,82,Tỉnh Tiền Giang,82,Tỉnh Đồng Tháp
+Ðong Tháp,VN-45,87,Tỉnh Đồng Tháp,82,Tỉnh Đồng Tháp
+Bến Tre,VN-50,83,Tỉnh Bến Tre,86,Tỉnh Vĩnh Long
+Trà Vinh,VN-51,84,Tỉnh Trà Vinh,86,Tỉnh Vĩnh Long
+Vĩnh Long,VN-49,86,Tỉnh Vĩnh Long,86,Tỉnh Vĩnh Long
+An Giang,VN-44,89,Tỉnh An Giang,91,Tỉnh An Giang
+Kiên Giang,VN-47,91,Tỉnh Kiên Giang,91,Tỉnh An Giang
+Can Tho,VN-CT,92,Thành phố Cần Thơ,92,Thành phố Cần Thơ
+Hau Giang,VN-73,93,Tỉnh Hậu Giang,92,Thành phố Cần Thơ
+Sóc Trăng,VN-52,94,Tỉnh Sóc Trăng,92,Thành phố Cần Thơ
+Bạc Liêu,VN-55,95,Tỉnh Bạc Liêu,96,Tỉnh Cà Mau
+Cà Mau,VN-59,96,Tỉnh Cà Mau,96,Tỉnh Cà Mau

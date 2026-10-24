@@ -19,9 +19,14 @@ cp .env.example .env && php artisan key:generate   # chỉnh DB_* (MySQL) và DB
 Tạo sẵn 2 CSDL rỗng: MySQL `webgis_app`, PostgreSQL `webgis_spatial` (migration tự `CREATE EXTENSION postgis`,
 tài khoản cần đủ quyền).
 
-**Bản đồ nền VIETMAP:** đăng ký API key tại [maps.vietmap.vn](https://maps.vietmap.vn) rồi điền `VIETMAP_API_KEY=` trong `.env`
-(nên giới hạn key theo domain/referer trong trang quản lý của Vietmap vì key lộ ra trình duyệt). Để trống thì web dùng nền
-dự phòng Google (Việt Nam). Không dùng OpenStreetMap/CARTO vì các nền này vẽ "đường lưỡi bò" ở mức thu nhỏ.
+**Bản đồ nền:** mặc định là nền **tự phục vụ trên GeoServer của dự án** (layer group `nen_ban_do`, mục 3) — không lấy tile
+bên thứ ba, đã bỏ mọi nền có vẽ "đường lưỡi bò". Dữ liệu: Natural Earth 1:10m bản theo quan điểm Việt Nam (quần đảo Hoàng Sa
+thuộc TP Đà Nẵng, quần đảo Trường Sa thuộc tỉnh Khánh Hòa, ghi "Biển Đông"), 34 tỉnh sau sáp nhập 01/07/2025 (đối chiếu
+63 → 34 tỉnh từ [provinces.open-api.vn](https://provinces.open-api.vn), lưu ở `geoserver/basemap/provinces_2025.csv`) và
+OpenStreetMap quanh vùng nghiên cứu (đường, sông/kênh, mặt nước, địa danh; © OpenStreetMap contributors, ODbL).
+Nền phụ: Google bản Việt Nam (`gl=VN`) và ảnh vệ tinh Esri; điền `VIETMAP_API_KEY=` trong `.env` (key tại
+[maps.vietmap.vn](https://maps.vietmap.vn), nên giới hạn theo domain vì key lộ ra trình duyệt) để thêm nền VIETMAP.
+Không dùng nền OpenStreetMap/CARTO dạng tile có sẵn vì ở mức thu nhỏ chúng vẽ "đường lưỡi bò".
 
 ## 2. Migrate & seed
 
@@ -46,8 +51,13 @@ Chưa có dữ liệu thật? Nạp dữ liệu **tổng hợp** để xem giao 
 
 ```bash
 python3 geoserver/enable-cors.py $GEOSERVER_HOME     # bật CORS cho Leaflet, rồi (re)start GeoServer
-geoserver/provision.sh songhau webgis_spatial        # workspace + PostGIS store + SLD + 4 layer (idempotent)
+python3 geoserver/basemap/build_basemap.py         # dữ liệu nền → schema basemap (tải Natural Earth, OSM, danh mục tỉnh)
+geoserver/provision.sh songhau webgis_spatial        # workspace + PostGIS store + SLD + 4 layer + nền nen_ban_do (idempotent)
 ```
+
+`build_basemap.py` đọc `DB_PGSQL_*` từ môi trường (`set -a && . ./.env && set +a`), cache file tải về ở
+`geoserver/basemap/.cache/`; thêm `--refresh` để tải lại OSM và bảng đối chiếu tỉnh. Với CSDL E2E:
+`DB_PGSQL_DATABASE=webgis_spatial_e2e python3 geoserver/basemap/build_basemap.py` rồi `provision.sh songhau_e2e webgis_spatial_e2e`.
 
 Biến `GEOSERVER_URL`, `GEOSERVER_AUTH` (mặc định `admin:geoserver` — đổi khi triển khai thật), `DB_PGSQL_*` được script đọc
 từ môi trường. Layer `transects` publish từ view `transects_styled` (có `change_class` để tô màu).

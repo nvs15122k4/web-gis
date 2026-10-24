@@ -27,3 +27,4 @@ Homestead.yaml
 Thumbs.db
 .env.testing
 .env.e2e
+/geoserver/basemap/.cache
