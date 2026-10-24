@@ -4,3 +4,4 @@ data/composite/
 data/water/
 data/*.log
 data/ground_truth/img/
+data/crosscheck/*.tif

@@ -1,0 +1,263 @@
+{
+ "by_source": {
+  "worldcover": {
+   "2020": {
+    "ndwi": {
+     "precision": 0.8879,
+     "recall": 0.89,
+     "f1": 0.8889,
+     "iou": 0.8001,
+     "pixels": 1347878
+    },
+    "mndwi": {
+     "precision": 0.9745,
+     "recall": 0.822,
+     "f1": 0.8918,
+     "iou": 0.8047,
+     "pixels": 1347878
+    },
+    "awei": {
+     "precision": 0.92,
+     "recall": 0.893,
+     "f1": 0.9063,
+     "iou": 0.8287,
+     "pixels": 1347878
+    },
+    "shoreline_offset": {
+     "n_transects": 263,
+     "mean_m": 32.51,
+     "mean_abs_m": 33.07,
+     "median_m": 15.04,
+     "rmse_m": 69.19,
+     "n_over_50m": 27
+    }
+   },
+   "2021": {
+    "ndwi": {
+     "precision": 0.8679,
+     "recall": 0.9267,
+     "f1": 0.8964,
+     "iou": 0.8122,
+     "pixels": 1347846
+    },
+    "mndwi": {
+     "precision": 0.9673,
+     "recall": 0.8733,
+     "f1": 0.9179,
+     "iou": 0.8483,
+     "pixels": 1347846
+    },
+    "awei": {
+     "precision": 0.912,
+     "recall": 0.9282,
+     "f1": 0.9201,
+     "iou": 0.8519,
+     "pixels": 1347846
+    },
+    "shoreline_offset": {
+     "n_transects": 266,
+     "mean_m": 25.71,
+     "mean_abs_m": 26.1,
+     "median_m": 13.15,
+     "rmse_m": 61.7,
+     "n_over_50m": 15
+    }
+   }
+  },
+  "io_lulc": {
+   "2018": {
+    "ndwi": {
+     "precision": 0.9282,
+     "recall": 0.7831,
+     "f1": 0.8495,
+     "iou": 0.7384,
+     "pixels": 1347862
+    },
+    "mndwi": {
+     "precision": 0.9701,
+     "recall": 0.7673,
+     "f1": 0.8569,
+     "iou": 0.7496,
+     "pixels": 1347862
+    },
+    "awei": {
+     "precision": 0.8287,
+     "recall": 0.8212,
+     "f1": 0.8249,
+     "iou": 0.702,
+     "pixels": 1347862
+    },
+    "shoreline_offset": {
+     "n_transects": 240,
+     "mean_m": 21.75,
+     "mean_abs_m": 23.17,
+     "median_m": 10.4,
+     "rmse_m": 45.55,
+     "n_over_50m": 21
+    }
+   },
+   "2019": {
+    "ndwi": {
+     "precision": 0.8366,
+     "recall": 0.6961,
+     "f1": 0.7599,
+     "iou": 0.6128,
+     "pixels": 1347886
+    },
+    "mndwi": {
+     "precision": 0.9581,
+     "recall": 0.664,
+     "f1": 0.7844,
+     "iou": 0.6453,
+     "pixels": 1347886
+    },
+    "awei": {
+     "precision": 0.9026,
+     "recall": 0.7066,
+     "f1": 0.7926,
+     "iou": 0.6565,
+     "pixels": 1347886
+    },
+    "shoreline_offset": {
+     "n_transects": 238,
+     "mean_m": 25.03,
+     "mean_abs_m": 26.11,
+     "median_m": 10.7,
+     "rmse_m": 48.74,
+     "n_over_50m": 25
+    }
+   },
+   "2020": {
+    "ndwi": {
+     "precision": 0.8716,
+     "recall": 0.8809,
+     "f1": 0.8762,
+     "iou": 0.7797,
+     "pixels": 1347878
+    },
+    "mndwi": {
+     "precision": 0.973,
+     "recall": 0.8274,
+     "f1": 0.8943,
+     "iou": 0.8089,
+     "pixels": 1347878
+    },
+    "awei": {
+     "precision": 0.9136,
+     "recall": 0.8941,
+     "f1": 0.9038,
+     "iou": 0.8244,
+     "pixels": 1347878
+    },
+    "shoreline_offset": {
+     "n_transects": 240,
+     "mean_m": 30.36,
+     "mean_abs_m": 30.64,
+     "median_m": 13.16,
+     "rmse_m": 60.68,
+     "n_over_50m": 26
+    }
+   },
+   "2021": {
+    "ndwi": {
+     "precision": 0.8776,
+     "recall": 0.8751,
+     "f1": 0.8763,
+     "iou": 0.7799,
+     "pixels": 1347846
+    },
+    "mndwi": {
+     "precision": 0.9793,
+     "recall": 0.8256,
+     "f1": 0.8959,
+     "iou": 0.8115,
+     "pixels": 1347846
+    },
+    "awei": {
+     "precision": 0.933,
+     "recall": 0.8868,
+     "f1": 0.9093,
+     "iou": 0.8337,
+     "pixels": 1347846
+    },
+    "shoreline_offset": {
+     "n_transects": 240,
+     "mean_m": 26.65,
+     "mean_abs_m": 27.23,
+     "median_m": 11.86,
+     "rmse_m": 56.54,
+     "n_over_50m": 23
+    }
+   },
+   "2022": {
+    "ndwi": {
+     "precision": 0.8393,
+     "recall": 0.8715,
+     "f1": 0.8551,
+     "iou": 0.7469,
+     "pixels": 1347878
+    },
+    "mndwi": {
+     "precision": 0.9685,
+     "recall": 0.8126,
+     "f1": 0.8837,
+     "iou": 0.7917,
+     "pixels": 1347878
+    },
+    "awei": {
+     "precision": 0.885,
+     "recall": 0.8985,
+     "f1": 0.8917,
+     "iou": 0.8045,
+     "pixels": 1347878
+    },
+    "shoreline_offset": {
+     "n_transects": 240,
+     "mean_m": 24.51,
+     "mean_abs_m": 26.16,
+     "median_m": 10.1,
+     "rmse_m": 56.5,
+     "n_over_50m": 22
+    }
+   },
+   "2023": {
+    "ndwi": {
+     "precision": 0.8589,
+     "recall": 0.8682,
+     "f1": 0.8635,
+     "iou": 0.7598,
+     "pixels": 1347886
+    },
+    "mndwi": {
+     "precision": 0.973,
+     "recall": 0.8151,
+     "f1": 0.8871,
+     "iou": 0.7971,
+     "pixels": 1347886
+    },
+    "awei": {
+     "precision": 0.9002,
+     "recall": 0.8983,
+     "f1": 0.8993,
+     "iou": 0.817,
+     "pixels": 1347886
+    },
+    "shoreline_offset": {
+     "n_transects": 237,
+     "mean_m": 21.52,
+     "mean_abs_m": 22.12,
+     "median_m": 10.04,
+     "rmse_m": 48.69,
+     "n_over_50m": 20
+    }
+   }
+  }
+ },
+ "mean_f1_all": {
+  "ndwi": 0.8582,
+  "mndwi": 0.8765,
+  "awei": 0.881
+ },
+ "best_index_by_mean_f1": "awei",
+ "note": "Đối chiếu chéo với sản phẩm phủ bề mặt độc lập (ảnh cả năm, độ chính xác ~75–85%). Không thay ground truth số hoá thủ công Mục 2.4; không dùng để điền U_CLASSIFY."
+}

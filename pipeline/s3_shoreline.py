@@ -57,10 +57,12 @@ def fill_small_gaps(raw):
 
 
 def extract(year, index):
-    src = C.DATA / "water" / f"{year}_{index}.tif"
-    a = rioxarray.open_rasterio(src).isel(band=0)
-    raw = a.values
-    tr = a.rio.transform()
+    a = rioxarray.open_rasterio(C.DATA / "water" / f"{year}_{index}.tif").isel(band=0)
+    return vectorize(a.values, a.rio.transform())
+
+
+def vectorize(raw, tr):
+    """Raster nước uint8 (1 nước, 0 đất, 255 không dữ liệu) -> MultiLineString đường bờ trong ranh giới xã."""
     raw, big_gaps = fill_small_gaps(raw)
     water = clean_water(raw == 1)
     lines = []
