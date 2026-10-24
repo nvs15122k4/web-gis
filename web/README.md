@@ -27,6 +27,8 @@ OpenStreetMap quanh vùng nghiên cứu (đường, sông/kênh, mặt nước, 
 Nền phụ: Google bản Việt Nam (`gl=VN`) và ảnh vệ tinh Esri; điền `VIETMAP_API_KEY=` trong `.env` (key tại
 [maps.vietmap.vn](https://maps.vietmap.vn), nên giới hạn theo domain vì key lộ ra trình duyệt) để thêm nền VIETMAP.
 Không dùng nền OpenStreetMap/CARTO dạng tile có sẵn vì ở mức thu nhỏ chúng vẽ "đường lưỡi bò".
+Bản đồ khoá khung nhìn trong phạm vi đề tài (đoạn sông Hậu – xã Bình Mỹ, hằng `AREA` trong `resources/js/map.js`): không kéo,
+thu nhỏ ra ngoài được, kể cả khi mở liên kết chia sẻ trỏ ra xa.
 
 ## 2. Migrate & seed
 
@@ -83,7 +85,7 @@ php artisan test
 ```
 
 ```bash
-# Playwright E2E (20 kịch bản) trên CSDL riêng *_e2e + workspace GeoServer songhau_e2e
+# Playwright E2E (21 kịch bản) trên CSDL riêng *_e2e + workspace GeoServer songhau_e2e
 php artisan migrate --env=e2e && geoserver/provision.sh songhau_e2e webgis_spatial_e2e   # một lần
 cd ../e2e && npm install && npx playwright install && npx playwright test
 ```
