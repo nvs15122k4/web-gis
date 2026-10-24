@@ -1,5 +1,10 @@
-# Tài liệu đồ án — không đưa lên repo
-/docs/
+# Tài liệu đồ án — không đưa lên repo, trừ hình minh hoạ (bản đồ QGIS, ảnh hệ thống, sơ đồ)
+/docs/*
+!/docs/ban_do/
+/docs/ban_do/*
+!/docs/ban_do/*.png
+!/docs/minh_chung/
+!/docs/assets/
 
 # E2E (Playwright)
 /e2e/node_modules/
