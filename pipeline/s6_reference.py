@@ -12,7 +12,7 @@ docs/NGUON_TRICH_DAN.md.
 Lý trình Km không có toạ độ công khai, nên chỉ số hoá VÙNG cảnh báo: đoạn đường bờ 2018 nằm giữa hình chiếu của
 cầu Cây Dương (miệng vàm) và bến phà Năng Gù lên bờ phía Bình Mỹ. Vị trí điểm sạt lở cụ thể cần số hoá bổ sung
 khi có toạ độ thực địa (ghi rõ trong báo cáo).
-Đầu ra: output/reference.geojson (EPSG:4326).
+Đầu ra: output/reference.json (EPSG:4326).
 """
 import json
 
@@ -39,7 +39,7 @@ EVENTS = [
 
 
 def main():
-    shore = gpd.read_file(C.DATA / "shoreline" / f"{min(C.YEARS)}.geojson").geometry.iloc[0]
+    shore = gpd.read_file(C.DATA / "shoreline" / f"{min(C.YEARS)}.json").geometry.iloc[0]
     line = max(shore.geoms, key=lambda g: g.length)
     pts = gpd.GeoSeries([Point(CAY_DUONG), Point(NANG_GU)], crs=4326).to_crs(C.CRS)
     a, b = sorted(line.project(p) for p in pts)
@@ -47,21 +47,21 @@ def main():
     feats = gpd.GeoDataFrame([{**e, "length_m": round(zone.length), "location": "Ấp Bình Tân, xã Bình Mỹ, An Giang",
                                "geometry": zone} for e in EVENTS], crs=C.CRS).to_crs(4326)
     C.OUTPUT.mkdir(parents=True, exist_ok=True)
-    (C.OUTPUT / "reference.geojson").write_text(feats.to_json(ensure_ascii=False))
+    (C.OUTPUT / "reference.json").write_text(feats.to_json(ensure_ascii=False))
     print(f"Vùng cảnh báo tham chiếu dài {zone.length:.0f} m dọc bờ")
     write_aoi()
 
 
 def write_aoi():
     """AOI cho web (Mục 2.2): ranh giới xã + vùng nghiên cứu = dải bờ sông mà transect phủ tới."""
-    tr = gpd.read_file(C.DATA / "transects.geojson").to_crs(C.CRS)
+    tr = gpd.read_file(C.DATA / "transects.json").to_crs(C.CRS)
     study = tr.buffer(C.TRANSECT_SPACING).union_all().simplify(20)
     commune = gpd.read_file(C.COMMUNE_FILE).to_crs(C.CRS).geometry.iloc[0].simplify(10)
     aoi = gpd.GeoDataFrame([
         {"name": "Vùng nghiên cứu — đoạn bờ sông Hậu thuộc xã Bình Mỹ", "role": "study_area", "geometry": study},
         {"name": "Ranh giới xã Bình Mỹ (OpenStreetMap, sau sáp nhập 2025)", "role": "commune", "geometry": commune},
     ], crs=C.CRS).to_crs(4326)
-    (C.OUTPUT / "aoi.geojson").write_text(aoi.to_json(ensure_ascii=False))
+    (C.OUTPUT / "aoi.json").write_text(aoi.to_json(ensure_ascii=False))
 
 
 if __name__ == "__main__":
