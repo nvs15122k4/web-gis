@@ -11,7 +11,7 @@ tổng thể công bố ~75–85% — đây là phép đối chiếu chéo, khô
   - Sai lệch đường bờ: đường bờ tham chiếu vector hoá từ mặt nạ nước tham chiếu bằng đúng thủ tục bước 3; đo chênh
     khoảng cách từ gốc transect tới hai đường bờ (mean, mean |.|, trung vị, RMSE, số transect lệch > 50 m).
     Dương = đường bờ pipeline nằm phía sông so với tham chiếu.
-Đầu ra: output/crosscheck.json, data/crosscheck/<nguồn>_<năm>.tif|.geojson.
+Đầu ra: output/crosscheck.json, data/crosscheck/<nguồn>_<năm>.tif|.json.
 """
 import json
 
@@ -68,7 +68,7 @@ def shoreline_offsets(auto, ref, transects):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     cat = pystac_client.Client.open(C.STAC_URL, modifier=pc.sign_inplace)
-    transects = list(gpd.read_file(C.DATA / "transects.geojson").geometry)
+    transects = list(gpd.read_file(C.DATA / "transects.json").geometry)
     report = {}
     for src, (collection, asset, water_class, years) in SOURCES.items():
         report[src] = {}
@@ -86,10 +86,10 @@ def main():
                 valid = zone & (a != 255) & (ref.values != 255)
                 r[idx] = pixel_metrics(a[valid] == 1, ref.values[valid] == 1)
             ref_line = s3_shoreline.vectorize(ref.values.copy(), ref.rio.transform())
-            auto_file = C.DATA / "shoreline" / f"{y}.geojson"
+            auto_file = C.DATA / "shoreline" / f"{y}.json"
             if ref_line is not None and auto_file.exists():
                 gpd.GeoDataFrame({"source": [src], "year": [y]}, geometry=[ref_line], crs=C.CRS) \
-                    .to_file(OUT / f"{src}_{y}.geojson", driver="GeoJSON")
+                    .to_file(OUT / f"{src}_{y}.json", driver="GeoJSON")
                 auto = gpd.read_file(auto_file).geometry.union_all()
                 r["shoreline_offset"] = shoreline_offsets(auto, ref_line, transects)
             report[src][y] = r
