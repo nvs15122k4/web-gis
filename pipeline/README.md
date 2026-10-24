@@ -40,7 +40,8 @@ Mọi tham số nằm trong `config.py`.
 1. **Ground truth (Mục 2.4)** — số hoá thủ công trong QGIS (`data/ground_truth/so_hoa_ground_truth.qgz`), chạy `s7_evaluate.py`, rồi:
    - đổi `DEFAULT_INDEX` sang chỉ số có F1 cao nhất;
    - điền `U_CLASSIFY` = RMSE từng năm. Hiện đang dùng tạm `U_CLASSIFY_DEFAULT = 10 m` (`summary.json` có cờ `u_classify_is_placeholder`).
-2. **U_georef** — hiện lấy 11 m; đối chiếu Sentinel-2 Data Quality Report của lô ảnh đã dùng.
+2. **U_georef** — đã chốt 12 m theo đặc tả ESA (định vị tuyệt đối L1C < 12 m, độ tin cậy 95,5%); còn trích số liệu đo
+   trong Data Quality Report đúng giai đoạn ảnh để dẫn chứng thêm.
 3. **Vị trí điểm sạt lở** — nguồn công khai chỉ ghi lý trình Km 89+272–89+336 (2019) và Km 89+076 (2020), không có toạ độ;
    hiện số hoá cả vùng cảnh báo từ vàm Cây Dương đến bến phà Năng Gù. Có toạ độ thực địa thì cập nhật `s6_reference.py`.
 
@@ -48,5 +49,5 @@ Mọi tham số nằm trong `config.py`.
 
 - Trong vùng sạt lở 2019–2020 (66 transect) không có transect nào "lùi": 36 bồi, 30 ổn định; khoảng cách trung bình
   giảm nhẹ 2018→2019 rồi tăng đều tới 2026. Giả thuyết cần kiểm chứng: công trình gia cố sau sự cố (bao cát ~26.000 m³,
-  kè) đẩy mép nước ra sông; còn vết sạt 85 m chỉ ≈ 2 transect và vài mét — xấp xỉ độ bất định ±15,7 m. Nêu rõ trong Chương 3.
+  kè) đẩy mép nước ra sông; còn vết sạt 85 m chỉ ≈ 2 transect và vài mét — xấp xỉ độ bất định ±16,4 m. Nêu rõ trong Chương 3.
 - Các đoạn "lùi bờ mạnh" hiện ngắn (1–2 transect); tiêu chí Mục 2.5 không đặt độ dài tối thiểu nên giữ nguyên.
