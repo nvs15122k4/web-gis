@@ -10,18 +10,16 @@ const DEFAULT_CENTER = [10.545, 105.29];
 const DEFAULT_ZOOM = 13;
 /**
  * Phạm vi đề tài: đoạn bờ sông Hậu thuộc xã Bình Mỹ, An Giang (đề cương). Khung bao ranh giới xã (public/data/aoi.geojson)
- * nới vài km để thấy cả hai bờ sông; bản đồ không cho kéo hay thu nhỏ ra ngoài khung này.
+ * nới vài km để thấy cả hai bờ sông. Khung nhìn neo vào khung này (kéo không ra ngoài) nhưng vẫn phóng to/thu nhỏ tự do.
  */
 const AREA = L.latLngBounds([10.40, 105.12], [10.62, 105.42]);
+/** Thu nhỏ tối đa ra toàn Việt Nam (nền GeoServer ghi Hoàng Sa, Trường Sa, Biển Đông). */
+const MIN_ZOOM = 5;
 
 export function initMap() {
     const link = readPermalink();
-    const map = L.map('map', { maxBounds: AREA, maxBoundsViscosity: 1 });
-    // Mức thu nhỏ nhất vẫn vừa trọn khung AREA; tính lại khi đổi kích thước cửa sổ.
-    const fitArea = () => map.setMinZoom(map.getBoundsZoom(AREA));
-    fitArea();
-    map.on('resize', fitArea);
-    map.setView(link.view?.center ?? DEFAULT_CENTER, link.view?.zoom ?? DEFAULT_ZOOM);
+    const map = L.map('map', { minZoom: MIN_ZOOM, maxBounds: AREA, maxBoundsViscosity: 1 })
+        .setView(link.view?.center ?? DEFAULT_CENTER, link.view?.zoom ?? DEFAULT_ZOOM);
 
     initBasemaps(map, window.WEBGIS.vietmapKey);
 
@@ -86,7 +84,7 @@ function initSidebarToggle(map) {
     };
 }
 
-/** Nút ⌂ dưới nút phóng to/thu nhỏ: quay về khu vực nghiên cứu sau khi di chuyển, phóng to. */
+/** Nút ⌂ dưới nút phóng to/thu nhỏ: quay về khung ranh giới khu vực nghiên cứu sau khi phóng to/thu nhỏ. */
 function addHomeControl(map, bounds) {
     const Home = L.Control.extend({
         options: { position: 'topleft' },
