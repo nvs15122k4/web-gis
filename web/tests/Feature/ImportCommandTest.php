@@ -30,7 +30,7 @@ class ImportCommandTest extends TestCase
 
     private function write(string $name, array $features): void
     {
-        file_put_contents("{$this->dir}/{$name}.geojson", json_encode(['type' => 'FeatureCollection', 'features' => $features]));
+        file_put_contents("{$this->dir}/{$name}.json", json_encode(['type' => 'FeatureCollection', 'features' => $features]));
     }
 
     private function fixtureFiles(float $lrr): void
