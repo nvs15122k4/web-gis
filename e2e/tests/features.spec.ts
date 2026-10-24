@@ -76,6 +76,25 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         expect(z[0]).toBeLessThan(z[1]);
     });
 
+    test('21 phạm vi bản đồ khoá quanh đoạn sông Hậu – xã Bình Mỹ, kể cả liên kết trỏ ra xa', async ({ page }) => {
+        await page.goto('/#map=5/13.50000/111.00000');
+        await page.waitForFunction(() => (window as any).__webgis?.map);
+        const view = await page.evaluate(() => {
+            const m = (window as any).__webgis.map;
+            m.setZoom(3, { animate: false });
+            m.panBy([-5000, -5000], { animate: false });
+            const b = m.getBounds();
+            return { zoom: m.getZoom(), min: m.getMinZoom(), s: b.getSouth(), w: b.getWest(), n: b.getNorth(), e: b.getEast() };
+        });
+        expect(view.zoom).toBe(view.min);
+        expect(view.min).toBeGreaterThanOrEqual(10);
+        // Khung nhìn chỉ quanh xã Bình Mỹ (khoảng 105.1–105.45°E, 10.4–10.65°N), không bao giờ ra tới Biển Đông.
+        expect(view.w).toBeGreaterThan(104.9);
+        expect(view.e).toBeLessThan(105.65);
+        expect(view.s).toBeGreaterThan(10.2);
+        expect(view.n).toBeLessThan(10.85);
+    });
+
     test('19 trang giới thiệu & tải dữ liệu', async ({ page }) => {
         await page.goto('/gioi-thieu');
         await expect(page.getByRole('heading', { name: 'Tiêu chí phân loại mức biến động (Mục 2.5 đề cương)' })).toBeVisible();
