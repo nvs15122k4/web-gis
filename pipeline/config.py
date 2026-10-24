@@ -7,7 +7,7 @@ OUTPUT = ROOT / "output"          # thư mục GeoJSON cho `php artisan webgis:i
 
 # Vùng tải ảnh (EPSG:4326): đoạn sông Hậu qua xã Bình Mỹ + vùng đệm. Phân tích chi tiết cắt theo ranh giới xã.
 BBOX = (105.17, 10.45, 105.36, 10.575)
-COMMUNE_FILE = DATA / "ref" / "binhmy_osm.geojson"   # ranh giới xã (OSM relation 13646056, sau sáp nhập 2025)
+COMMUNE_FILE = DATA / "ref" / "binhmy_osm.json"   # ranh giới xã (OSM relation 13646056, sau sáp nhập 2025)
 CRS = "EPSG:32648"                 # UTM 48N — đo khoảng cách theo mét
 RESOLUTION = 10                    # m, resample mọi kênh về 10 m (Mục 2.3)
 
