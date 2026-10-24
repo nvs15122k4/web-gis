@@ -91,7 +91,15 @@ if curl -s -u "$AUTH" "$GS/rest/workspaces/$WS/datastores/basemap/featuretypes.j
   # Xoá tile cũ trong GeoWebCache để style mới có hiệu lực ngay.
   curl -s -u "$AUTH" -X POST -H 'Content-Type: text/xml' \
     -d "<truncateLayer><layerName>$WS:nen_ban_do</layerName></truncateLayer>" "$GS/gwc/rest/masstruncate" >/dev/null
-  echo "   $WS:nen_ban_do ← $(echo $BASEMAP | wc -w) lớp"
+  # Vẽ sẵn tile cho vùng web có thể hiển thị (khung nhìn neo quanh Bình Mỹ, zoom 5–16) để lần xem đầu không bị trống.
+  seed() {
+    curl -s -u "$AUTH" -X POST -H 'Content-Type: application/json' -d "{\"seedRequest\":{\"name\":\"$WS:nen_ban_do\",
+      \"gridSetId\":\"EPSG:900913\",\"zoomStart\":$1,\"zoomStop\":$2,\"format\":\"image/png\",\"type\":\"seed\",
+      \"threadCount\":2,\"bounds\":{\"coords\":{\"double\":[$3]}}}}" "$GS/gwc/rest/seed/$WS:nen_ban_do.json" >/dev/null
+  }
+  seed 5 9 "10200000,-500000,13500000,3000000"        # Đông Nam Á, Biển Đông (EPSG:3857)
+  seed 10 16 "11695000,1158000,11745000,1197000"     # xã Bình Mỹ và đoạn sông Hậu
+  echo "   $WS:nen_ban_do ← $(echo $BASEMAP | wc -w) lớp (đang seed cache GeoWebCache nền)"
 else
   echo "→ bỏ qua nền bản đồ: chưa có schema basemap (chạy geoserver/basemap/build_basemap.py trước)"
 fi
