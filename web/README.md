@@ -24,9 +24,11 @@ bên thứ ba, đã bỏ mọi nền có vẽ "đường lưỡi bò". Dữ li�
 thuộc TP Đà Nẵng, quần đảo Trường Sa thuộc tỉnh Khánh Hòa, ghi "Biển Đông"), 34 tỉnh sau sáp nhập 01/07/2025 (đối chiếu
 63 → 34 tỉnh từ [provinces.open-api.vn](https://provinces.open-api.vn), lưu ở `geoserver/basemap/provinces_2025.csv`) và
 OpenStreetMap quanh vùng nghiên cứu (đường, sông/kênh, mặt nước, địa danh; © OpenStreetMap contributors, ODbL).
-Nền phụ: Google bản Việt Nam (`gl=VN`) và ảnh vệ tinh Esri; điền `VIETMAP_API_KEY=` trong `.env` (key tại
+Nền phụ: ảnh vệ tinh Esri (không nhãn, không ranh giới). Đã bỏ nền Google vì chỉ ghi "quần đảo Hoàng Sa/Trường Sa",
+"East Sea" mà không thể hiện thuộc Việt Nam. Điền `VIETMAP_API_KEY=` trong `.env` (key tại
 [maps.vietmap.vn](https://maps.vietmap.vn), nên giới hạn theo domain vì key lộ ra trình duyệt) để thêm nền VIETMAP.
 Không dùng nền OpenStreetMap/CARTO dạng tile có sẵn vì ở mức thu nhỏ chúng vẽ "đường lưỡi bò".
+File GeoJSON trong repo lưu đuôi `.json` (không dùng `.geojson`) vì GitHub tự vẽ file `.geojson` lên bản đồ nền có "đường lưỡi bò".
 Khung nhìn neo vào phạm vi đề tài (đoạn sông Hậu – xã Bình Mỹ, hằng `AREA` trong `resources/js/map.js`): không kéo ra ngoài
 được, kể cả khi mở liên kết chia sẻ trỏ ra xa, nhưng vẫn phóng to/thu nhỏ tự do (thu nhỏ tối đa ra toàn Việt Nam).
 
@@ -73,7 +75,7 @@ Lọc năm dùng `CQL_FILTER=year=…`.
 npm run build && php artisan serve      # http://127.0.0.1:8000  (trang quản trị ngưỡng: /admin)
 ```
 
-AOI hiện là **khung tạm** (`public/data/aoi.geojson`) — thay bằng ranh giới hành chính xã Bình Mỹ.
+AOI hiện là **khung tạm** (`public/data/aoi.json`) — thay bằng ranh giới hành chính xã Bình Mỹ.
 
 ## 5. Kiểm thử
 
