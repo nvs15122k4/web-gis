@@ -19,6 +19,29 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 - **Xuất dữ liệu** — tải các lớp dưới dạng GeoJSON/CSV qua REST API.
 - **Quản trị** — đăng nhập (Sanctum) để chỉnh ngưỡng hiển thị; mọi thay đổi được ghi nhật ký.
 
+## Hình ảnh
+
+Toàn bộ hình chỉ thể hiện khu vực đề tài — đoạn bờ sông Hậu thuộc xã Bình Mỹ, An Giang.
+
+| | |
+|---|---|
+| ![Bản đồ tổng quan](docs/minh_chung/01_ban_do_tong_quan.png) | ![Chi tiết transect T0020](docs/minh_chung/02_transect_T0020.png) |
+| Bản đồ tổng quan: 266 transect theo mức biến động | Chi tiết transect T0020: NSM/EPR/LRR/R², lịch sử vị trí đường bờ |
+
+**Bản đồ chuyên đề** — thành lập bằng QGIS 3.40 (print layout, script PyQGIS [`pipeline/qgis_maps.py`](pipeline/qgis_maps.py)),
+nền ảnh tổng hợp Sentinel-2, hệ toạ độ WGS 84 / UTM 48N, xuất 300 dpi:
+
+| | | |
+|---|---|---|
+| [![Vị trí](docs/ban_do/vi_tri.png)](docs/ban_do/vi_tri.png) | [![Đường bờ](docs/ban_do/duong_bo.png)](docs/ban_do/duong_bo.png) | [![Phân loại](docs/ban_do/phan_loai.png)](docs/ban_do/phan_loai.png) |
+| Vị trí khu vực nghiên cứu | Đường bờ 2018–2026 | Phân loại mức biến động |
+| [![Chi tiết điểm nóng](docs/ban_do/duong_bo_chi_tiet.png)](docs/ban_do/duong_bo_chi_tiet.png) | [![Đối chiếu 2021](docs/ban_do/doi_chieu_2021.png)](docs/ban_do/doi_chieu_2021.png) | |
+| Điểm nóng xói lở mạnh nhất | Đối chiếu với ESA WorldCover 2021 | |
+
+**Sơ đồ** (Mermaid): [kiến trúc](docs/assets/architecture.png) · [ERD PostGIS](docs/assets/er-postgis.png) ·
+[ERD MySQL](docs/assets/er-mysql.png) · [tiến độ](docs/assets/gantt.png). Trang giới thiệu & phương pháp:
+[ảnh](docs/minh_chung/03_trang_gioi_thieu.png).
+
 ## Kiến trúc
 
 ```mermaid
@@ -66,7 +89,8 @@ cp .env.example .env && php artisan key:generate   # chỉnh DB_* và DB_PGSQL_*
 
 php artisan migrate --seed
 php artisan webgis:import ../pipeline/output       # nạp kết quả pipeline có sẵn trong repo
-geoserver/provision.sh songhau webgis_spatial      # workspace, store, style, layer
+python3 geoserver/basemap/build_basemap.py         # nền bản đồ tự phục vụ (Natural Earth quan điểm VN + OSM)
+geoserver/provision.sh songhau webgis_spatial      # workspace, store, style, layer, nền nen_ban_do
 
 npm run build && php artisan serve                 # http://127.0.0.1:8000
 ```
