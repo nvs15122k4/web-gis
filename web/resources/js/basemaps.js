@@ -7,17 +7,6 @@ const STORAGE_KEY = 'webgis_basemap';
  */
 export const BASEMAP_PANE = 'basemap';
 
-// Ẩn điểm quan tâm (chợ, cửa hàng…) để không lấn át lớp chuyên đề.
-const HIDE_POI = encodeURIComponent('s.t:2|p.v:off');
-
-/** Nền Google phiên bản Việt Nam (gl=VN, hl=vi): nhãn tiếng Việt, ghi "quần đảo Hoàng Sa/Trường Sa", không vẽ "đường lưỡi bò". */
-const google = (lyrs) => L.tileLayer(`https://mt{s}.google.com/vt/lyrs=${lyrs}&hl=vi&gl=VN&x={x}&y={y}&z={z}&apistyle=${HIDE_POI}`, {
-    attribution: 'Bản đồ &copy; Google',
-    subdomains: '0123',
-    maxZoom: 20,
-    pane: BASEMAP_PANE,
-});
-
 /**
  * Nền tự phục vụ: layer group nen_ban_do trên GeoServer của dự án (geoserver/basemap/build_basemap.py), lấy qua
  * GeoWebCache (cache sẵn, metatile nên nhãn không bị cắt giữa các tile). Dữ liệu Natural Earth bản quan điểm Việt Nam
@@ -45,27 +34,23 @@ const esri = (service, attribution) => L.tileLayer(`https://server.arcgisonline.
 });
 
 /**
- * Nền dự phòng khi chưa cấu hình VIETMAP_API_KEY. Không dùng OpenStreetMap/CARTO vì ở mức thu nhỏ chúng vẽ
- * ranh giới yêu sách "đường lưỡi bò" và tên chữ Hán trên Biển Đông.
+ * Chỉ dùng nền thể hiện đúng chủ quyền Hoàng Sa, Trường Sa. Không dùng OpenStreetMap/CARTO (vẽ "đường lưỡi bò", tên chữ Hán
+ * trên Biển Đông) và Google (chỉ ghi "quần đảo Hoàng Sa/Trường Sa", "East Sea", không ghi thuộc Việt Nam).
+ * Ảnh vệ tinh Esri không có nhãn hay ranh giới.
  */
-const FALLBACK = {
-    'Bản đồ đường (Google)': () => google('m'),
-    'Ảnh vệ tinh + nhãn (Google)': () => google('y'),
-};
-
 const ESRI_IMAGERY = { 'Ảnh vệ tinh (Esri)': () => esri('World_Imagery', 'Esri, Maxar, Earthstar Geographics') };
 
-/** Mặc định là nền tự phục vụ; có API key thì thêm nền VIETMAP (tải thư viện GL theo nhu cầu), lỗi tải thì dùng nền dự phòng. */
+/** Mặc định là nền tự phục vụ; có API key thì thêm nền VIETMAP (tải thư viện GL theo nhu cầu), lỗi tải thì chỉ dùng nền tự phục vụ + ảnh vệ tinh. */
 async function basemapDefs(vietmapKey) {
     if (vietmapKey) {
         try {
             const { vietmapBasemaps } = await import('./vietmap');
             return { ...SELF_HOSTED, ...vietmapBasemaps(vietmapKey), ...ESRI_IMAGERY };
         } catch (e) {
-            console.warn('Không tải được nền VIETMAP, dùng nền dự phòng.', e);
+            console.warn('Không tải được nền VIETMAP, chỉ dùng nền GeoServer và ảnh vệ tinh.', e);
         }
     }
-    return { ...SELF_HOSTED, ...FALLBACK, ...ESRI_IMAGERY };
+    return { ...SELF_HOSTED, ...ESRI_IMAGERY };
 }
 
 function remembered() {
