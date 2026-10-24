@@ -96,8 +96,10 @@ jobs:
       - name: Kiểm tra GeoJSON đầu ra
         run: |
           python - <<'PY'
-          import json, pathlib
-          files = sorted(pathlib.Path("pipeline").rglob("*.geojson"))
+          import json, pathlib, subprocess
+          # GeoJSON lưu đuôi .json; bỏ qua 2 file thống kê không phải FeatureCollection
+          tracked = subprocess.run(["git", "ls-files", "pipeline/*.json"], capture_output=True, text=True, check=True).stdout.split()
+          files = [pathlib.Path(f) for f in tracked if pathlib.Path(f).name not in {"summary.json", "crosscheck.json"}]
           for f in files:
               assert json.loads(f.read_text())["type"] == "FeatureCollection", f
           print(f"{len(files)} file GeoJSON hợp lệ")
