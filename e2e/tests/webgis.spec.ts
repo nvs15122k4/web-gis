@@ -10,8 +10,8 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         const t0 = Date.now();
         await expect(page.locator('#map .leaflet-tile-loaded').first()).toBeVisible({ timeout: 3000 });
         expect(Date.now() - t0).toBeLessThan(3000);
-        // bỏ qua lỗi tải tile nền (Google/Esri) do mạng ngoài, chỉ quan tâm lỗi của ứng dụng
-        const appErrors = errors.filter((e) => !/google\.com|arcgisonline|ERR_|Failed to load resource/i.test(e));
+        // bỏ qua lỗi tải tile nền (Esri) do mạng ngoài, chỉ quan tâm lỗi của ứng dụng
+        const appErrors = errors.filter((e) => !/arcgisonline|ERR_|Failed to load resource/i.test(e));
         expect(appErrors).toEqual([]);
     });
 
@@ -112,7 +112,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await page.click('#compare-apply');
         await expect(page.locator('#status')).toContainText('2022');
         await expect(page.locator('#map')).toBeVisible();
-        expect(errors.filter((e) => !/google\.com|arcgisonline|ERR_|Failed to load resource/i.test(e))).toEqual([]);
+        expect(errors.filter((e) => !/arcgisonline|ERR_|Failed to load resource/i.test(e))).toEqual([]);
     });
 
     test('09 biên: transect thiếu năm → chart bỏ điểm thiếu, không nội suy', async ({ page }) => {
@@ -131,7 +131,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await page.locator('#layer-reference').check();
         await expect(page.locator('#reference-status')).toContainText('Không có sự kiện');
         expect(await page.evaluate(() => (window as any).__webgis.layers.reference.getLayers().length)).toBe(0);
-        expect(errors.filter((e) => !/google\.com|arcgisonline|ERR_|Failed to load resource/i.test(e))).toEqual([]);
+        expect(errors.filter((e) => !/arcgisonline|ERR_|Failed to load resource/i.test(e))).toEqual([]);
     });
 
     test('11 responsive 400px: sidebar thu gọn, bản đồ full-width, vẫn thao tác được', async ({ page }) => {

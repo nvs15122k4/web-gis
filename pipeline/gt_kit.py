@@ -31,8 +31,8 @@ SAMPLES = [
 
 
 def windows():
-    tr = gpd.read_file(C.DATA / "transects.geojson").set_index("transect_code")
-    shore = gpd.read_file(C.DATA / "shoreline" / f"{min(C.YEARS)}.geojson").geometry.iloc[0]
+    tr = gpd.read_file(C.DATA / "transects.json").set_index("transect_code")
+    shore = gpd.read_file(C.DATA / "shoreline" / f"{min(C.YEARS)}.json").geometry.iloc[0]
     rows = []
     for i, (code, kind) in enumerate(SAMPLES, 1):
         t = tr.loc[code].geometry

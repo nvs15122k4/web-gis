@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\DB;
  * Nạp output pipeline Python vào PostGIS bằng UPSERT (Mục 10: không xoá-tạo-lại ID đang tham chiếu).
  *
  * Thư mục nguồn chứa các file GeoJSON (EPSG:4326):
- *   baseline.geojson   1 feature LineString
- *   shorelines.geojson properties: year, water_index, source_image_date?
- *   transects.geojson  properties: transect_code, distances{"2018": m,...}, stats{nsm_m, epr_m_per_year,
+ *   baseline.json   1 feature LineString
+ *   shorelines.json properties: year, water_index, source_image_date?
+ *   transects.json  properties: transect_code, distances{"2018": m,...}, stats{nsm_m, epr_m_per_year,
  *                      lrr_m_per_year, se_lrr, r_squared, is_significant, change_class,
  *                      consecutive_erosion_periods, u_shoreline_avg}
- *   hotspots.geojson   properties: severity, period_start_year, period_end_year, notes
- *   reference.geojson  properties: event_date, description, source, danger_level?, length_m?, location?
+ *   hotspots.json   properties: severity, period_start_year, period_end_year, notes
+ *   reference.json  properties: event_date, description, source, danger_level?, length_m?, location?
  *                      (danger_level: dac_biet_nguy_hiem | nguy_hiem | binh_thuong — theo QĐ 01/2011/QĐ-TTg)
  * File nào không có thì bỏ qua.
  */
@@ -63,7 +63,7 @@ class ImportPipelineOutput extends Command
 
     private function features(string $dir, string $name): array
     {
-        $file = "{$dir}/{$name}.geojson";
+        $file = "{$dir}/{$name}.json";
         if (! is_file($file)) {
             return [];
         }

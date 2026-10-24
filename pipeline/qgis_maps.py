@@ -65,28 +65,28 @@ def line(color, width, style="solid"):
 
 def build_layers():
     L = {"img": composite(2026), "img2021": composite(2021)}
-    aoi = vector(OUTPUT / "aoi.geojson", "Ranh giới xã Bình Mỹ")
+    aoi = vector(OUTPUT / "aoi.json", "Ranh giới xã Bình Mỹ")
     aoi.setSubsetString("\"role\" = 'commune'")
     aoi.renderer().setSymbol(QgsFillSymbol.createSimple(
         {"color": "0,0,0,0", "outline_color": "255,255,0", "outline_width": "0.6", "outline_style": "dash"}))
     L["xa"] = aoi
 
-    sl = vector(OUTPUT / "shorelines.geojson", "Đường bờ theo năm")
+    sl = vector(OUTPUT / "shorelines.json", "Đường bờ theo năm")
     sl.setRenderer(QgsCategorizedSymbolRenderer("year", [
         QgsRendererCategory(y, line(c, 0.5), str(y)) for y, c in zip(YEARS, YEAR_COLORS)]))
     L["bo"] = sl
 
-    tr = vector(OUTPUT / "transects.geojson", "Transect theo mức biến động")
+    tr = vector(OUTPUT / "transects.json", "Transect theo mức biến động")
     tr.setRenderer(QgsCategorizedSymbolRenderer("map_get(\"stats\", 'change_class')", [
         QgsRendererCategory(k, line(c, 0.8), lab) for k, lab, c in CLASSES]))
     L["tr"] = tr
 
-    hs = vector(OUTPUT / "hotspots.geojson", "Điểm nóng xói lở")
+    hs = vector(OUTPUT / "hotspots.json", "Điểm nóng xói lở")
     hs.renderer().setSymbol(QgsFillSymbol.createSimple(
         {"color": "208,49,45,90", "outline_color": "255,255,255", "outline_width": "0.5"}))
     L["hs"] = hs
 
-    ref = vector(OUTPUT / "reference.geojson", "Vùng sạt lở tham chiếu 2019–2020")
+    ref = vector(OUTPUT / "reference.json", "Vùng sạt lở tham chiếu 2019–2020")
     sym = ref.renderer().symbol()
     if ref.geometryType() == 1:  # đường
         ref.renderer().setSymbol(line("#ff00ff", 1.6))
@@ -94,11 +94,11 @@ def build_layers():
         sym.setColor(QColor(255, 0, 255, 70))
     L["ref"] = ref
 
-    auto = vector(OUTPUT / "shorelines.geojson", "Đường bờ pipeline 2021 (MNDWI)")
+    auto = vector(OUTPUT / "shorelines.json", "Đường bờ pipeline 2021 (MNDWI)")
     auto.setSubsetString("\"year\" = 2021")
     auto.renderer().setSymbol(line("#00e5ff", 0.6))
     L["auto21"] = auto
-    wc = vector(DATA / "crosscheck" / "worldcover_2021.geojson", "Đường bờ ESA WorldCover 2021")
+    wc = vector(DATA / "crosscheck" / "worldcover_2021.json", "Đường bờ ESA WorldCover 2021")
     wc.renderer().setSymbol(line("#ff3b30", 0.6, "dash"))
     L["wc21"] = wc
     return L
@@ -192,7 +192,7 @@ def main():
     worst = max(L["hs"].getFeatures(), key=lambda f: f["severity"])
     hot = QgsCoordinateTransform(L["hs"].crs(), CRS, project) \
         .transformBoundingBox(worst.geometry().boundingBox()).buffered(450)
-    ends = vector(OUTPUT / "shorelines.geojson", "Đường bờ 2018 và 2026")
+    ends = vector(OUTPUT / "shorelines.json", "Đường bờ 2018 và 2026")
     ends.setSubsetString("\"year\" IN (2018, 2026)")
     ends.setRenderer(QgsCategorizedSymbolRenderer("year", [
         QgsRendererCategory(2018, line("#ffeb3b", 0.7), "2018"), QgsRendererCategory(2026, line("#ff1744", 0.7), "2026")]))

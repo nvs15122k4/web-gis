@@ -9,7 +9,7 @@ import { initTransectPanel, showTransect, zoomToTransect } from './transect-pane
 const DEFAULT_CENTER = [10.545, 105.29];
 const DEFAULT_ZOOM = 13;
 /**
- * Phạm vi đề tài: đoạn bờ sông Hậu thuộc xã Bình Mỹ, An Giang (đề cương). Khung bao ranh giới xã (public/data/aoi.geojson)
+ * Phạm vi đề tài: đoạn bờ sông Hậu thuộc xã Bình Mỹ, An Giang (đề cương). Khung bao ranh giới xã (public/data/aoi.json)
  * nới vài km để thấy cả hai bờ sông. Khung nhìn neo vào khung này (kéo không ra ngoài) nhưng vẫn phóng to/thu nhỏ tự do.
  */
 const AREA = L.latLngBounds([10.40, 105.12], [10.62, 105.42]);
@@ -30,7 +30,7 @@ export function initMap() {
     });
 
     // AOI do pipeline sinh (pipeline/s6_reference.py): ranh giới xã + vùng nghiên cứu dọc bờ sông.
-    fetch('/data/aoi.geojson')
+    fetch('/data/aoi.json')
         .then((r) => r.json())
         .then((aoi) => {
             const layer = L.geoJSON(aoi, {

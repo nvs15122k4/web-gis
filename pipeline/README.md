@@ -12,11 +12,11 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python run.py --skip-download  # chạy lại các bước sau khi đã có composite
 .venv/bin/python s8_crosscheck.py          # đối chiếu chéo với sản phẩm phủ bề mặt độc lập
 python3 qgis_maps.py                     # bản đồ chuyên đề (PyQGIS hệ thống)
-cp output/aoi.geojson ../web/public/data/aoi.geojson
+cp output/aoi.json ../web/public/data/aoi.json
 cd ../web && php artisan webgis:import ../pipeline/output
 ```
 
-`quicklook.py <năm> <ảnh.png> [lớp.geojson:màu ...]` vẽ ảnh composite kèm lớp vector để kiểm tra/minh hoạ báo cáo.
+`quicklook.py <năm> <ảnh.png> [lớp.json:màu ...]` vẽ ảnh composite kèm lớp vector để kiểm tra/minh hoạ báo cáo.
 
 ## Các bước
 
@@ -24,10 +24,10 @@ cd ../web && php artisan webgis:import ../pipeline/output
 |---|---|---|
 | `s1_composite.py` | Tìm ảnh L2A tháng 1–3 mỗi năm (ô 48PWS); bỏ pixel SCL mây/bóng mây/tuyết/bão hoà; loại ảnh có >30% pixel bị che; trừ offset 1000 cho ảnh processing baseline ≥ 04.00 (từ 25/01/2022); SWIR 20 m → 10 m song tuyến; composite trung vị | `data/composite/<năm>.tif`, `scenes.json` |
 | `s2_water.py` | NDWI (McFeeters 1996), MNDWI (Xu 2006), AWEI<sub>nsh</sub> (Feyisa 2014); ngưỡng Otsu trên ranh giới xã + đệm 1 km | `data/water/<năm>_<chỉ số>.tif`, `thresholds.json` |
-| `s3_shoreline.py` | Mở hình thái (bỏ kênh < ~100 m), giữ vùng nước liên thông lớn nhất, lấp lỗ < 5 ha; contour mức 0,5 (dưới pixel); cắt theo ranh giới xã; đơn giản hoá 5 m | `data/shoreline/<năm>.geojson` |
-| `s4_transects.py` | Baseline = đường bờ năm đầu làm trơn, dịch 250 m vào đất; transect vuông góc mỗi 50 m, dài 600 m; bỏ transect cắt nhau ở chỗ cong gắt; khoảng cách tới giao điểm gần baseline nhất | `data/transects.geojson`, `data/baseline.geojson` |
-| `s5_stats.py` | Despike (lệch > 50 m so với trung vị chuỗi); NSM, EPR, LRR (OLS), SE, R², Unc; phân loại Mục 2.5a; gom transect lùi mạnh liền kề thành hotspot | `output/*.geojson`, `output/summary.json` |
-| `s6_reference.py` | Số hoá vùng sạt lở tham chiếu 2019–2020 (nguồn báo chí/UBND tỉnh), AOI cho web | `output/reference.geojson`, `output/aoi.geojson` |
+| `s3_shoreline.py` | Mở hình thái (bỏ kênh < ~100 m), giữ vùng nước liên thông lớn nhất, lấp lỗ < 5 ha; contour mức 0,5 (dưới pixel); cắt theo ranh giới xã; đơn giản hoá 5 m | `data/shoreline/<năm>.json` |
+| `s4_transects.py` | Baseline = đường bờ năm đầu làm trơn, dịch 250 m vào đất; transect vuông góc mỗi 50 m, dài 600 m; bỏ transect cắt nhau ở chỗ cong gắt; khoảng cách tới giao điểm gần baseline nhất | `data/transects.json`, `data/baseline.json` |
+| `s5_stats.py` | Despike (lệch > 50 m so với trung vị chuỗi); NSM, EPR, LRR (OLS), SE, R², Unc; phân loại Mục 2.5a; gom transect lùi mạnh liền kề thành hotspot | `output/*.json`, `output/summary.json` |
+| `s6_reference.py` | Số hoá vùng sạt lở tham chiếu 2019–2020 (nguồn báo chí/UBND tỉnh), AOI cho web | `output/reference.json`, `output/aoi.json` |
 | `gt_kit.py`, `gt_qgis_project.py` | Bộ số hoá ground truth: 5 ô mẫu × 2018/2022/2026, ảnh màu giả, project QGIS `data/ground_truth/so_hoa_ground_truth.qgz` | `data/ground_truth/` |
 | `s7_evaluate.py` | Precision/Recall/F1/IoU từng chỉ số nước, RMSE đường bờ trên ô mẫu đã số hoá | `output/evaluation.json` |
 | `s8_crosscheck.py` | Đối chiếu chéo với ESA WorldCover 2020–2021 và Impact Observatory LULC 2018–2023 (10 m): F1/IoU từng chỉ số, sai lệch đường bờ trên transect — bổ sung, không thay ground truth | `output/crosscheck.json`, `data/crosscheck/` |

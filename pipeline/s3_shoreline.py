@@ -3,7 +3,7 @@
 Làm sạch mặt nạ: mở hình thái học (bỏ kênh rạch hẹp để đường bờ cắt ngang miệng kênh, như cách số hoá DSAS),
 giữ vùng nước liên thông lớn nhất (sông Hậu + Vàm Nao), lấp lỗ nhỏ (ghe tàu, bèo). Dò biên bằng contour mức 0,5
 (độ chính xác dưới pixel), đơn giản hoá, rồi chỉ giữ đoạn bờ nằm trong ranh giới xã.
-Đầu ra: data/shoreline/<năm>.geojson (EPSG:32648, MultiLineString).
+Đầu ra: data/shoreline/<năm>.json (EPSG:32648, MultiLineString).
 """
 import sys
 
@@ -93,7 +93,7 @@ def main(years, index=C.DEFAULT_INDEX):
             print(f"{y}: không trích được đường bờ")
             continue
         gpd.GeoDataFrame({"year": [y], "water_index": [index]}, geometry=[g], crs=C.CRS) \
-            .to_file(OUT / f"{y}.geojson", driver="GeoJSON")
+            .to_file(OUT / f"{y}.json", driver="GeoJSON")
         print(f"{y}: {len(g.geoms)} đoạn, tổng {g.length / 1000:.2f} km")
 
 

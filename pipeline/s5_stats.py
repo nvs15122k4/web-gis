@@ -7,7 +7,7 @@ Quy ước dấu: khoảng cách đo từ baseline (trên đất) ra sông, nên
   severe_erosion: erosion & LRR ≤ M − S (M, S tính trên tập erosion) & khoảng cách giảm liên tục ≥ 3 mốc năm liền nhau
   mild_erosion: erosion còn lại.
 consecutive_erosion_periods = số giai đoạn (khoảng giữa 2 năm liền nhau) giảm liên tục dài nhất; 3 mốc ⇔ 2 giai đoạn.
-Đầu ra: output/{baseline,shorelines,transects,hotspots}.geojson (EPSG:4326) + output/summary.json.
+Đầu ra: output/{baseline,shorelines,transects,hotspots}.json (EPSG:4326) + output/summary.json.
 """
 import json
 
@@ -141,10 +141,10 @@ def hotspots(gdf):
 
 def main():
     C.OUTPUT.mkdir(parents=True, exist_ok=True)
-    tr = gpd.read_file(C.DATA / "transects.geojson")
+    tr = gpd.read_file(C.DATA / "transects.json")
     shores = {}
     for y in C.YEARS:
-        f = C.DATA / "shoreline" / f"{y}.geojson"
+        f = C.DATA / "shoreline" / f"{y}.json"
         if f.exists():
             shores[y] = gpd.read_file(f)
     latest = shores[max(shores)].geometry.iloc[0] if shores else None
@@ -171,7 +171,7 @@ def main():
           "source_image_date": _image_date(y), "geometry": g.geometry.iloc[0]} for y, g in shores.items()],
         crs=C.CRS).to_crs(4326)
     _write(sl, "shorelines")
-    _write(gpd.read_file(C.DATA / "baseline.geojson").to_crs(4326)[["geometry"]], "baseline")
+    _write(gpd.read_file(C.DATA / "baseline.json").to_crs(4326)[["geometry"]], "baseline")
     _write(gpd.GeoDataFrame(hs, crs=C.CRS).to_crs(4326) if hs else None, "hotspots")
 
     counts = {}
@@ -194,7 +194,7 @@ def _image_date(year):
 
 
 def _write(gdf, name):
-    path = C.OUTPUT / f"{name}.geojson"
+    path = C.OUTPUT / f"{name}.json"
     if gdf is None or gdf.empty:
         path.unlink(missing_ok=True)
         return
