@@ -37,7 +37,7 @@ DESPIKE_M = 50
 
 # Độ bất định (Mục 2.5b): U_shoreline = sqrt(U_pixel² + U_georef² + U_classify²)
 U_PIXEL = 5.0                      # nửa pixel 10 m
-U_GEOREF = 11.0                    # ESA: sai số định vị tuyệt đối L2A (2σ) — xác nhận lại theo Data Quality Report
+U_GEOREF = 12.0                    # ESA: định vị tuyệt đối Sentinel-2 L1C < 12 m ở độ tin cậy 95,5% (2σ) — đặc tả sản phẩm
 U_CLASSIFY = {}                    # {năm: RMSE m} — điền sau khi đánh giá ground truth (Mục 2.4)
 U_CLASSIFY_DEFAULT = 10.0          # tạm dùng khi chưa có RMSE, ghi rõ trong báo cáo
 
