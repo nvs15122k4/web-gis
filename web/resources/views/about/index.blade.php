@@ -39,12 +39,12 @@
         <h2>Dữ liệu</h2>
         <div class="table-wrap"><table>
             <tr><th>Lớp</th><th>Nội dung</th><th>Trạng thái</th></tr>
-            <tr><td>Ảnh vệ tinh</td><td>Composite mùa khô (tháng 1–3) mỗi năm, lọc mây theo lớp SCL</td><td class="updating">Đang cập nhật</td></tr>
+            <tr><td>Ảnh vệ tinh</td><td>Composite Sentinel-2 L2A mùa khô (tháng 1–3) mỗi năm, lọc mây theo lớp SCL; xử lý trong pipeline, không phát lên web</td><td>Đã xử lý (pipeline)</td></tr>
             <tr><td>Đường bờ theo năm</td><td>Ranh giới nước–đất trích từ chỉ số nước NDWI / MNDWI / AWEI (ngưỡng Otsu)</td><td data-layer="shorelines"></td></tr>
             <tr><td>Transect</td><td>Mặt cắt vuông góc với đường cơ sở (baseline), cách đều nhau dọc bờ</td><td data-layer="transects"></td></tr>
             <tr><td>Hotspot lùi bờ</td><td>Đoạn bờ gộp từ các transect lùi bờ mạnh liên tiếp</td><td data-layer="hotspots"></td></tr>
             <tr><td>Sạt lở tham chiếu</td><td>Sự kiện 2019–2020 từ nguồn công bố chính thức, chỉ dùng để đối chiếu</td><td data-layer="reference_events"></td></tr>
-            <tr><td>Ranh giới xã Bình Mỹ</td><td>Hiện là khung tạm</td><td class="updating">Đang cập nhật</td></tr>
+            <tr><td>Ranh giới xã Bình Mỹ</td><td>Ranh giới hành chính từ OpenStreetMap (sau sáp nhập 2025) và vùng nghiên cứu dọc đoạn bờ sông Hậu</td><td>Đã có</td></tr>
         </table></div>
     </section>
 
