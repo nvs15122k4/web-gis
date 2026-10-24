@@ -47,7 +47,7 @@ def nearest_hit(transect, line):
 
 
 def shoreline_error(year, ref, transects, zone):
-    f = C.DATA / "shoreline" / f"{year}.geojson"
+    f = C.DATA / "shoreline" / f"{year}.json"
     if ref is None or ref.is_empty or not f.exists():
         return None
     auto = gpd.read_file(f).geometry.union_all()
@@ -70,7 +70,7 @@ def main():
         raise SystemExit("Chưa có bộ số hoá — chạy `python gt_kit.py` trước.")
     windows = gpd.read_file(GPKG, layer="windows").to_crs(C.CRS)
     layers = [name for name, _ in pyogrio.list_layers(GPKG) if name.startswith("water_")]
-    transects = list(gpd.read_file(C.DATA / "transects.geojson").geometry)
+    transects = list(gpd.read_file(C.DATA / "transects.json").geometry)
     report = {}
     for layer in sorted(layers):
         y = int(layer.split("_")[1])
