@@ -10,6 +10,8 @@ cd pipeline
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python run.py                  # ~15 phút lần đầu (tải ảnh từ Microsoft Planetary Computer, không cần tài khoản)
 .venv/bin/python run.py --skip-download  # chạy lại các bước sau khi đã có composite
+.venv/bin/python s8_crosscheck.py          # đối chiếu chéo với sản phẩm phủ bề mặt độc lập
+python3 qgis_maps.py                     # bản đồ chuyên đề (PyQGIS hệ thống)
 cp output/aoi.geojson ../web/public/data/aoi.geojson
 cd ../web && php artisan webgis:import ../pipeline/output
 ```
@@ -28,6 +30,8 @@ cd ../web && php artisan webgis:import ../pipeline/output
 | `s6_reference.py` | Số hoá vùng sạt lở tham chiếu 2019–2020 (nguồn báo chí/UBND tỉnh), AOI cho web | `output/reference.geojson`, `output/aoi.geojson` |
 | `gt_kit.py`, `gt_qgis_project.py` | Bộ số hoá ground truth: 5 ô mẫu × 2018/2022/2026, ảnh màu giả, project QGIS `data/ground_truth/so_hoa_ground_truth.qgz` | `data/ground_truth/` |
 | `s7_evaluate.py` | Precision/Recall/F1/IoU từng chỉ số nước, RMSE đường bờ trên ô mẫu đã số hoá | `output/evaluation.json` |
+| `s8_crosscheck.py` | Đối chiếu chéo với ESA WorldCover 2020–2021 và Impact Observatory LULC 2018–2023 (10 m): F1/IoU từng chỉ số, sai lệch đường bờ trên transect — bổ sung, không thay ground truth | `output/crosscheck.json`, `data/crosscheck/` |
+| `qgis_maps.py` | Thành lập 5 bản đồ chuyên đề bằng QGIS (vị trí, đường bờ, phân loại, chi tiết điểm nóng, đối chiếu 2021) — chạy bằng `python3` hệ thống có PyQGIS | `../docs/ban_do/*.png\|pdf`, `data/ban_do/ket_qua_song_hau.qgz` |
 
 Mọi tham số nằm trong `config.py`.
 
