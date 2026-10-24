@@ -4,7 +4,7 @@ Baseline: lấy đoạn đường bờ dài nhất của năm đầu tiên có d
 BASELINE_OFFSET m (phía đất xác định bằng mặt nạ nước). Transect: vuông góc baseline, cách đều TRANSECT_SPACING m,
 hướng ra sông. Khoảng cách mỗi năm = từ gốc transect tới giao điểm GẦN NHẤT với đường bờ năm đó
 (tuỳ chọn "closest intersection" của DSAS); không giao thì để trống (không nội suy).
-Đầu ra: data/transects.geojson (EPSG:32648), thuộc tính distances = {năm: m | null}.
+Đầu ra: data/transects.json (EPSG:32648), thuộc tính distances = {năm: m | null}.
 """
 import json
 
@@ -23,7 +23,7 @@ TANGENT_WINDOW = 100    # m — ước lượng hướng baseline trên cửa s�
 def load_shorelines():
     out = {}
     for y in C.YEARS:
-        f = C.DATA / "shoreline" / f"{y}.geojson"
+        f = C.DATA / "shoreline" / f"{y}.json"
         if f.exists():
             out[y] = gpd.read_file(f).geometry.iloc[0]
     return out
@@ -114,8 +114,8 @@ def main():
     for code, line, chain in transects:
         d = {str(y): distance(line, shores.get(y)) for y in C.YEARS}
         rows.append({"transect_code": code, "chainage_m": chain, "distances": json.dumps(d), "geometry": line})
-    gpd.GeoDataFrame(rows, crs=C.CRS).to_file(C.DATA / "transects.geojson", driver="GeoJSON")
-    gpd.GeoDataFrame({"ref_year": [first]}, geometry=[baseline], crs=C.CRS).to_file(C.DATA / "baseline.geojson", driver="GeoJSON")
+    gpd.GeoDataFrame(rows, crs=C.CRS).to_file(C.DATA / "transects.json", driver="GeoJSON")
+    gpd.GeoDataFrame({"ref_year": [first]}, geometry=[baseline], crs=C.CRS).to_file(C.DATA / "baseline.json", driver="GeoJSON")
     hit = sum(any(v is not None for v in json.loads(r["distances"]).values()) for r in rows)
     print(f"Baseline {baseline.length / 1000:.2f} km (từ đường bờ {first}); {len(rows)} transect "
           f"(bỏ {len(built) - len(rows)} transect cắt nhau), {hit} cắt được đường bờ")
