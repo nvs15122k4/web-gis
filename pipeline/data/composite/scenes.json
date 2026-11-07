@@ -1,0 +1,812 @@
+{
+ "2020": {
+  "scenes": [
+   {
+    "date": "2020-01-01",
+    "masked_fraction": 0.005,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-01-06",
+    "masked_fraction": 0.008,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-01-16",
+    "masked_fraction": 0.003,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-01-21",
+    "masked_fraction": 0.001,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-01-26",
+    "masked_fraction": 0.261,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-02-05",
+    "masked_fraction": 0.029,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-02-15",
+    "masked_fraction": 0.042,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-02-20",
+    "masked_fraction": 0.015,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-02-25",
+    "masked_fraction": 0.003,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-03-06",
+    "masked_fraction": 0.188,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-03-16",
+    "masked_fraction": 0.315,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-03-21",
+    "masked_fraction": 0.27,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-03-26",
+    "masked_fraction": 0.009,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2020-03-31",
+    "masked_fraction": 0.265,
+    "used": true,
+    "processing_baseline": "02.12"
+   }
+  ],
+  "used": 13,
+  "source_image_date": "2020-03-31"
+ },
+ "2018": {
+  "scenes": [
+   {
+    "date": "2018-01-01",
+    "masked_fraction": 0.004,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-01-06",
+    "masked_fraction": 0.852,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-01-11",
+    "masked_fraction": 0.353,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-01-31",
+    "masked_fraction": 0.525,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-02-05",
+    "masked_fraction": 0.174,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-02-10",
+    "masked_fraction": 0.196,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-02-15",
+    "masked_fraction": 0.497,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-02-20",
+    "masked_fraction": 0.321,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-02-25",
+    "masked_fraction": 1.0,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-03-02",
+    "masked_fraction": 0.315,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-03-07",
+    "masked_fraction": 0.339,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-03-22",
+    "masked_fraction": 0.837,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2018-03-27",
+    "masked_fraction": 0.021,
+    "used": true,
+    "processing_baseline": "02.12"
+   }
+  ],
+  "used": 4,
+  "source_image_date": "2018-03-27"
+ },
+ "2019": {
+  "scenes": [
+   {
+    "date": "2019-01-06",
+    "masked_fraction": 0.064,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-01-11",
+    "masked_fraction": 0.367,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-01-16",
+    "masked_fraction": 0.602,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-01-21",
+    "masked_fraction": 0.006,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-01-31",
+    "masked_fraction": 0.193,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-02-05",
+    "masked_fraction": 0.943,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-02-10",
+    "masked_fraction": 0.304,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-02-15",
+    "masked_fraction": 0.001,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-02-20",
+    "masked_fraction": 0.272,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-02-25",
+    "masked_fraction": 0.019,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-03-02",
+    "masked_fraction": 0.021,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-03-12",
+    "masked_fraction": 0.152,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-03-17",
+    "masked_fraction": 0.474,
+    "used": false,
+    "processing_baseline": "05.00"
+   },
+   {
+    "date": "2019-03-22",
+    "masked_fraction": 0.416,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2019-03-27",
+    "masked_fraction": 0.098,
+    "used": true,
+    "processing_baseline": "02.12"
+   }
+  ],
+  "used": 9,
+  "source_image_date": "2019-03-27"
+ },
+ "2021": {
+  "scenes": [
+   {
+    "date": "2021-01-15",
+    "masked_fraction": 0.142,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-01-25",
+    "masked_fraction": 0.803,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-01-30",
+    "masked_fraction": 0.359,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-02-04",
+    "masked_fraction": 0.33,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-02-09",
+    "masked_fraction": 0.309,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-02-14",
+    "masked_fraction": 0.616,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-02-19",
+    "masked_fraction": 0.004,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-02-24",
+    "masked_fraction": 0.138,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-03-01",
+    "masked_fraction": 0.404,
+    "used": false,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-03-06",
+    "masked_fraction": 0.116,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-03-11",
+    "masked_fraction": 0.118,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-03-16",
+    "masked_fraction": 0.185,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-03-21",
+    "masked_fraction": 0.051,
+    "used": true,
+    "processing_baseline": "02.12"
+   },
+   {
+    "date": "2021-03-31",
+    "masked_fraction": 0.062,
+    "used": true,
+    "processing_baseline": "02.12"
+   }
+  ],
+  "used": 8,
+  "source_image_date": "2021-03-31"
+ },
+ "2022": {
+  "scenes": [
+   {
+    "date": "2022-01-05",
+    "masked_fraction": 0.313,
+    "used": false,
+    "processing_baseline": "03.00"
+   },
+   {
+    "date": "2022-01-10",
+    "masked_fraction": 0.157,
+    "used": true,
+    "processing_baseline": "03.00"
+   },
+   {
+    "date": "2022-01-20",
+    "masked_fraction": 0.204,
+    "used": true,
+    "processing_baseline": "03.00"
+   },
+   {
+    "date": "2022-01-30",
+    "masked_fraction": 0.569,
+    "used": false,
+    "processing_baseline": "04.00"
+   },
+   {
+    "date": "2022-02-04",
+    "masked_fraction": 0.224,
+    "used": true,
+    "processing_baseline": "04.00"
+   },
+   {
+    "date": "2022-02-14",
+    "masked_fraction": 0.432,
+    "used": false,
+    "processing_baseline": "04.00"
+   },
+   {
+    "date": "2022-02-19",
+    "masked_fraction": 0.54,
+    "used": false,
+    "processing_baseline": "04.00"
+   },
+   {
+    "date": "2022-03-01",
+    "masked_fraction": 0.117,
+    "used": true,
+    "processing_baseline": "04.00"
+   },
+   {
+    "date": "2022-03-06",
+    "masked_fraction": 0.32,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2022-03-11",
+    "masked_fraction": 0.111,
+    "used": true,
+    "processing_baseline": "04.00"
+   },
+   {
+    "date": "2022-03-21",
+    "masked_fraction": 0.63,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2022-03-26",
+    "masked_fraction": 0.368,
+    "used": false,
+    "processing_baseline": "04.00"
+   },
+   {
+    "date": "2022-03-31",
+    "masked_fraction": 0.702,
+    "used": false,
+    "processing_baseline": "05.10"
+   }
+  ],
+  "used": 5,
+  "source_image_date": "2022-03-11"
+ },
+ "2023": {
+  "scenes": [
+   {
+    "date": "2023-01-15",
+    "masked_fraction": 0.031,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-02-04",
+    "masked_fraction": 0.126,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-02-09",
+    "masked_fraction": 0.773,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-02-19",
+    "masked_fraction": 0.364,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-02-24",
+    "masked_fraction": 0.112,
+    "used": true,
+    "processing_baseline": "04.00"
+   },
+   {
+    "date": "2023-03-01",
+    "masked_fraction": 0.753,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-03-06",
+    "masked_fraction": 0.926,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-03-11",
+    "masked_fraction": 0.16,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-03-16",
+    "masked_fraction": 0.133,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-03-21",
+    "masked_fraction": 0.33,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-03-26",
+    "masked_fraction": 0.036,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2023-03-31",
+    "masked_fraction": 0.218,
+    "used": true,
+    "processing_baseline": "05.10"
+   }
+  ],
+  "used": 7,
+  "source_image_date": "2023-03-31"
+ },
+ "2024": {
+  "scenes": [
+   {
+    "date": "2024-01-10",
+    "masked_fraction": 0.999,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-01-15",
+    "masked_fraction": 0.006,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-01-20",
+    "masked_fraction": 1.0,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-01-25",
+    "masked_fraction": 0.07,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-01-30",
+    "masked_fraction": 0.0,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-02-04",
+    "masked_fraction": 0.278,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-02-09",
+    "masked_fraction": 0.534,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-02-14",
+    "masked_fraction": 0.0,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-02-19",
+    "masked_fraction": 0.678,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-02-24",
+    "masked_fraction": 0.412,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-02-29",
+    "masked_fraction": 0.0,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-03-05",
+    "masked_fraction": 0.557,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-03-15",
+    "masked_fraction": 0.491,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-03-20",
+    "masked_fraction": 0.001,
+    "used": true,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-03-25",
+    "masked_fraction": 0.518,
+    "used": false,
+    "processing_baseline": "05.10"
+   },
+   {
+    "date": "2024-03-30",
+    "masked_fraction": 0.553,
+    "used": false,
+    "processing_baseline": "05.10"
+   }
+  ],
+  "used": 7,
+  "source_image_date": "2024-03-20"
+ },
+ "2025": {
+  "scenes": [
+   {
+    "date": "2025-01-04",
+    "masked_fraction": 0.002,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-01-14",
+    "masked_fraction": 0.785,
+    "used": false,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-01-19",
+    "masked_fraction": 0.283,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-02-03",
+    "masked_fraction": 0.254,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-02-08",
+    "masked_fraction": 0.0,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-02-13",
+    "masked_fraction": 0.197,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-02-18",
+    "masked_fraction": 0.994,
+    "used": false,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-02-28",
+    "masked_fraction": 0.0,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-03-05",
+    "masked_fraction": 0.53,
+    "used": false,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-03-10",
+    "masked_fraction": 0.041,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2025-03-30",
+    "masked_fraction": 0.623,
+    "used": false,
+    "processing_baseline": "05.11"
+   }
+  ],
+  "used": 7,
+  "source_image_date": "2025-03-10"
+ },
+ "2026": {
+  "scenes": [
+   {
+    "date": "2026-01-04",
+    "masked_fraction": 0.5,
+    "used": false,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2026-01-09",
+    "masked_fraction": 0.0,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2026-01-14",
+    "masked_fraction": 0.697,
+    "used": false,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2026-01-19",
+    "masked_fraction": 0.264,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2026-01-24",
+    "masked_fraction": 0.775,
+    "used": false,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2026-01-29",
+    "masked_fraction": 0.323,
+    "used": false,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2026-02-03",
+    "masked_fraction": 0.0,
+    "used": true,
+    "processing_baseline": "05.11"
+   },
+   {
+    "date": "2026-02-08",
+    "masked_fraction": 0.999,
+    "used": false,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-02-18",
+    "masked_fraction": 0.919,
+    "used": false,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-02-23",
+    "masked_fraction": 0.997,
+    "used": false,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-02-28",
+    "masked_fraction": 0.878,
+    "used": false,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-03-05",
+    "masked_fraction": 0.379,
+    "used": false,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-03-10",
+    "masked_fraction": 0.104,
+    "used": true,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-03-15",
+    "masked_fraction": 0.002,
+    "used": true,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-03-20",
+    "masked_fraction": 0.651,
+    "used": false,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-03-25",
+    "masked_fraction": 0.042,
+    "used": true,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-03-27",
+    "masked_fraction": 0.404,
+    "used": false,
+    "processing_baseline": "05.12"
+   },
+   {
+    "date": "2026-03-30",
+    "masked_fraction": 0.612,
+    "used": false,
+    "processing_baseline": "05.12"
+   }
+  ],
+  "used": 6,
+  "source_image_date": "2026-03-25"
+ }
+}
