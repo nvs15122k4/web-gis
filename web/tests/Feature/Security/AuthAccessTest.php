@@ -31,12 +31,19 @@ class AuthAccessTest extends TestCase
         $this->withToken($t)->putJson(self::URL, ['value' => 3])->assertOk();
     }
 
-    public function test_login_tokens_never_expire_by_default(): void
+    public function test_login_tokens_expire_after_configured_minutes(): void
     {
-        $this->login();
-        // Ghi nhận cấu hình: sanctum.expiration = null -> token sống vĩnh viễn tới khi bị xoá.
-        $this->assertNull(config('sanctum.expiration'));
-        $this->assertNull(PersonalAccessToken::first()->expires_at);
+        $this->assertSame(480, config('sanctum.expiration'));
+        $t = $this->login();
+        $this->withToken($t)->putJson(self::URL, ['value' => 3])->assertOk();
+
+        $this->travel(479)->minutes();
+        $this->app['auth']->forgetGuards();
+        $this->withToken($t)->putJson(self::URL, ['value' => 3])->assertOk();
+
+        $this->travel(2)->minutes();
+        $this->app['auth']->forgetGuards();
+        $this->withToken($t)->putJson(self::URL, ['value' => 3])->assertUnauthorized();
     }
 
     public function test_tampered_token_secret_rejected(): void
@@ -142,13 +149,31 @@ class AuthAccessTest extends TestCase
         $this->postJson('/api/auth/login', ['email' => 'admin@webgis.test', 'password' => 'password '])->assertUnauthorized();
     }
 
-    public function test_no_rate_limit_on_login_brute_force(): void
+    public function test_login_is_locked_after_too_many_failures(): void
     {
-        // Ghi nhận: không có throttle — 15 lần sai liên tiếp vẫn là 401, không bao giờ 429; sau đó đăng nhập đúng vẫn được.
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $this->postJson('/api/auth/login', ['email' => 'admin@webgis.test', 'password' => "sai{$i}"])->assertUnauthorized();
         }
+        $r = $this->postJson('/api/auth/login', ['email' => 'admin@webgis.test', 'password' => 'password']);
+        $r->assertStatus(429)->assertHeader('Retry-After');
+        $this->assertSame(0, PersonalAccessToken::count());
+
+        $this->travel(61)->seconds();
         $this->postJson('/api/auth/login', ['email' => 'admin@webgis.test', 'password' => 'password'])->assertOk();
+    }
+
+    public function test_lockout_is_per_email_and_cleared_on_success(): void
+    {
+        for ($i = 0; $i < 4; $i++) {
+            $this->postJson('/api/auth/login', ['email' => 'admin@webgis.test', 'password' => 'sai'])->assertUnauthorized();
+        }
+        $this->postJson('/api/auth/login', ['email' => 'khac@webgis.test', 'password' => 'sai'])->assertUnauthorized();
+        $this->postJson('/api/auth/login', ['email' => 'admin@webgis.test', 'password' => 'password'])->assertOk();
+        // Đăng nhập đúng xoá bộ đếm: lại có đủ 5 lần sai.
+        for ($i = 0; $i < 5; $i++) {
+            $this->postJson('/api/auth/login', ['email' => 'ADMIN@webgis.test', 'password' => 'sai'])->assertUnauthorized();
+        }
+        $this->postJson('/api/auth/login', ['email' => 'admin@webgis.test', 'password' => 'sai'])->assertStatus(429);
     }
 
     public function test_no_rate_limit_on_public_reads(): void
