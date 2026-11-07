@@ -52,7 +52,7 @@ class RoutesAndConfigTest extends BaseUnitTest
     public function test_id_phai_la_so(string $uri): void
     {
         $r = $this->route('GET', $uri);
-        $this->assertSame('[0-9]+', $r->wheres['id']);
+        $this->assertSame('[0-9]{1,9}', $r->wheres['id']);
     }
 
     public function test_route_chi_cho_phep_dung_phuong_thuc(): void
