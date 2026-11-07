@@ -23,7 +23,7 @@ SCL_MASK = [0, 1, 3, 8, 9, 10, 11] # no-data, bão hoà, bóng mây, mây TB/cao
 BANDS = ["B03", "B08", "B11", "B12", "SCL"]
 
 WATER_INDICES = ["ndwi", "mndwi", "awei"]
-DEFAULT_INDEX = "mndwi"           # dùng tới khi có kết quả đánh giá Mục 2.4 thì đổi theo chỉ số tốt nhất
+DEFAULT_INDEX = "mndwi"           # F1 TB mndwi 0,9456 ≈ awei 0,9457 (hoà); chọn mndwi vì RMSE đường bờ thấp hơn nhiều (Mục 2.4)
 
 # Transect (Mục 2.3)
 TRANSECT_SPACING = 50              # m
@@ -38,8 +38,8 @@ DESPIKE_M = 50
 # Độ bất định (Mục 2.5b): U_shoreline = sqrt(U_pixel² + U_georef² + U_classify²)
 U_PIXEL = 5.0                      # nửa pixel 10 m
 U_GEOREF = 12.0                    # ESA: định vị tuyệt đối Sentinel-2 L1C < 12 m ở độ tin cậy 95,5% (2σ) — đặc tả sản phẩm
-U_CLASSIFY = {}                    # {năm: RMSE m} — điền sau khi đánh giá ground truth (Mục 2.4)
-U_CLASSIFY_DEFAULT = 10.0          # tạm dùng khi chưa có RMSE, ghi rõ trong báo cáo
+U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}  # RMSE đường bờ vs ground_truth (output/evaluation.json, Mục 2.4)
+U_CLASSIFY_DEFAULT = 20.0          # các năm không có ground truth: lấy giá trị lớn nhất đã đo (thận trọng)
 
 # Phân loại (Mục 2.5a)
 Z95 = 1.96
