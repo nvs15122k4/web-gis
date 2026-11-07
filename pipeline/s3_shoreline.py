@@ -2,10 +2,13 @@
 
 Làm sạch mặt nạ: mở hình thái học (bỏ kênh rạch hẹp để đường bờ cắt ngang miệng kênh, như cách số hoá DSAS),
 giữ vùng nước liên thông lớn nhất (sông Hậu + Vàm Nao), lấp lỗ nhỏ (ghe tàu, bèo). Dò biên bằng contour mức 0,5
-(độ chính xác dưới pixel), đơn giản hoá, rồi chỉ giữ đoạn bờ nằm trong ranh giới xã.
+trên TRƯỜNG CHỈ SỐ LIÊN TỤC tại ngưỡng Otsu (dưới pixel thật; contour trên mặt nạ nhị phân chỉ cho vị trí
+lượng tử hoá theo nửa pixel), đơn giản hoá, rồi chỉ giữ đoạn bờ nằm trong ranh giới xã.
 Đầu ra: data/shoreline/<năm>.json (EPSG:32648, MultiLineString).
 """
 import sys
+
+import json
 
 import geopandas as gpd
 import numpy as np
@@ -18,6 +21,7 @@ from skimage.measure import find_contours
 from skimage.morphology import disk
 
 import config as C
+from s2_water import indices
 
 OUT = C.DATA / "shoreline"
 OPEN_RADIUS = 5            # px (50 m) — kênh rạch hẹp hơn ~100 m bị loại
@@ -58,15 +62,30 @@ def fill_small_gaps(raw):
 
 def extract(year, index):
     a = rioxarray.open_rasterio(C.DATA / "water" / f"{year}_{index}.tif").isel(band=0)
-    return vectorize(a.values, a.rio.transform())
+    field = None
+    comp = C.DATA / "composite" / f"{year}.tif"
+    thr = C.DATA / "water" / "thresholds.json"
+    if comp.exists() and thr.exists():
+        t = json.loads(thr.read_text())[str(year)][index]
+        field = indices(rioxarray.open_rasterio(comp))[index] - t
+    return vectorize(a.values, a.rio.transform(), field)
 
 
-def vectorize(raw, tr):
+def subpixel_field(water, field):
+    """Trường có dấu: dương trong vùng nước đã làm sạch, âm ngoài; giữ giá trị chỉ số liên tục ở nơi mặt nạ sạch
+    khớp ngưỡng (để contour 0 nội suy dưới pixel), còn chỗ hình thái học đã sửa mặt nạ thì rơi về ±eps (cạnh pixel)."""
+    eps = 1e-3
+    f = np.where(np.isfinite(field), field, 0.0)
+    return np.where(water, np.maximum(f, eps), np.minimum(f, -eps))
+
+
+def vectorize(raw, tr, field=None):
     """Raster nước uint8 (1 nước, 0 đất, 255 không dữ liệu) -> MultiLineString đường bờ trong ranh giới xã."""
     raw, big_gaps = fill_small_gaps(raw)
     water = clean_water(raw == 1)
     lines = []
-    for c in find_contours(water.astype(float), 0.5):
+    surface, level = (water.astype(float), 0.5) if field is None else (subpixel_field(water, field), 0.0)
+    for c in find_contours(surface, level):
         rows, cols = c[:, 0], c[:, 1]
         xs, ys = tr * (cols + 0.5, rows + 0.5)
         if len(xs) > 1:
