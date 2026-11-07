@@ -7,7 +7,7 @@ Nguồn chính thống (Báo An Giang, cổng TTĐT tỉnh An Giang):
   - Vùng cảnh báo dọc sông Hậu từ vàm xáng Cây Dương đến bến phà Năng Gù.
   - 23/05/2020: nứt tại Km 89+076; 25/05/2020 UBND tỉnh ký QĐ 1174/QĐ-UBND công bố tình huống khẩn cấp đoạn 2.000 m
     (công bố sáng 27/05/2020, cùng ngày sạt ~40 m); 81 hộ bị đe doạ, 27 hộ di dời khẩn cấp.
-Số hiệu, ngày ký lấy theo Báo An Giang và SGGP — chưa có bản gốc văn bản; danh sách nguồn ở docs/NGUON_TRICH_DAN.md.
+Số hiệu, ngày ký lấy theo Báo An Giang và SGGP — chưa có bản gốc văn bản; danh sách nguồn ở docs/NGUON_TRICH_DAN.docx.
 Lý trình Km không có toạ độ công khai, nên chỉ số hoá VÙNG cảnh báo: đoạn đường bờ 2018 nằm giữa hình chiếu của
 cầu Cây Dương (miệng vàm) và bến phà Năng Gù lên bờ phía Bình Mỹ. Vị trí điểm sạt lở cụ thể cần số hoá bổ sung
 khi có toạ độ thực địa (ghi rõ trong báo cáo).

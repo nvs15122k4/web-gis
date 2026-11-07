@@ -108,8 +108,9 @@ CI trên GitHub Actions chạy PHPUnit (MySQL + PostGIS), build front-end và ki
 
 ## Dữ liệu
 
-Dữ liệu trong `pipeline/output/` và `pipeline/data/` là **bản demo** phục vụ phát triển; độ bất định phân loại đang dùng
-giá trị tạm cho đến khi hoàn tất đánh giá độ chính xác với ground truth.
+Dữ liệu trong `pipeline/output/` và `pipeline/data/` là **bản demo** phục vụ phát triển. Độ bất định phân loại (U_classify)
+lấy theo RMSE đường bờ so với ground truth số hoá trên 5 ô mẫu (2018, 2022, 2026); các năm còn lại dùng giá trị lớn nhất đã đo.
+Kết quả đánh giá nằm ở `pipeline/output/evaluation.json`.
 Ảnh Sentinel-2: © Copernicus / ESA, truy cập qua Microsoft Planetary Computer.
 
 ## Tác giả

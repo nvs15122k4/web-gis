@@ -102,7 +102,7 @@
         <p><strong>Về độ chính xác vị trí:</strong> nguồn công khai chỉ nêu lý trình Km trên QL91, không có toạ độ. Hai sự kiện
             (01/08/2019 và 27/05/2020) vì vậy dùng chung một vùng cảnh báo dài khoảng 3,3 km, không phải vị trí sạt lở chính xác.
             Số quyết định (1843/QĐ-UBND năm 2019, 1174/QĐ-UBND năm 2020) được lấy từ báo chí, chưa đối chiếu với bản gốc.</p>
-        <p><strong>Kết quả đối chiếu:</strong> trong khoảng 300 m quanh vùng cảnh báo có 39 transect, trong đó 30 bồi và 9 ổn định;
+        <p><strong>Kết quả đối chiếu:</strong> trong khoảng 300 m quanh vùng cảnh báo có 73 transect, trong đó 50 bồi và 23 ổn định;
             pipeline <strong>không phát hiện đoạn lùi bờ</strong> nào ở đây. Đây là một hạn chế của phương pháp (ảnh 10 m, một ảnh mỗi năm,
             sạt lở đột ngột giữa hai năm), không phải bằng chứng pipeline khớp với thực tế.</p>
     </section>
@@ -116,7 +116,7 @@
             <li>Khu vực có bãi bồi, bùn, thực vật ven bờ, công trình hay tàu thuyền neo đậu có thể làm sai lệch đường bờ.</li>
             <li>Hệ thống <strong>không dự báo thời điểm hay vị trí sạt lở</strong> và không thay thế khảo sát thuỷ lực, địa chất,
                 địa kỹ thuật tại hiện trường.</li>
-            <li>Độ chính xác của đường bờ chưa được kiểm chứng bằng ground truth số hoá; U<sub>classify</sub> hiện là giá trị tạm.</li>
+            <li>Độ chính xác đường bờ được kiểm chứng trên 5 ô mẫu ground truth số hoá (2018, 2022, 2026); U<sub>classify</sub> lấy theo RMSE đường bờ từng năm (15,1 – 20,0 m), nên biến động nhỏ hơn cỡ này không được kết luận.</li>
             <li class="disclaimer">Thông tin mang tính tham khảo phục vụ nghiên cứu. Không dùng thay cho cảnh báo chính thức của cơ quan chức năng.</li>
         </ul>
     </section>
