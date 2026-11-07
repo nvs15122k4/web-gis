@@ -24,12 +24,12 @@
      "pixels": 1347878
     },
     "shoreline_offset": {
-     "n_transects": 263,
-     "mean_m": 32.51,
-     "mean_abs_m": 33.07,
-     "median_m": 15.04,
-     "rmse_m": 69.19,
-     "n_over_50m": 27
+     "n_transects": 264,
+     "mean_m": 33.26,
+     "mean_abs_m": 33.66,
+     "median_m": 15.91,
+     "rmse_m": 70.66,
+     "n_over_50m": 28
     }
    },
    "2021": {
@@ -55,12 +55,12 @@
      "pixels": 1347846
     },
     "shoreline_offset": {
-     "n_transects": 266,
-     "mean_m": 25.71,
-     "mean_abs_m": 26.1,
-     "median_m": 13.15,
-     "rmse_m": 61.7,
-     "n_over_50m": 15
+     "n_transects": 267,
+     "mean_m": 24.47,
+     "mean_abs_m": 24.9,
+     "median_m": 12.72,
+     "rmse_m": 60.53,
+     "n_over_50m": 14
     }
    }
   },
@@ -88,12 +88,12 @@
      "pixels": 1347862
     },
     "shoreline_offset": {
-     "n_transects": 240,
-     "mean_m": 21.75,
-     "mean_abs_m": 23.17,
-     "median_m": 10.4,
-     "rmse_m": 45.55,
-     "n_over_50m": 21
+     "n_transects": 241,
+     "mean_m": 21.55,
+     "mean_abs_m": 22.97,
+     "median_m": 10.55,
+     "rmse_m": 46.92,
+     "n_over_50m": 19
     }
    },
    "2019": {
@@ -119,12 +119,12 @@
      "pixels": 1347886
     },
     "shoreline_offset": {
-     "n_transects": 238,
-     "mean_m": 25.03,
-     "mean_abs_m": 26.11,
+     "n_transects": 241,
+     "mean_m": 24.56,
+     "mean_abs_m": 25.77,
      "median_m": 10.7,
-     "rmse_m": 48.74,
-     "n_over_50m": 25
+     "rmse_m": 49.67,
+     "n_over_50m": 26
     }
    },
    "2020": {
@@ -150,12 +150,12 @@
      "pixels": 1347878
     },
     "shoreline_offset": {
-     "n_transects": 240,
-     "mean_m": 30.36,
-     "mean_abs_m": 30.64,
-     "median_m": 13.16,
-     "rmse_m": 60.68,
-     "n_over_50m": 26
+     "n_transects": 241,
+     "mean_m": 29.91,
+     "mean_abs_m": 30.24,
+     "median_m": 13.47,
+     "rmse_m": 59.92,
+     "n_over_50m": 24
     }
    },
    "2021": {
@@ -181,12 +181,12 @@
      "pixels": 1347846
     },
     "shoreline_offset": {
-     "n_transects": 240,
-     "mean_m": 26.65,
-     "mean_abs_m": 27.23,
-     "median_m": 11.86,
-     "rmse_m": 56.54,
-     "n_over_50m": 23
+     "n_transects": 241,
+     "mean_m": 24.66,
+     "mean_abs_m": 25.22,
+     "median_m": 11.78,
+     "rmse_m": 52.29,
+     "n_over_50m": 21
     }
    },
    "2022": {
@@ -212,11 +212,11 @@
      "pixels": 1347878
     },
     "shoreline_offset": {
-     "n_transects": 240,
-     "mean_m": 24.51,
-     "mean_abs_m": 26.16,
-     "median_m": 10.1,
-     "rmse_m": 56.5,
+     "n_transects": 241,
+     "mean_m": 22.23,
+     "mean_abs_m": 23.7,
+     "median_m": 8.36,
+     "rmse_m": 51.92,
      "n_over_50m": 22
     }
    },
@@ -243,11 +243,11 @@
      "pixels": 1347886
     },
     "shoreline_offset": {
-     "n_transects": 237,
-     "mean_m": 21.52,
-     "mean_abs_m": 22.12,
-     "median_m": 10.04,
-     "rmse_m": 48.69,
+     "n_transects": 240,
+     "mean_m": 22.2,
+     "mean_abs_m": 23.13,
+     "median_m": 9.61,
+     "rmse_m": 51.07,
      "n_over_50m": 20
     }
    }
