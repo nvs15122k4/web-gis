@@ -19,7 +19,7 @@ class ThresholdConfigController extends Controller
     /** PUT /api/admin/config/thresholds/{key} — chỉ admin. */
     public function update(Request $request, string $key): JsonResponse
     {
-        $data = $request->validate(['value' => ['required', 'numeric']]);
+        $data = $request->validate(['value' => ['required', 'numeric', 'min:0']]);
 
         $config = ThresholdConfig::where('key', $key)->firstOrFail();
         $config->update(['value' => $data['value'], 'updated_by' => $request->user()->id]);

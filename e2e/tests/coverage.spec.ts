@@ -377,10 +377,7 @@ test.describe('Đăng nhập & phân quyền', () => {
         expect(after).toEqual(before);
     });
 
-    // BUG ĐÃ BIẾT: PUT /api/admin/config/thresholds/{key} chỉ validate 'numeric', chấp nhận giá trị âm (form UI có min=0).
-    // test.fail(): test được kỳ vọng FAIL cho tới khi backend sửa; khi sửa xong test sẽ báo "unexpectedly passed" -> bỏ test.fail().
     test('P09 admin nhập giá trị âm: phải bị từ chối 422, ngưỡng không đổi', async ({ page }) => {
-        test.fail(true, 'Bug: backend nhận ngưỡng âm (trả 200)');
         const before = await (await page.request.get('/api/config/thresholds')).json();
         const key = before[0].key;
         const a = await apiLogin(page, 'admin@webgis.test', 'password');
