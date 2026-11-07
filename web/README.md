@@ -75,7 +75,7 @@ Lọc năm dùng `CQL_FILTER=year=…`.
 npm run build && php artisan serve      # http://127.0.0.1:8000  (trang quản trị ngưỡng: /admin)
 ```
 
-AOI hiện là **khung tạm** (`public/data/aoi.json`) — thay bằng ranh giới hành chính xã Bình Mỹ.
+AOI (`public/data/aoi.json`) là vùng nghiên cứu — đoạn bờ sông Hậu thuộc xã Bình Mỹ, sinh ra từ `pipeline/s6_reference.py`.
 
 ## 5. Kiểm thử
 
