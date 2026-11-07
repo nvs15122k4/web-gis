@@ -12,7 +12,7 @@ class TransectController extends Controller
     /** GET /api/transects?bbox=minLng,minLat,maxLng,maxLat&change_class= */
     public function index(Request $request): JsonResponse
     {
-        $bbox = $request->filled('bbox') ? array_map('floatval', explode(',', $request->query('bbox'))) : null;
+        $bbox = $request->filled('bbox') && is_string($request->query('bbox')) ? array_map('floatval', explode(',', $request->query('bbox'))) : null;
 
         $transects = Transect::withGeoJson()
             ->join('shoreline_change_stats as s', 's.transect_id', '=', 'transects.id')

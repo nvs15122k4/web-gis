@@ -12,7 +12,7 @@ class ReferenceEventController extends Controller
     /** GET /api/reference-events?bbox= — luôn trả FeatureCollection hợp lệ, kể cả khi rỗng. */
     public function index(Request $request): JsonResponse
     {
-        $bbox = $request->filled('bbox') ? array_map('floatval', explode(',', $request->query('bbox'))) : null;
+        $bbox = $request->filled('bbox') && is_string($request->query('bbox')) ? array_map('floatval', explode(',', $request->query('bbox'))) : null;
 
         $events = ReferenceLandslideEvent::withGeoJson()
             ->when($bbox && count($bbox) === 4, fn ($q) => $q->whereRaw(

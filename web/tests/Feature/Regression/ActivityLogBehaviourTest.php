@@ -138,17 +138,17 @@ class ActivityLogBehaviourTest extends TestCase
 
     public function test_action_length_limit_not_exceeded_by_long_value(): void
     {
-        // action là VARCHAR(255): giá trị số rất dài vẫn phải ghi được (255 - độ dài tiền tố).
-        $v = str_repeat('9', 200);
-        $this->update($v)->assertOk();
+        // Giá trị lớn nhất cho phép (1e9) vẫn ghi được vào action VARCHAR(255).
+        $this->update('1000000000')->assertOk();
         $this->assertSame(1, ActivityLog::count());
     }
 
-    public function test_bug_overlong_numeric_value_returns_503_not_validation_error(): void
+    public function test_overlong_numeric_value_returns_422(): void
     {
-        // BUG ghi nhận: value số dài > ~200 ký tự làm tràn cột activity_logs.action / threshold_configs.value -> QueryException -> 503.
+        // Đã sửa: value vượt max:1000000000 bị từ chối 422, không còn tràn cột (trước đây trả 503).
         $v = str_repeat('9', 300);
-        $this->update($v)->assertStatus(503);
+        $this->update($v)->assertStatus(422)->assertJsonValidationErrors('value');
+        $this->update('1000000001')->assertStatus(422);
         $this->assertSame(0, ActivityLog::count());
     }
 }

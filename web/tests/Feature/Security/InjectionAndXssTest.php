@@ -101,11 +101,11 @@ class InjectionAndXssTest extends TestCase
         $this->getJson('/api/transects?change_class[]=severe_erosion&change_class[]=stable')->assertStatus(200);
     }
 
-    public function test_bug_array_bbox_causes_500_instead_of_ignoring(): void
+    public function test_array_bbox_is_ignored(): void
     {
-        // BUG (ghi nhận, chưa sửa): explode() nhận mảng -> TypeError -> 500 thay vì bỏ qua/422.
-        $this->getJson('/api/transects?bbox[]=1&bbox[]=2')->assertStatus(500);
-        $this->getJson('/api/reference-events?bbox[]=1')->assertStatus(500);
+        // Đã sửa: bbox dạng mảng bị bỏ qua như bbox sai khác (trước đây explode() ném TypeError -> 500).
+        $this->getJson('/api/transects?bbox[]=1&bbox[]=2')->assertOk();
+        $this->getJson('/api/reference-events?bbox[]=1')->assertOk();
     }
 
     public function test_array_change_class_behaviour_is_documented(): void
@@ -170,11 +170,11 @@ class InjectionAndXssTest extends TestCase
         }
     }
 
-    public function test_bug_huge_numeric_id_returns_500(): void
+    public function test_huge_numeric_id_returns_404(): void
     {
         $r = $this->getJson('/api/transects/99999999999999999999999');
-        // BUG ghi nhận: id vượt int -> TypeError (controller khai báo int $id) nên 500 thay vì 404.
-        $this->assertSame(500, $r->getStatusCode());
+        // Đã sửa: route chỉ nhận 1-9 chữ số, id vượt int không khớp route -> 404 (trước đây TypeError -> 500).
+        $this->assertSame(404, $r->getStatusCode());
     }
 
     public function test_very_long_param_value_is_handled(): void

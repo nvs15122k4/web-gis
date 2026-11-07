@@ -20,8 +20,8 @@ Route::get('/export/{layer}.{format}', [ExportController::class, 'show'])
 Route::get('/shorelines', [ShorelineController::class, 'index']);
 
 Route::get('/transects', [TransectController::class, 'index']);
-Route::get('/transects/{id}', [TransectController::class, 'show'])->whereNumber('id');
-Route::get('/transects/{id}/history', [TransectController::class, 'history'])->whereNumber('id');
+Route::get('/transects/{id}', [TransectController::class, 'show'])->where('id', '[0-9]{1,9}');
+Route::get('/transects/{id}/history', [TransectController::class, 'history'])->where('id', '[0-9]{1,9}');
 
 Route::get('/erosion-hotspots', [ErosionHotspotController::class, 'index']);
 Route::get('/reference-events', [ReferenceEventController::class, 'index']);
