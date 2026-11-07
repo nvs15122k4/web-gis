@@ -5,6 +5,9 @@
 !/docs/ban_do/*.png
 !/docs/minh_chung/
 !/docs/assets/
+!/docs/GIANG_VIEN.md
+!/docs/HUONG_DAN_CHAY_WEB.md
+!/docs/KET_QUA_DOI_CHIEU_VA_BAN_DO.md
 
 # E2E (Playwright)
 /e2e/node_modules/
@@ -23,3 +26,6 @@
 Thumbs.db
 .idea/
 .vscode/
+
+# Đồ thị tri thức sinh ra (graphify)
+graphify-out/
