@@ -1,0 +1,10 @@
+KET QUA KIEM THU - chay ngay 2026-11-07
+1) Playwright E2E (e2e/, project chromium, CSDL *_e2e + GeoServer :8080 + artisan serve :8010)
+   Lenh: cd e2e && npx playwright test --project=chromium --reporter=list
+   Ket qua: 21 passed, 0 failed (19.0s). Cac spec: tests/webgis.spec.ts (01-12), tests/features.spec.ts (13-21).
+   Firefox/webkit chua chay.
+2) PHPUnit (web/): php artisan test -> 33 passed, 148 assertions, 0 failed.
+3) Doi chieu CSDL PostGIS (webgis_spatial) voi pipeline/output/*.json (sinh luc 19:24-20:08):
+   transects 267, shoreline_change_stats 267, hotspots 2, shorelines 9, baseline 1, reference 2;
+   phan lop accretion 96 / stable 143 / mild_erosion 25 / severe_erosion 3 khop summary.json;
+   LRR, NSM, u_shoreline_avg, change_class cua 267 transect khop 100% (lech 0).
