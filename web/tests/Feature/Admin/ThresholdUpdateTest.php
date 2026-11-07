@@ -33,6 +33,8 @@ class ThresholdUpdateTest extends TestCase
             'boolean chữ' => [['value' => 'true']],
             'hex' => [['value' => '0x1A']],
             'số mũ lỗi' => [['value' => '1e']],
+            'âm' => [['value' => -1]],
+            'âm dạng chuỗi' => [['value' => '-0.5']],
         ];
     }
 
@@ -46,7 +48,7 @@ class ThresholdUpdateTest extends TestCase
 
     public static function validValues(): array
     {
-        return [[2], [0], [0.5], ['3.25'], [-1], [100], ['7']];
+        return [[2], [0], [0.5], ['3.25'], [100], ['7']];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('validValues')]
