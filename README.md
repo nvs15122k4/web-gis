@@ -25,8 +25,8 @@ Toàn bộ hình chỉ thể hiện khu vực đề tài — đoạn bờ sông 
 
 | | |
 |---|---|
-| ![Bản đồ tổng quan](docs/minh_chung/01_ban_do_tong_quan.png) | ![Chi tiết transect T0020](docs/minh_chung/02_transect_T0020.png) |
-| Bản đồ tổng quan: 266 transect theo mức biến động | Chi tiết transect T0020: NSM/EPR/LRR/R², lịch sử vị trí đường bờ |
+| ![Bản đồ tổng quan](docs/minh_chung/01_ban_do_tong_quan.png) | ![Chi tiết transect T0094](docs/minh_chung/02_transect_T0094.png) |
+| Bản đồ tổng quan: 267 transect theo mức biến động | Chi tiết transect T0094: NSM/EPR/LRR/R², lịch sử vị trí đường bờ |
 
 **Bản đồ chuyên đề** — thành lập bằng QGIS 3.40 (print layout, script PyQGIS [`pipeline/qgis_maps.py`](pipeline/qgis_maps.py)),
 nền ảnh tổng hợp Sentinel-2, hệ toạ độ WGS 84 / UTM 48N, xuất 300 dpi:
