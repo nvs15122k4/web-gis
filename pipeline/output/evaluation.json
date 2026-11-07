@@ -1,0 +1,119 @@
+{
+ "by_year": {
+  "2018": {
+   "windows": [
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5"
+   ],
+   "ndwi": {
+    "precision": 0.9469,
+    "recall": 0.9498,
+    "f1": 0.9483,
+    "iou": 0.9017,
+    "pixels": 18000
+   },
+   "mndwi": {
+    "precision": 0.9613,
+    "recall": 0.9321,
+    "f1": 0.9465,
+    "iou": 0.8984,
+    "pixels": 18000
+   },
+   "awei": {
+    "precision": 0.9151,
+    "recall": 0.9727,
+    "f1": 0.943,
+    "iou": 0.8922,
+    "pixels": 18000
+   },
+   "shoreline_error": {
+    "n_transects": 58,
+    "mean_m": 1.58,
+    "mean_abs_m": 9.23,
+    "rmse_m": 15.1
+   }
+  },
+  "2022": {
+   "windows": [
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5"
+   ],
+   "ndwi": {
+    "precision": 0.9072,
+    "recall": 0.968,
+    "f1": 0.9366,
+    "iou": 0.8807,
+    "pixels": 18000
+   },
+   "mndwi": {
+    "precision": 0.9659,
+    "recall": 0.9333,
+    "f1": 0.9493,
+    "iou": 0.9035,
+    "pixels": 18000
+   },
+   "awei": {
+    "precision": 0.9135,
+    "recall": 0.9787,
+    "f1": 0.945,
+    "iou": 0.8957,
+    "pixels": 18000
+   },
+   "shoreline_error": {
+    "n_transects": 58,
+    "mean_m": 0.8,
+    "mean_abs_m": 11.38,
+    "rmse_m": 18.39
+   }
+  },
+  "2026": {
+   "windows": [
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5"
+   ],
+   "ndwi": {
+    "precision": 0.9212,
+    "recall": 0.9482,
+    "f1": 0.9345,
+    "iou": 0.877,
+    "pixels": 18000
+   },
+   "mndwi": {
+    "precision": 0.9686,
+    "recall": 0.9151,
+    "f1": 0.9411,
+    "iou": 0.8887,
+    "pixels": 18000
+   },
+   "awei": {
+    "precision": 0.9288,
+    "recall": 0.9704,
+    "f1": 0.9491,
+    "iou": 0.9032,
+    "pixels": 18000
+   },
+   "shoreline_error": {
+    "n_transects": 59,
+    "mean_m": 4.01,
+    "mean_abs_m": 13.45,
+    "rmse_m": 19.99
+   }
+  }
+ },
+ "best_index_by_mean_f1": "awei",
+ "u_classify_suggestion": {
+  "2018": 15.1,
+  "2022": 18.39,
+  "2026": 19.99
+ },
+ "note": "Đổi config.DEFAULT_INDEX = 'awei' và điền config.U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}, rồi chạy lại `run.py --skip-download` (nếu đổi chỉ số, chạy lại gt RMSE vì đường bờ tự động đổi theo)."
+}
