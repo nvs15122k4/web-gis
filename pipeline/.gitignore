@@ -1,6 +1,7 @@
 .venv/
 __pycache__/
-data/composite/
+data/composite/*
+!data/composite/scenes.json
 data/water/
 data/*.log
 data/ground_truth/img/
