@@ -31,27 +31,33 @@ BASELINE_OFFSET = 250              # m, đặt baseline trên bờ (phía đất
 TRANSECT_LENGTH = 600              # m, từ baseline hướng ra sông
 SMOOTH_TOLERANCE = 5               # m (nửa pixel), đơn giản hoá đường bờ sau vector hoá — lớn hơn sẽ nuốt biến động nhỏ
 
-# Loại quan sát nhiễu (despike, như CoastSat — Vos et al., 2019): khoảng cách lệch > DESPIKE_M so với trung vị
-# chuỗi của transect là do transect xuyên qua miệng kênh/cắt nhầm bờ khác, không phải biến động thật.
+# Loại quan sát nhiễu (despike): khoảng cách lệch > DESPIKE_M so với trung vị chuỗi của transect là do transect
+# xuyên qua miệng kênh/cắt nhầm bờ khác, không phải biến động thật. Ý tưởng lọc đột biến có trong mã CoastSat
+# (tham số max_cross_change), không có trong bài Vos et al. (2019, Environ. Model. Softw.); ngưỡng 50 m là giả định của đồ án.
 DESPIKE_M = 50
 
 # ---------------------------------------------------------------------------------------------------------------
 # Độ bất định và phân loại. Tiêu chí được CHỐT TRƯỚC khi chạy lại, không điều chỉnh theo kết quả (docs/checklist-yeu-cau.md).
-# Nguồn tham khảo cho từng tham số: danh sách nguồn chờ xác nhận ở docs/nguon-cho-xac-nhan.md (chưa dẫn vào văn bản).
+# Nguồn: DSAS v5.1 (Himmelstoss et al., 2021): EPRunc = sqrt(uncA² + uncB²)/Δt, LSE chia (n − 2), KTC của LRR = SE × thống kê
+# hai phía. Sentinel-2: ESA (định vị < 12 m ở 95,5%), Clerc et al. (CE95 < 12,5 m). Nửa pixel: Vos et al. (2019), Luijendijk et al. (2018).
+# Là SUY LUẬN/GIẢ ĐỊNH của đồ án, không gán cho nguồn: công thức gộp U_shoreline từng đường bờ, quy 12 m (95,5%) về 6 m (1σ),
+# gọi đúng tên "Student t, df = n − 2" cho KTC của LRR, ngưỡng khử đột biến 50 m.
 # ---------------------------------------------------------------------------------------------------------------
 # Độ bất định đường bờ (Mục 2.5b), MỌI thành phần quy về cùng chuẩn 1σ:
 #   U_shoreline(1σ) = sqrt(U_pixel² + U_georef² + U_classify²)
 # Độ bất định EPR và LRR báo cáo ở độ tin cậy 95% (CONFIDENCE).
 CONFIDENCE = 0.95
 Z95 = 1.959964                     # hệ số phủ chuẩn 95% cho độ bất định lan truyền từ nguồn ngoài (EPR); LRR dùng t(df = n − 2)
-U_PIXEL = 5.0                      # m, nửa pixel 10 m (xem là 1σ; chưa có nguồn riêng — ghi nhận là giả định)
-U_GEOREF_95 = 12.0                 # m, ESA: định vị tuyệt đối Sentinel-2 L1C < 12 m ở độ tin cậy 95,5% (2σ) — đặc tả sản phẩm
+U_PIXEL = 5.0                      # m, nửa pixel 10 m (nửa pixel, Vos et al. 2019; xem là 1σ — giả định của đồ án)
+U_GEOREF_95 = 12.0                 # m, ESA: định vị tuyệt đối Sentinel-2 L1C < 12 m ở độ tin cậy 95,5% (2σ) — ESA, đặc tả sản phẩm; quy về 1σ là suy luận của đồ án
 GEOREF_SIGMA_K = 2.0               # 95,5% ứng với 2σ
 U_GEOREF = U_GEOREF_95 / GEOREF_SIGMA_K   # m, quy về 1σ = 6 m để cộng bình phương cùng chuẩn với U_pixel/U_classify
 U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}  # RMSE đường bờ vs ground_truth (output/evaluation.json, Mục 2.4), xem là 1σ
 U_CLASSIFY_DEFAULT = 20.0          # các năm không có ground truth: lấy giá trị lớn nhất đã đo (thận trọng)
 
 # Phân loại biến động (Mục 2.5a). Ngưỡng tuyệt đối, đặt trước, không phụ thuộc phân phối kết quả.
+# −2 m/năm là QUY ƯỚC CỦA ĐỒ ÁN, tham chiếu khoảng phân lớp xói của Luijendijk et al. (2018) và Nguyen & Khoi (2020);
+# không có tài liệu nào dùng đúng ngưỡng này. Số mốc liên tiếp ≥ 3 cũng là quy ước của đồ án.
 SEVERE_LRR = -2.0                  # m/năm: lùi bờ mạnh khi LRR <= SEVERE_LRR
 MIN_CONSECUTIVE_DECLINE = 3        # số mốc năm liên tiếp khoảng cách giảm dần (3 mốc = 2 giai đoạn liền nhau)
 R2_CAUTION = 0.3                   # chỉ là CỜ chất lượng (low_r2_caution), không dùng để loại hay đổi nhóm
