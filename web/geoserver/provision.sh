@@ -68,6 +68,13 @@ for spec in shorelines:shorelines:shoreline transects:transects_styled:change_cl
   echo "   $WS:$name ← $native (style $sld)"
 done
 
+# WFS (đề cương hứa WMS + WFS): các lớp trên cũng phục vụ qua WFS (GeoJSON, lọc CQL/bbox). Bật dịch vụ WFS riêng cho workspace
+# và nạp lại cấu hình để cột mới của view/bảng (vd. unc_lrr) xuất hiện trong schema lớp.
+echo "→ dịch vụ WFS"
+json -X PUT -d "{\"wfs\":{\"enabled\":true,\"name\":\"WFS\",\"title\":\"WFS Sông Hậu\",\"maxFeatures\":5000,\"serviceLevel\":\"BASIC\"}}" \
+  "$GS/rest/services/wfs/workspaces/$WS/settings" >/dev/null || true
+[ "$(rest -X POST "$GS/rest/reload")" = 200 ] || echo "   (không nạp lại được cấu hình GeoServer — khởi động lại thủ công nếu thiếu cột mới)"
+
 # Nền bản đồ tự phục vụ (không lấy tile bên thứ ba, không có "đường lưỡi bò"): dữ liệu do
 # geoserver/basemap/build_basemap.py nạp vào schema basemap. Thứ tự dưới đây là thứ tự vẽ (dưới → trên).
 BASEMAP="ocean countries ne_water ne_rivers osm_residential osm_water osm_waterways provinces borders osm_roads
@@ -103,4 +110,4 @@ if curl -s -u "$AUTH" "$GS/rest/workspaces/$WS/datastores/basemap/featuretypes.j
 else
   echo "→ bỏ qua nền bản đồ: chưa có schema basemap (chạy geoserver/basemap/build_basemap.py trước)"
 fi
-echo "Xong. Kiểm tra: $GS/$WS/wms?service=WMS&request=GetCapabilities"
+echo "Xong. Kiểm tra: $GS/$WS/wms?service=WMS&request=GetCapabilities  và  $GS/$WS/wfs?service=WFS&request=GetCapabilities"
