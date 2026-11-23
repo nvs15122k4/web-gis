@@ -1,3 +1,4 @@
+<a class="skip-link" href="#main-content">Bỏ qua điều hướng, đến nội dung chính</a>
 <header class="appbar">
     @isset($withSidebarToggle)
         <button id="sidebar-toggle" class="icon-btn" type="button" aria-label="Mở/đóng bảng điều khiển" aria-controls="sidebar" aria-expanded="true">
