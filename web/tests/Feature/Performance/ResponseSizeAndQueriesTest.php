@@ -56,7 +56,7 @@ class ResponseSizeAndQueriesTest extends TestCase
     }
 
     #[DataProvider('endpoints')]
-    public function test_fixture_response_is_fast(string $url): void
+    public function test_fixture_response_is_fast(string $url, int $maxBytes): void
     {
         $this->getJson($url); // làm nóng
         $t = microtime(true);
