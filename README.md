@@ -146,6 +146,10 @@ cd web && php artisan migrate --env=testing && php artisan test   # PHPUnit
 cd e2e && npm ci && npx playwright test                           # Playwright E2E
 ```
 
+### Chạy E2E song song nhiều phiên
+
+Mặc định E2E dùng cổng 8010 và CSDL `webgis_app_e2e`; hai phiên chạy cùng lúc sẽ đè ngưỡng của nhau (ca `AD09` từng flaky vì lý do này). Đặt `E2E_SLOT=<tên>` (a-z, 0-9, `_`) để mỗi phiên có cổng và CSDL MySQL riêng (`webgis_app_e2e_<tên>`, tự tạo), ví dụ `E2E_SLOT=a npx playwright test`. PostGIS và GeoServer dùng chung (dữ liệu cố định, chỉ nạp khi còn trống); kết quả nằm ở `e2e/test-results-<tên>/` và `e2e/playwright-report-<tên>/`.
+
 ### Phân loại kiểm thử E2E
 
 Mỗi kiểm thử Playwright mang tag theo cách chia chuẩn; một kiểm thử có thể có nhiều tag.
