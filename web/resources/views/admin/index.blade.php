@@ -8,7 +8,7 @@
 </head>
 <body class="page">
 @include('partials.nav')
-<main class="admin">
+<main class="admin" id="main-content" tabindex="-1">
     <div class="admin-card">
         <h1>Quản trị ngưỡng hiển thị</h1>
         <p class="lead">Ngưỡng dùng để lọc hotspot trên bản đồ. Chỉ tài khoản admin được sửa.</p>
