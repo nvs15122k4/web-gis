@@ -66,6 +66,9 @@ jobs:
           composer install --no-interaction --prefer-dist --no-progress
           npm ci
 
+      - name: Vitest (JS frontend)
+        run: npm run test:js
+
       - name: Chuẩn bị môi trường
         run: |
           cp .env.example .env
