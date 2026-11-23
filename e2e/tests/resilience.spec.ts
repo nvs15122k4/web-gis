@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { BASE } from '../env';
 import { openMap, openTab } from './helpers';
 import { openMapLoose, appErrors } from './helpers-journey';
 
@@ -181,7 +182,7 @@ test.describe('Chịu lỗi: GeoServer', () => {
 test.describe('Console và network sạch', () => {
     test('C01 duyệt bản đồ + các tab: không có phản hồi 4xx/5xx của ứng dụng', { tag: ['@regression'] }, async ({ page }) => {
         const bad: string[] = [];
-        page.on('response', (r) => { if (r.status() >= 400 && new URL(r.url()).origin === 'http://127.0.0.1:8010') bad.push(`${r.status()} ${r.url()}`); });
+        page.on('response', (r) => { if (r.status() >= 400 && new URL(r.url()).origin === new URL(BASE).origin) bad.push(`${r.status()} ${r.url()}`); });
         const errors = await openMap(page);
         for (const tab of ['hotspots', 'share', 'overview', 'layers']) await openTab(page, tab);
         await page.locator('#year-2020').check();
@@ -193,7 +194,7 @@ test.describe('Console và network sạch', () => {
     test('C02 trang giới thiệu và quản trị: không 4xx/5xx, không lỗi console', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
         const bad: string[] = [];
         const errs: string[] = [];
-        page.on('response', (r) => { if (r.status() >= 400 && new URL(r.url()).origin === 'http://127.0.0.1:8010') bad.push(`${r.status()} ${r.url()}`); });
+        page.on('response', (r) => { if (r.status() >= 400 && new URL(r.url()).origin === new URL(BASE).origin) bad.push(`${r.status()} ${r.url()}`); });
         page.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
         page.on('pageerror', (e) => errs.push(e.message));
         await page.goto('/gioi-thieu');
