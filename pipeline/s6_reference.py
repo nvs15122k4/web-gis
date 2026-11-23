@@ -10,7 +10,7 @@ Nguồn chính thống (Báo An Giang, cổng TTĐT tỉnh An Giang):
 Số hiệu, ngày ký lấy theo Báo An Giang và SGGP — chưa có bản gốc văn bản; danh sách nguồn ở docs/NGUON_TRICH_DAN.docx.
 Lý trình Km không có toạ độ công khai, nên chỉ số hoá VÙNG cảnh báo: đoạn đường bờ 2018 nằm giữa hình chiếu của
 cầu Cây Dương (miệng vàm) và bến phà Năng Gù lên bờ phía Bình Mỹ. Vị trí điểm sạt lở cụ thể cần số hoá bổ sung
-khi có toạ độ thực địa (ghi rõ trong báo cáo).
+khi có toạ độ thực địa (ghi rõ trong báo cáo). Không suy diễn toạ độ từ lý trình Km: OSM không có cột mốc Km của QL91.
 Đầu ra: output/reference.json (EPSG:4326).
 """
 import json
@@ -29,11 +29,12 @@ EVENTS = [
     {"event_date": "2019-08-01", "danger_level": "dac_biet_nguy_hiem",
      "source": "UBND tỉnh An Giang, QĐ 1843/QĐ-UBND ngày 29/07/2019; Báo An Giang 01/08/2019, 20/08/2019; SGGP 01/08/2019",
      "description": "Vùng cảnh báo sạt lở QL91 ấp Bình Tân (sạt 85 m, ăn sâu 25 m rạng sáng 1/8/2019, sập thêm "
-                    "gần 30 m ngày 20/8/2019; Km 89+250–89+390). Vị trí trong vùng chưa xác định chính xác."},
+                    "gần 30 m ngày 20/8/2019; Km 89+250–89+390). Độ chính xác vị trí: đây là VÙNG cảnh báo, không phải "
+                    "vị trí điểm sạt; lý trình Km chưa quy đổi được sang toạ độ."},
     {"event_date": "2020-05-27", "danger_level": "dac_biet_nguy_hiem",
      "source": "UBND tỉnh An Giang, QĐ 1174/QĐ-UBND ngày 25/05/2020 (Báo An Giang 24/05/2020, 27/05/2020; Báo Cần Thơ 27/05/2020)",
      "description": "Tình huống khẩn cấp nguy cơ sạt lở nghiêm trọng QL91 qua xã Bình Mỹ, dài 2.000 m, 81 hộ bị đe doạ "
-                    "(vết nứt Km 89+076 ngày 23/5/2020)."},
+                    "(vết nứt Km 89+076 ngày 23/5/2020). Độ chính xác vị trí: vùng cảnh báo, chưa có toạ độ thực địa."},
 ]
 
 
