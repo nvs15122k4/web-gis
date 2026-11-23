@@ -35,13 +35,23 @@ SMOOTH_TOLERANCE = 5               # m (nửa pixel), đơn giản hoá đườn
 # chuỗi của transect là do transect xuyên qua miệng kênh/cắt nhầm bờ khác, không phải biến động thật.
 DESPIKE_M = 50
 
-# Độ bất định (Mục 2.5b): U_shoreline = sqrt(U_pixel² + U_georef² + U_classify²)
-U_PIXEL = 5.0                      # nửa pixel 10 m
-U_GEOREF = 12.0                    # ESA: định vị tuyệt đối Sentinel-2 L1C < 12 m ở độ tin cậy 95,5% (2σ) — đặc tả sản phẩm
-U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}  # RMSE đường bờ vs ground_truth (output/evaluation.json, Mục 2.4)
+# ---------------------------------------------------------------------------------------------------------------
+# Độ bất định và phân loại. Tiêu chí được CHỐT TRƯỚC khi chạy lại, không điều chỉnh theo kết quả (docs/checklist-yeu-cau.md).
+# Nguồn tham khảo cho từng tham số: danh sách nguồn chờ xác nhận ở docs/nguon-cho-xac-nhan.md (chưa dẫn vào văn bản).
+# ---------------------------------------------------------------------------------------------------------------
+# Độ bất định đường bờ (Mục 2.5b), MỌI thành phần quy về cùng chuẩn 1σ:
+#   U_shoreline(1σ) = sqrt(U_pixel² + U_georef² + U_classify²)
+# Độ bất định EPR và LRR báo cáo ở độ tin cậy 95% (CONFIDENCE).
+CONFIDENCE = 0.95
+Z95 = 1.959964                     # hệ số phủ chuẩn 95% cho độ bất định lan truyền từ nguồn ngoài (EPR); LRR dùng t(df = n − 2)
+U_PIXEL = 5.0                      # m, nửa pixel 10 m (xem là 1σ; chưa có nguồn riêng — ghi nhận là giả định)
+U_GEOREF_95 = 12.0                 # m, ESA: định vị tuyệt đối Sentinel-2 L1C < 12 m ở độ tin cậy 95,5% (2σ) — đặc tả sản phẩm
+GEOREF_SIGMA_K = 2.0               # 95,5% ứng với 2σ
+U_GEOREF = U_GEOREF_95 / GEOREF_SIGMA_K   # m, quy về 1σ = 6 m để cộng bình phương cùng chuẩn với U_pixel/U_classify
+U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}  # RMSE đường bờ vs ground_truth (output/evaluation.json, Mục 2.4), xem là 1σ
 U_CLASSIFY_DEFAULT = 20.0          # các năm không có ground truth: lấy giá trị lớn nhất đã đo (thận trọng)
 
-# Phân loại (Mục 2.5a)
-Z95 = 1.96
-MIN_CONSECUTIVE_DECLINE = 3        # số mốc năm liên tiếp khoảng cách giảm dần
-R2_CAUTION = 0.3
+# Phân loại biến động (Mục 2.5a). Ngưỡng tuyệt đối, đặt trước, không phụ thuộc phân phối kết quả.
+SEVERE_LRR = -2.0                  # m/năm: lùi bờ mạnh khi LRR <= SEVERE_LRR
+MIN_CONSECUTIVE_DECLINE = 3        # số mốc năm liên tiếp khoảng cách giảm dần (3 mốc = 2 giai đoạn liền nhau)
+R2_CAUTION = 0.3                   # chỉ là CỜ chất lượng (low_r2_caution), không dùng để loại hay đổi nhóm
