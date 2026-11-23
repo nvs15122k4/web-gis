@@ -49,11 +49,11 @@
         <p class="disclaimer">Thông tin tham khảo phục vụ nghiên cứu, không thay thế cảnh báo chính thức của cơ quan chức năng.</p>
     </aside>
 
-    <div class="map-wrap" id="map-wrap">
+    <main class="map-wrap" id="main-content" tabindex="-1" aria-label="Bản đồ">
         <div id="map"></div>
         @include('partials.transect-panel')
         @include('partials.legend')
-    </div>
+    </main>
 </div>
 </body>
 </html>
