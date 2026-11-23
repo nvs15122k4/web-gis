@@ -24,7 +24,7 @@ def test_years_contiguous_and_sorted():
 
 
 @pytest.mark.parametrize("name", ["TRANSECT_SPACING", "BASELINE_OFFSET", "TRANSECT_LENGTH", "DESPIKE_M",
-                                  "U_PIXEL", "U_GEOREF", "U_CLASSIFY_DEFAULT", "RESOLUTION", "SMOOTH_TOLERANCE"])
+                                  "U_PIXEL", "U_GEOREF", "U_GEOREF_95", "U_CLASSIFY_DEFAULT", "RESOLUTION", "SMOOTH_TOLERANCE"])
 def test_positive_parameters(name):
     assert getattr(C, name) > 0
 
@@ -54,7 +54,9 @@ def test_scl_mask_values_valid():
 
 
 def test_classification_params():
-    assert C.Z95 == pytest.approx(1.96)
+    assert C.Z95 == pytest.approx(1.96, abs=1e-3)
+    assert C.CONFIDENCE == pytest.approx(0.95)
+    assert C.SEVERE_LRR < 0
     assert C.MIN_CONSECUTIVE_DECLINE >= 2
     assert 0 < C.R2_CAUTION < 1
 
