@@ -1,5 +1,10 @@
 KET QUA KIEM THU - chay ngay 2026-11-23
-1) Playwright E2E (e2e/, chromium + firefox, E2E_NO_WEBKIT=1): 296 passed.
+1) Playwright E2E (e2e/, chromium + firefox, E2E_NO_WEBKIT=1): 326 passed (163 kiem thu x 2 trinh duyet).
+   Phan loai theo tag (so lan chay tren 2 trinh duyet; moi kiem thu co the thuoc nhieu nhom):
+     @smoke 20 | @sanity 30 | @happy (luong chuan) 128 | @negative 80 | @edge (bien) 26 | @regression 74
+     Phi chuc nang: @a11y 30 | @responsive 42 | @performance 6 | @security 8 | @resilience 36
+   Chay theo nhom: cd e2e && npm run test:smoke | test:sanity | test:happy | test:negative | test:edge | test:regression
+   WebKit khong chay duoc tren may nay (thieu thu vien he thong tren Ubuntu moi), nen khong tinh vao ket qua.
 2) PHPUnit (web/): 1052 passed.
 3) pytest (pipeline/): 133 passed. vitest (web/): 80 passed.
 4) CSDL PostGIS (webgis_spatial) sau webgis:import: transects 267, shoreline_change_stats 267, hotspots 1,
