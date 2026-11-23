@@ -1,3 +1,4 @@
+import { readableTextOn } from './contrast.js';
 import L from 'leaflet';
 import colors from './colors.json';
 import { api } from './api';
@@ -48,14 +49,14 @@ function openInspector() {
     const panel = document.getElementById('inspector');
     if (!panel) return;
     panel.hidden = false;
-    document.getElementById('map-wrap')?.classList.add('inspecting');
+    document.getElementById('main-content')?.classList.add('inspecting');
 }
 
 function closeInspector() {
     const panel = document.getElementById('inspector');
     if (!panel || panel.hidden) return;
     panel.hidden = true;
-    document.getElementById('map-wrap')?.classList.remove('inspecting');
+    document.getElementById('main-content')?.classList.remove('inspecting');
     highlight.clearLayers();
     permalink?.setTransect(null);
 }
@@ -118,7 +119,9 @@ export async function showTransect(id) {
     document.getElementById('transect-code').textContent = detail.transect_code;
     const badge = document.getElementById('stat-class');
     badge.textContent = CLASS_LABEL[cls] ?? UPDATING;
-    badge.style.background = colors[cls] ?? '#888';
+    const bg = colors[cls] ?? '#888888';
+    badge.style.background = bg;
+    badge.style.color = readableTextOn(bg);
 
     const row = (label, id, value) => `<div><dt>${label}</dt><dd id="${id}">${value}</dd></div>`;
     document.getElementById('transect-detail').innerHTML = `
