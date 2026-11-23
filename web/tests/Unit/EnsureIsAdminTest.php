@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class EnsureIsAdminTest extends BaseUnitTest
 {
@@ -46,13 +47,33 @@ class EnsureIsAdminTest extends BaseUnitTest
     public function test_khong_goi_next_khi_bi_chan(): void
     {
         $called = false;
-        $request = Request::create('/x');
+        $request = Request::create('/api/x');
         (new EnsureIsAdmin)->handle($request, function () use (&$called) {
             $called = true;
 
             return response('');
         });
         $this->assertFalse($called);
+    }
+
+    public function test_trang_web_khong_phai_admin_bi_abort_403(): void
+    {
+        $request = Request::create('/bao-cao');
+        $request->setUserResolver(fn () => new User(['role' => 'viewer']));
+        try {
+            (new EnsureIsAdmin)->handle($request, fn () => response('ok'));
+            $this->fail('Phải ném HttpException 403');
+        } catch (HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
+    }
+
+    public function test_yeu_cau_json_o_trang_web_van_nhan_json_403(): void
+    {
+        $request = Request::create('/bao-cao', 'GET', server: ['HTTP_ACCEPT' => 'application/json']);
+        $request->setUserResolver(fn () => null);
+        $res = (new EnsureIsAdmin)->handle($request, fn () => response('ok'));
+        $this->assertSame(403, $res->getStatusCode());
     }
 
     public function test_alias_admin_da_dang_ky(): void
