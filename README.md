@@ -95,6 +95,8 @@ geoserver/provision.sh songhau webgis_spatial      # workspace, store, style, la
 npm run build && php artisan serve                 # http://127.0.0.1:8000
 ```
 
+> Docker compose chiếm cổng 5432 và 8080; nếu máy đã chạy sẵn PostgreSQL/GeoServer, hãy dừng chúng hoặc đổi cổng trong `docker-compose.yml` và `.env`.
+
 Chạy lại pipeline từ ảnh gốc: xem [`pipeline/README.md`](pipeline/README.md).
 
 ## Kiểm thử
@@ -103,6 +105,8 @@ Chạy lại pipeline từ ảnh gốc: xem [`pipeline/README.md`](pipeline/READ
 cd web && php artisan migrate --env=testing && php artisan test   # PHPUnit
 cd e2e && npm ci && npx playwright test                           # Playwright E2E
 ```
+
+PHPUnit dùng CSDL riêng `webgis_app_test` và `webgis_spatial_test` (tạo trước, cùng tài khoản với `.env`); `phpunit.xml` đã đặt sẵn `APP_ENV=testing`, `APP_DEBUG=false`, không cần `.env.testing`.
 
 CI trên GitHub Actions chạy PHPUnit (MySQL + PostGIS), build front-end và kiểm tra cú pháp pipeline cho mỗi push và pull request.
 
