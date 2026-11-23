@@ -48,6 +48,7 @@ CREATE TABLE shoreline_change_stats (
     epr_m_per_year DOUBLE PRECISION NULL,
     lrr_m_per_year DOUBLE PRECISION NULL,
     se_lrr DOUBLE PRECISION NULL,
+    unc_lrr DOUBLE PRECISION NULL,              -- nửa bề rộng KTC 95% của LRR (Student t, df = n − 2)
     r_squared DOUBLE PRECISION NULL,
     is_significant BOOLEAN NOT NULL DEFAULT FALSE,
     change_class VARCHAR(20) NOT NULL

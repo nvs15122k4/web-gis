@@ -72,7 +72,7 @@ function bindToggle(id, map, getLayer) {
     });
 }
 
-/** "Chỉ transect có ý nghĩa thống kê" — như bộ lọc p-value của DEA Coastlines; tiêu chí |LRR| > 1,96·SE do pipeline tính. */
+/** "Chỉ transect có ý nghĩa thống kê" — như bộ lọc p-value của DEA Coastlines; tiêu chí |LRR| > t(0,975; n−2)·SE do pipeline tính (phân phối Student t). */
 function bindSignificanceFilter() {
     document.getElementById('only-significant').addEventListener('change', (e) => {
         layers.transectFilter = e.target.checked ? 'is_significant=true' : null;

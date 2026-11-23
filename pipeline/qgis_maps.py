@@ -199,7 +199,7 @@ def main():
     project.addMapLayer(ends)
     root.findLayer(ends.id()).setItemVisibilityChecked(False)
 
-    sub_cls = "Phân loại theo Mục 2.5a (LRR, độ bất định, R²). U_classify đang dùng giá trị tạm 10 m."
+    sub_cls = "Phân loại theo Mục 2.5a (LRR, độ bất định, R²). Ý nghĩa thống kê: |LRR| > t(0,975; n−2)·SE; lùi mạnh: LRR ≤ −2 m/năm, ≥ 3 mốc liên tiếp."
     maps = [
         add_layout(project, "vi_tri", "Bản đồ vị trí khu vực nghiên cứu — xã Bình Mỹ, tỉnh An Giang",
                    [L["xa"], L["img"]], [L["xa"]],

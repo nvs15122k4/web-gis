@@ -15,7 +15,7 @@ class ExportController extends Controller
     /** layer => [SQL SELECT (không gồm cột hình học), bảng/alias chứa geom, ORDER BY] */
     private const LAYERS = [
         'transects' => [
-            'SELECT t.id, t.transect_code, s.change_class, s.nsm_m, s.epr_m_per_year, s.lrr_m_per_year, s.se_lrr,
+            'SELECT t.id, t.transect_code, s.change_class, s.nsm_m, s.epr_m_per_year, s.lrr_m_per_year, s.se_lrr, s.unc_lrr,
                     s.r_squared, s.is_significant, s.consecutive_erosion_periods, s.u_shoreline_avg
              FROM transects t LEFT JOIN shoreline_change_stats s ON s.transect_id = t.id',
             't', 't.transect_code',

@@ -93,7 +93,7 @@ class JsonSchemaContractTest extends TestCase
         $j = $this->getJson("/api/transects/{$id}")->assertOk()->json();
         $this->assertSame(['id', 'stats', 'transect_code'], $this->keys($j));
         $this->assertSame($id, $j['id']);
-        $this->assertSame(['change_class', 'consecutive_erosion_periods', 'epr_m_per_year', 'id', 'is_significant', 'lrr_m_per_year', 'nsm_m', 'r_squared', 'se_lrr', 'transect_id', 'u_shoreline_avg'], $this->keys($j['stats']));
+        $this->assertSame(['change_class', 'consecutive_erosion_periods', 'epr_m_per_year', 'id', 'is_significant', 'lrr_m_per_year', 'nsm_m', 'r_squared', 'se_lrr', 'transect_id', 'u_shoreline_avg', 'unc_lrr'], $this->keys($j['stats']));
         $this->assertIsBool($j['stats']['is_significant']);
     }
 

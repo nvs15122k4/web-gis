@@ -40,7 +40,7 @@ Mọi tham số nằm trong `config.py`.
 1. **Ground truth (Mục 2.4)** — *đã hoàn thành*: số hoá trong QGIS (`data/ground_truth/so_hoa_ground_truth.qgz`), `s7_evaluate.py` cho
    `output/evaluation.json`, `U_CLASSIFY` = RMSE từng năm (15,1 / 18,39 / 19,99 m; năm khác dùng 20 m). F1 trung bình của AWEI và MNDWI
    gần như hoà (0,9457 so với 0,9456) nên giữ `DEFAULT_INDEX = "mndwi"` vì RMSE đường bờ thấp hơn, dù `evaluation.json` gợi ý AWEI.
-2. **U_georef** — đã chốt 12 m theo đặc tả ESA (định vị tuyệt đối L1C < 12 m, độ tin cậy 95,5%); còn trích số liệu đo
+2. **U_georef** — đặc tả ESA: định vị tuyệt đối L1C < 12 m ở độ tin cậy 95,5% (2σ), quy về 1σ = 6 m để cùng chuẩn với U_pixel/U_classify (phép quy đổi là suy luận của đồ án, không có nguồn nói rõ; Clerc et al. đo 2σ thực tế 11,6 m cho S2A và 13,5 m cho S2B); còn trích số liệu đo
    trong Data Quality Report đúng giai đoạn ảnh để dẫn chứng thêm.
 3. **Vị trí điểm sạt lở** — nguồn công khai chỉ ghi lý trình Km 89+272–89+336 (2019) và Km 89+076 (2020), không có toạ độ;
    hiện số hoá cả vùng cảnh báo từ vàm Cây Dương đến bến phà Năng Gù. Có toạ độ thực địa thì cập nhật `s6_reference.py`.

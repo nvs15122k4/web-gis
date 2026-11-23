@@ -1,6 +1,6 @@
 # Web — ứng dụng WebGIS (Laravel)
 
-Thành phần web của dự án (xem [README gốc](../README.md)): Laravel (MVC) · PostgreSQL/PostGIS · MySQL · GeoServer (WMS) ·
+Thành phần web của dự án (xem [README gốc](../README.md)): Laravel (MVC) · PostgreSQL/PostGIS · MySQL · GeoServer (WMS + WFS) ·
 Leaflet + Chart.js. Dịch vụ nền chạy nhanh bằng `docker compose up -d` (MySQL :3307, PostGIS :5432, GeoServer :8080).
 
 Hệ thống **chỉ đọc**: NSM/EPR/LRR/R² và mức biến động được pipeline Python tính sẵn; Laravel không tính lại.

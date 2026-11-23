@@ -132,8 +132,8 @@ export async function showTransect(id) {
         </div>
         <dl class="stat-list">
             ${row('R²', 'stat-r2', val(s.r_squared, '', 3))}
-            ${row('KTC 95% của LRR', 'stat-ci', missing(s.se_lrr) ? val(null) : `±${fmt(1.96 * s.se_lrr)} m/năm`)}
-            ${row('Ý nghĩa thống kê', 'stat-sig', missing(s.is_significant) ? val(null) : s.is_significant ? 'Có (|LRR| &gt; 1,96·SE)' : 'Không — chưa đủ cơ sở kết luận')}
+            ${row('KTC 95% của LRR', 'stat-ci', missing(s.unc_lrr) ? val(null) : `±${fmt(s.unc_lrr)} m/năm`)}
+            ${row('Ý nghĩa thống kê', 'stat-sig', missing(s.is_significant) ? val(null) : s.is_significant ? 'Có (|LRR| &gt; t·SE, t theo bậc tự do n−2)' : 'Không — chưa đủ cơ sở kết luận')}
             ${row('Độ bất định', 'stat-u', missing(s.u_shoreline_avg) ? val(null) : `±${fmt(s.u_shoreline_avg, 1)} m (SE LRR ${fmt(s.se_lrr, 3)})`)}
             ${row('Số giai đoạn lùi liên tiếp', 'stat-periods', val(s.consecutive_erosion_periods, '', 0))}
             ${row('Số năm quan trắc', 'stat-obs', years.length ? `${years.length} năm (${years[0]}–${years[years.length - 1]})` : val(null))}

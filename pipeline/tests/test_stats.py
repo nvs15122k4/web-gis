@@ -117,7 +117,7 @@ def test_stats_accepts_string_year_keys_and_skips_none():
     assert st["epr_m_per_year"] == pytest.approx(2.0)
 
 
-def test_stats_three_points_has_se():
+def test_stats_three_points_has_se():  # noqa: D103
     st = S.stats({2018: 10.0, 2019: 12.0, 2020: 11.0})
     assert st["se_lrr"] is not None and st["n_years"] == 3
 
@@ -130,8 +130,48 @@ def test_stats_unsorted_input():
 
 def test_stats_epr_uncertainty_formula():
     st = S.stats({2018: 1.0, 2019: 2.0, 2020: 3.0, 2021: 4.5})
-    exp = math.hypot(S.u_shoreline(2018), S.u_shoreline(2021)) / 3
+    exp = C.Z95 * math.hypot(S.u_shoreline(2018), S.u_shoreline(2021)) / 3
     assert st["unc_epr"] == pytest.approx(exp, abs=1e-3)
+
+
+# ---------- t-quantile (độ tin cậy 95%, df = n − 2) ----------
+@pytest.mark.parametrize("n,expected", [(3, 12.7062), (4, 4.3027), (5, 3.1824), (7, 2.5706), (9, 2.3646), (30, 2.0484)])
+def test_t_crit_known_values(n, expected):
+    assert S.t_crit(n) == pytest.approx(expected, abs=1e-3)
+
+
+def test_t_crit_decreases_toward_normal():
+    vals = [S.t_crit(n) for n in range(3, 200)]
+    assert all(a > b for a, b in zip(vals, vals[1:]))
+    assert vals[-1] > C.Z95
+
+
+def test_stats_ci_uses_t_not_z_for_nine_years():
+    d = {y: 100 - 1.2 * (y - 2018) + (0.8 if y % 2 else -0.8) * 3 for y in range(2018, 2027)}
+    st = S.stats(d)
+    assert st["t_crit"] == pytest.approx(2.365, abs=1e-3)
+    assert st["unc_lrr"] == pytest.approx(2.365 * st["se_lrr"], abs=2e-3)
+    assert st["is_significant"] is (abs(st["lrr_m_per_year"]) > st["unc_lrr"])
+
+
+def test_stats_significance_differs_between_t_and_z():
+    # |LRR|/SE = 2,26: vượt z = 1,96 nhưng KHÔNG vượt t(df=7) = 2,365 -> không có ý nghĩa ở 95%
+    noise = [0, 3, -2, 4, -3, 1, -4, 2, 0]
+    d = {2018 + i: -1.0 * i + noise[i] * 1.5 for i in range(9)}
+    st = S.stats(d)
+    ratio = abs(st["lrr_m_per_year"]) / st["se_lrr"]
+    assert C.Z95 < ratio < st["t_crit"]
+    assert st["is_significant"] is False
+
+
+def test_stats_three_points_uses_df_one():
+    st = S.stats({2018: 10.0, 2019: 12.0, 2020: 11.0})
+    assert st["t_crit"] == pytest.approx(12.706, abs=1e-3)
+
+
+def test_u_georef_is_one_sigma():
+    assert C.U_GEOREF == pytest.approx(C.U_GEOREF_95 / C.GEOREF_SIGMA_K)
+    assert C.U_GEOREF == pytest.approx(6.0)
 
 
 def test_stats_noisy_is_not_significant():
@@ -154,7 +194,7 @@ def test_classify_basic_classes():
     assert got[2:] == ["mild_erosion"] * 3
 
 
-def test_classify_severe_requires_threshold_and_consecutive():
+def test_classify_severe_requires_absolute_threshold_and_consecutive():
     rows = [mk(-1.0 - 0.01 * i, periods=2) for i in range(8)] + [mk(-8.0, periods=2), mk(-8.0, periods=1)]  # cái cuối: dưới ngưỡng nhưng chuỗi giảm quá ngắn
     M, Sd = S.classify(rows)
     assert M is not None and Sd > 0
@@ -164,10 +204,36 @@ def test_classify_severe_requires_threshold_and_consecutive():
     assert cls[0] == "mild_erosion"
 
 
-def test_classify_single_erosion_gives_no_threshold():
-    rows = [mk(-3.0, periods=5), mk(1.0)]
-    assert S.classify(rows) == (None, None)
+@pytest.mark.parametrize("lrr,expected", [
+    (C.SEVERE_LRR, "severe_erosion"),            # đúng bằng ngưỡng: tính là mạnh (<=)
+    (C.SEVERE_LRR + 0.001, "mild_erosion"),
+    (C.SEVERE_LRR - 0.5, "severe_erosion"),
+])
+def test_classify_threshold_is_fixed_and_independent_of_distribution(lrr, expected):
+    # ngưỡng tuyệt đối đặt trước: không đổi dù các transect khác có LRR thế nào
+    for others in ([], [mk(-0.5, periods=2)] * 5, [mk(-9.0, periods=2)] * 5):
+        rows = [mk(lrr, periods=2)] + [dict(o) for o in others]
+        S.classify(rows)
+        assert rows[0]["stats"]["change_class"] == expected
+
+
+def test_classify_below_threshold_but_short_run_is_mild():
+    rows = [mk(-5.0, periods=C.MIN_CONSECUTIVE_DECLINE - 2)]
+    S.classify(rows)
     assert rows[0]["stats"]["change_class"] == "mild_erosion"
+
+
+def test_classify_single_erosion_still_severe_by_absolute_threshold():
+    rows = [mk(-3.0, periods=5), mk(1.0)]
+    assert S.classify(rows) == (None, None)       # M, S mô tả cần >= 2 transect lùi
+    assert rows[0]["stats"]["change_class"] == "severe_erosion"
+
+
+def test_classify_r2_does_not_change_class():
+    lo, hi = mk(-3.0, periods=3, r2=0.05), mk(-3.0, periods=3, r2=0.95)
+    S.classify([lo, hi])
+    assert lo["stats"]["change_class"] == hi["stats"]["change_class"] == "severe_erosion"
+    assert lo["stats"]["low_r2_caution"] is True and hi["stats"]["low_r2_caution"] is False
 
 
 def test_classify_none_stats_skipped_and_empty():

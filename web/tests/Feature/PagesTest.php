@@ -20,7 +20,10 @@ class PagesTest extends TestCase
     {
         $this->get('/gioi-thieu')->assertOk()
             ->assertSee('Tiêu chí phân loại mức biến động')
-            ->assertSee('1,96 × SE(LRR)')
-            ->assertSee('/api/export/transects.geojson', false);
+            ->assertSee('|LRR| &gt; t × SE(LRR)', false)
+            ->assertSee('LRR ≤ −2 m/năm')
+            ->assertSee('/api/export/transects.geojson', false)
+            ->assertSee('/wfs?service=WFS&amp;request=GetCapabilities', false)
+            ->assertSee('typeName='.config('services.geoserver.workspace').':transects', false);
     }
 }
