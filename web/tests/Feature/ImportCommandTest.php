@@ -41,7 +41,7 @@ class ImportCommandTest extends TestCase
         $this->write('transects', [$this->feature($line, [
             'transect_code' => 'X01',
             'distances' => ['2018' => 100, '2019' => null, '2020' => 90],
-            'stats' => ['nsm_m' => -10, 'lrr_m_per_year' => $lrr, 'epr_m_per_year' => -5, 'change_class' => 'severe_erosion', 'is_significant' => true],
+            'stats' => ['nsm_m' => -10, 'lrr_m_per_year' => $lrr, 'epr_m_per_year' => -5, 'unc_lrr' => 1.4, 'change_class' => 'severe_erosion', 'is_significant' => true],
         ])]);
     }
 
@@ -56,6 +56,7 @@ class ImportCommandTest extends TestCase
         // năm null (thiếu dữ liệu) không được ghi, không nội suy
         $this->assertSame([2018, 2020], $pg->table('transect_shoreline_distances')->where('transect_id', $id)->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all());
         $this->assertEquals(-5.0, $pg->table('shoreline_change_stats')->where('transect_id', $id)->value('lrr_m_per_year'));
+        $this->assertEquals(1.4, $pg->table('shoreline_change_stats')->where('transect_id', $id)->value('unc_lrr'));
 
         // chạy lại với số liệu mới: cùng ID, giá trị cập nhật, không nhân đôi
         $this->fixtureFiles(-6.5);
