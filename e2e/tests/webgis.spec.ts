@@ -4,7 +4,7 @@ import { openMap, openTab, centerOnTransect, clickAt } from './helpers';
 const fmt = (v: number | null, d = 2) => (v == null ? '—' : Number(v).toFixed(d));
 
 test.describe('Bản đồ WebGIS sông Hậu', () => {
-    test('01 tải trang: bản đồ + AOI render, không lỗi console', async ({ page }) => {
+    test('01 tải trang: bản đồ + AOI render, không lỗi console', { tag: ['@smoke', '@happy'] }, async ({ page }) => {
         const errors = await openMap(page);
         await expect(page.locator('#map .leaflet-overlay-pane path').first()).toBeAttached(); // AOI
         const t0 = Date.now();
@@ -15,7 +15,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         expect(appErrors).toEqual([]);
     });
 
-    test('02 layer control: bật/tắt lớp Đường bờ 2020', async ({ page }) => {
+    test('02 layer control: bật/tắt lớp Đường bờ 2020', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         const req = page.waitForRequest((r) => /shorelines/.test(r.url()) && /year%3D2020|year=2020/i.test(r.url()));
@@ -29,7 +29,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         expect(await page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.transects); })).toBe(false);
     });
 
-    test('03 so sánh năm: 2019 & 2024 hiển thị đồng thời, hai màu khác nhau', async ({ page }) => {
+    test('03 so sánh năm: 2019 & 2024 hiển thị đồng thời, hai màu khác nhau', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         await page.selectOption('#compare-a', '2019');
@@ -45,7 +45,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         expect([info.fa, info.fb]).toEqual(['year=2019', 'year=2024']);
     });
 
-    test('04 chi tiết transect: click hiển thị NSM/EPR/LRR/R² khớp API', async ({ page }) => {
+    test('04 chi tiết transect: click hiển thị NSM/EPR/LRR/R² khớp API', { tag: ['@sanity', '@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         const { id, lat, lng } = await centerOnTransect(page, 'T09');
         await clickAt(page, lat, lng);
@@ -58,7 +58,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await expect(page.locator('#stat-class')).toHaveText('Lùi mạnh');
     });
 
-    test('05 biểu đồ: số điểm = số năm có dữ liệu', async ({ page }) => {
+    test('05 biểu đồ: số điểm = số năm có dữ liệu', { tag: ['@sanity', '@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         const { id, lat, lng } = await centerOnTransect(page, 'T01');
         await clickAt(page, lat, lng);
@@ -67,7 +67,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         expect(history.length).toBe(8);
     });
 
-    test('06 lọc ngưỡng: danh sách hotspot cập nhật theo API', async ({ page }) => {
+    test('06 lọc ngưỡng: danh sách hotspot cập nhật theo API', { tag: ['@sanity', '@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'hotspots');
         await expect(page.locator('#hotspot-list li')).toHaveCount(2); // ngưỡng mặc định 1.0
@@ -81,7 +81,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await expect(page.locator('#hotspot-count')).toContainText('0 đoạn');
     });
 
-    test('07 sạt lở tham chiếu: điểm đúng vị trí, popup đủ thông tin', async ({ page }) => {
+    test('07 sạt lở tham chiếu: điểm đúng vị trí, popup đủ thông tin', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         const api = await (await page.request.get('/api/reference-events')).json();
         const [lng, lat] = api.features[0].geometry.coordinates;
@@ -102,7 +102,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await expect(popup).toContainText('Nguồn');
     });
 
-    test('08 biên: năm không có composite → báo không có dữ liệu, không crash', async ({ page }) => {
+    test('08 biên: năm không có composite → báo không có dữ liệu, không crash', { tag: ['@edge'] }, async ({ page }) => {
         const errors = await openMap(page);
         await openTab(page, 'layers');
         await page.locator('#year-2022').click(); // ứng dụng tự bỏ chọn nên không dùng check()
@@ -115,7 +115,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         expect(errors.filter((e) => !/arcgisonline|ERR_|Failed to load resource/i.test(e))).toEqual([]);
     });
 
-    test('09 biên: transect thiếu năm → chart bỏ điểm thiếu, không nội suy', async ({ page }) => {
+    test('09 biên: transect thiếu năm → chart bỏ điểm thiếu, không nội suy', { tag: ['@edge'] }, async ({ page }) => {
         await openMap(page);
         const { lat, lng } = await centerOnTransect(page, 'T05');
         await clickAt(page, lat, lng);
@@ -124,7 +124,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await expect(page.locator('#history-chart')).toHaveAttribute('data-points', '6');
     });
 
-    test('10 biên: vùng không có sạt lở tham chiếu → rỗng hợp lệ, không lỗi', async ({ page }) => {
+    test('10 biên: vùng không có sạt lở tham chiếu → rỗng hợp lệ, không lỗi', { tag: ['@edge'] }, async ({ page }) => {
         const errors = await openMap(page);
         await page.evaluate(() => (window as any).__webgis.map.setView([10.597, 105.21], 16, { animate: false }));
         await openTab(page, 'layers');
@@ -134,7 +134,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         expect(errors.filter((e) => !/arcgisonline|ERR_|Failed to load resource/i.test(e))).toEqual([]);
     });
 
-    test('11 responsive 400px: sidebar thu gọn, bản đồ full-width, vẫn thao tác được', async ({ page }) => {
+    test('11 responsive 400px: sidebar thu gọn, bản đồ full-width, vẫn thao tác được', { tag: ['@responsive'] }, async ({ page }) => {
         await page.setViewportSize({ width: 400, height: 800 });
         await openMap(page);
         await expect(page.locator('#sidebar')).toHaveClass(/collapsed/);
@@ -153,7 +153,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await expect(page.locator('#year-2020')).toBeChecked();
     });
 
-    test('12 đăng nhập admin: sai/viewer bị từ chối, admin sửa ngưỡng và UI phản ánh ngay', async ({ page }) => {
+    test('12 đăng nhập admin: sai/viewer bị từ chối, admin sửa ngưỡng và UI phản ánh ngay', { tag: ['@happy'] }, async ({ page }) => {
         await page.goto('/admin');
         const login = async (email: string, password: string) => {
             await page.fill('#login-form [name=email]', email);
