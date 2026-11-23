@@ -146,6 +146,21 @@ cd web && php artisan migrate --env=testing && php artisan test   # PHPUnit
 cd e2e && npm ci && npx playwright test                           # Playwright E2E
 ```
 
+### Phân loại kiểm thử E2E
+
+Mỗi kiểm thử Playwright mang tag theo cách chia chuẩn; một kiểm thử có thể có nhiều tag.
+
+| Tag | Mục đích | Lệnh (trong `e2e/`) |
+|---|---|---|
+| `@smoke` | Kiểm thử khói: trang chính, API, đăng nhập có chạy không (nhanh, không retry) | `npm run test:smoke` |
+| `@sanity` | Kiểm thử tỉnh táo: chức năng lõi vừa sửa còn hợp lý | `npm run test:sanity` |
+| `@happy` | Luồng chuẩn: người dùng làm đúng, kết quả thành công | `npm run test:happy` |
+| `@negative` | Đầu vào sai, thiếu quyền, hệ thống phụ lỗi → phải bị từ chối đúng cách | `npm run test:negative` |
+| `@edge` | Ngoại lệ & biên: ngưỡng 0, năm/transect thiếu dữ liệu, hash URL hỏng | `npm run test:edge` |
+| `@regression` | Hồi quy: số liệu UI khớp API, chia sẻ liên kết, console sạch, phân quyền | `npm run test:regression` (3 trình duyệt) |
+
+Tag phi chức năng: `@a11y`, `@responsive`, `@performance`, `@security`, `@resilience` (script `npm run test:<tag>`). Kết quả mỗi nhóm nằm trong [`docs/minh_chung/ketqua_e2e.txt`](docs/minh_chung/ketqua_e2e.txt).
+
 PHPUnit dùng CSDL riêng `webgis_app_test` và `webgis_spatial_test` (tạo trước, cùng tài khoản với `.env`); `phpunit.xml` đã đặt sẵn `APP_ENV=testing`, `APP_DEBUG=false`, không cần `.env.testing`.
 
 CI trên GitHub Actions chạy PHPUnit (MySQL + PostGIS), build front-end và kiểm tra cú pháp pipeline cho mỗi push và pull request.
