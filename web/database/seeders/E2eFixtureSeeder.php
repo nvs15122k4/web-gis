@@ -98,6 +98,7 @@ class E2eFixtureSeeder extends Seeder
                 'epr_m_per_year' => round((end($vals) - $vals[0]) / $span, 3),
                 'lrr_m_per_year' => round($slope, 3),
                 'se_lrr' => round($se, 3),
+                'unc_lrr' => round($this->tCrit(count($years) - 2) * $se, 3),
                 'r_squared' => round($r2, 3),
                 'is_significant' => $class !== 'stable',
                 'change_class' => $class,
@@ -143,6 +144,14 @@ class E2eFixtureSeeder extends Seeder
                 [sprintf('POINT(%F %F)', $lonAt(790), $lat($k) + 0.001), $date, $desc, 'Fixture kiểm thử', $level, $length, $location]
             );
         }
+    }
+
+    /** Hệ số t hai phía 95% theo bậc tự do (bảng ngắn, đủ cho fixture; df lớn thì tiến về 1,96). */
+    private function tCrit(int $df): float
+    {
+        $table = [1 => 12.706, 2 => 4.303, 3 => 3.182, 4 => 2.776, 5 => 2.571, 6 => 2.447, 7 => 2.365, 8 => 2.306, 9 => 2.262, 10 => 2.228];
+
+        return $table[$df] ?? ($df > 10 ? 2.0 : 12.706);
     }
 
     /** @return array{0: float, 1: float, 2: float} [độ dốc, R², sai số chuẩn của độ dốc] */
