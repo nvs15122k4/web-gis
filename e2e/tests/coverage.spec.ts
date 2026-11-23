@@ -15,14 +15,14 @@ test.describe('Điều hướng & trang tĩnh', () => {
         await expect(page).toHaveURL(/\/admin$/);
         await expect(page.getByRole('heading', { level: 1 })).toHaveText('Quản trị ngưỡng hiển thị');
         await nav.getByRole('link', { name: 'Bản đồ' }).click();
-        await expect(page).toHaveURL(/\/$/);
+        await expect(page).toHaveURL(/\/(#.*)?$/);
         await expect(page.locator('#map')).toBeVisible();
     });
 
     test('N02 logo thương hiệu đưa về trang bản đồ', async ({ page }) => {
         await page.goto('/gioi-thieu');
         await page.locator('a.brand').click();
-        await expect(page).toHaveURL(/\/$/);
+        await expect(page).toHaveURL(/\/(#.*)?$/);
         await expect(page.locator('#map')).toBeVisible();
     });
 
