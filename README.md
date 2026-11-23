@@ -13,23 +13,64 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ## Tính năng
 
-- **Bản đồ tương tác** — đường bờ theo năm, transect tô màu theo mức biến động, điểm nóng xói lở, sự kiện sạt lở tham chiếu (Leaflet + WMS GeoServer; dữ liệu vector còn truy vấn được qua WFS).
-- **Phân tích transect** — biểu đồ chuỗi khoảng cách theo năm, chỉ số NSM/EPR/LRR/R² và độ bất định.
-- **Tổng quan** — thống kê theo mức biến động, lọc điểm nóng theo ngưỡng, liên kết chia sẻ (permalink).
-- **Xuất dữ liệu** — tải các lớp dưới dạng GeoJSON/CSV qua REST API.
-- **Quản trị** — đăng nhập (Sanctum) để chỉnh ngưỡng hiển thị; mọi thay đổi được ghi nhật ký.
+Ứng dụng web (Laravel + Leaflet + Chart.js) gồm các trang sau; ảnh chụp từ bản chạy thật trên dữ liệu pipeline (267 transect).
 
-## Hình ảnh
+| Đường dẫn | Quyền | Nội dung |
+|---|---|---|
+| `/` | công khai | Bản đồ tương tác với 4 thẻ: Tổng quan, Lớp dữ liệu, Hotspot, Chia sẻ |
+| `/gioi-thieu` | công khai | Phương pháp (DSAS: NSM, EPR, LRR, R²), tiêu chí phân loại, độ bất định, hạn chế, liên kết WMS/WFS |
+| `/huong-dan` | công khai | Hướng dẫn sử dụng, đọc kết quả, hỏi đáp, hỗ trợ bàn phím |
+| `/dang-nhap` | công khai | Đăng nhập bằng phiên (khoá tạm sau 5 lần sai) |
+| `/admin` | `admin` | Sửa ngưỡng hiển thị hotspot `min_erosion_rate`; mọi thay đổi ghi `activity_logs` |
+| `/bao-cao` | `admin` | Báo cáo nội bộ: tiến độ theo đề cương, mốc thời gian, kiểm thử |
+| `/api/*` | công khai (trừ ghi) | REST trả GeoJSON/JSON EPSG:4326; xem bảng bên dưới |
 
-Toàn bộ hình chỉ thể hiện khu vực đề tài — đoạn bờ sông Hậu thuộc xã Bình Mỹ, An Giang.
+### Bản đồ
+
+![Bản đồ tổng quan](docs/minh_chung/giao_dien/01_ban_do_tong_quan.png)
+
+*Thẻ **Tổng quan**: 267 transect tô màu theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), thống kê, hotspot, sạt lở tham chiếu,
+ranh giới khu vực nghiên cứu. Nền bản đồ tự phục vụ trên GeoServer.*
 
 | | |
 |---|---|
-| ![Bản đồ tổng quan](docs/minh_chung/01_ban_do_tong_quan.png) | ![Chi tiết transect T0094](docs/minh_chung/02_transect_T0094.png) |
-| Bản đồ tổng quan: 267 transect theo mức biến động | Chi tiết transect T0094: NSM/EPR/LRR/R², lịch sử vị trí đường bờ |
+| ![Thẻ Lớp dữ liệu](docs/minh_chung/giao_dien/02_tab_lop.png) | ![Thẻ Hotspot](docs/minh_chung/giao_dien/03_tab_diem_nong.png) |
+| **Lớp dữ liệu**: bật/tắt transect, hotspot, sạt lở tham chiếu; đường bờ từng năm 2018–2026; so sánh hai năm | **Hotspot**: lọc đoạn lùi bờ theo tốc độ tối thiểu (m/năm), bấm một đoạn để phóng tới |
+| ![Chi tiết transect](docs/minh_chung/giao_dien/05_chi_tiet_transect.png) | ![So sánh hai năm](docs/minh_chung/giao_dien/06_so_sanh_nam.png) |
+| **Chi tiết transect T0094**: NSM, EPR, LRR, R², khoảng tin cậy 95%, độ bất định, biểu đồ lịch sử vị trí đường bờ | **So sánh hai năm**: chồng hai đường bờ để xem dịch chuyển |
 
-**Bản đồ chuyên đề** — thành lập bằng QGIS 3.40 (print layout, script PyQGIS [`pipeline/qgis_maps.py`](pipeline/qgis_maps.py)),
-nền ảnh tổng hợp Sentinel-2, hệ toạ độ WGS 84 / UTM 48N, xuất 300 dpi:
+- **Chia sẻ & xuất dữ liệu** — liên kết chia sẻ lưu khung nhìn, lớp, năm trong URL (`#map=…`); tải từng lớp dạng GeoJSON/CSV tại `/api/export/{lớp}.{geojson|csv}`.
+- **Giao diện di động** — bố cục thu gọn, xem [ảnh](docs/minh_chung/giao_dien/13_di_dong.png).
+
+### Các trang còn lại
+
+| | |
+|---|---|
+| ![Phương pháp](docs/minh_chung/giao_dien/07_gioi_thieu.png) | ![Hướng dẫn](docs/minh_chung/giao_dien/08_huong_dan.png) |
+| `/gioi-thieu` — phương pháp và hạn chế | `/huong-dan` — hướng dẫn sử dụng |
+| ![Quản trị ngưỡng](docs/minh_chung/giao_dien/12_quan_tri_nguong.png) | ![Báo cáo](docs/minh_chung/giao_dien/11_bao_cao.png) |
+| `/admin` — chỉnh ngưỡng hiển thị (cần quyền `admin`) | `/bao-cao` — báo cáo nội bộ (cần quyền `admin`) |
+
+### REST API
+
+| Phương thức | Đường dẫn | Mô tả |
+|---|---|---|
+| GET | `/api/status` | Tình trạng MySQL, PostGIS, GeoServer và số bản ghi |
+| GET | `/api/summary` | Thống kê theo mức biến động, transect lùi/bồi mạnh nhất, hotspot, sạt lở tham chiếu |
+| GET | `/api/shorelines` | Đường bờ theo năm |
+| GET | `/api/transects`, `/api/transects/{id}`, `/api/transects/{id}/history` | Transect, chi tiết, chuỗi khoảng cách theo năm |
+| GET | `/api/erosion-hotspots` | Đoạn lùi bờ mạnh |
+| GET | `/api/reference-events` | Sạt lở tham chiếu 2019–2020 |
+| GET | `/api/config/thresholds` | Ngưỡng hiển thị hiện hành |
+| GET | `/api/export/{lớp}.{geojson\|csv}` | Tải dữ liệu |
+| POST | `/api/auth/login` | Cấp token Sanctum |
+| PUT | `/api/admin/config/thresholds/{key}` | Sửa ngưỡng (`admin`) |
+
+## Bản đồ chuyên đề và sơ đồ
+
+Bản đồ chuyên đề thành lập bằng QGIS 3.40 (print layout, script PyQGIS [`pipeline/qgis_maps.py`](pipeline/qgis_maps.py)),
+nền ảnh tổng hợp Sentinel-2, hệ toạ độ WGS 84 / UTM 48N, xuất 300 dpi. Toàn bộ hình chỉ thể hiện khu vực đề tài —
+đoạn bờ sông Hậu thuộc xã Bình Mỹ, An Giang.
 
 | | | |
 |---|---|---|
@@ -39,8 +80,7 @@ nền ảnh tổng hợp Sentinel-2, hệ toạ độ WGS 84 / UTM 48N, xuất 3
 | Điểm nóng xói lở mạnh nhất | Đối chiếu với ESA WorldCover 2021 | |
 
 **Sơ đồ** (Mermaid): [kiến trúc](docs/assets/architecture.png) · [ERD PostGIS](docs/assets/er-postgis.png) ·
-[ERD MySQL](docs/assets/er-mysql.png) · [tiến độ](docs/assets/gantt.png). Trang giới thiệu & phương pháp:
-[ảnh](docs/minh_chung/03_trang_gioi_thieu.png).
+[ERD MySQL](docs/assets/er-mysql.png) · [tiến độ](docs/assets/gantt.png).
 
 ## Kiến trúc
 
@@ -199,6 +239,33 @@ RMSE này là gợi ý `U_classify` (15,1 / 18,39 / 19,99 m).
 | IO-LULC | 2021 | 0,8959 | 0,9093 | 52,29 |
 | IO-LULC | 2022 | 0,8837 | 0,8917 | 51,92 |
 | IO-LULC | 2023 | 0,8871 | 0,8993 | 51,07 |
+
+## Đối chiếu với đề cương và yêu cầu
+
+Đối chiếu bản web đang chạy (chụp ngày 23/11/2026, dữ liệu 267 transect) với đề cương đồ án (mục 2.1, 2.5, 3.5–3.7) và
+`docs/tai-lieu/yeu-cau.txt`.
+
+**Đã đáp ứng:** nền bản đồ; đường bờ 2018–2026 bật/tắt và so sánh hai năm; transect và hotspot tô màu theo mức biến động;
+lớp sạt lở tham chiếu; chọn transect xem NSM/EPR/LRR/R², độ bất định và biểu đồ lịch sử (Chart.js); lọc hotspot theo ngưỡng;
+API từ PostGIS; WMS/WFS qua GeoServer; MySQL lưu người dùng, ngưỡng, nhật ký; Playwright E2E.
+
+**Chỗ lệch (web thực tế khác hoặc vượt đề cương):**
+
+| # | Đề cương / yêu cầu | Thực tế | Ghi chú |
+|---|---|---|---|
+| 1 | Phân loại 3 mức: bồi, ổn định, lùi bờ mạnh (2.1) | 4 mức: thêm **lùi nhẹ** | Đúng với tiêu chí chốt ở mục 2.5; đề cương mục 2.1 chưa nhắc "lùi nhẹ" |
+| 2 | "Không yêu cầu phân quyền phức tạp" (2.1) | Có đăng nhập, vai trò `admin`/`viewer`, token Sanctum, trang `/admin` | Chỉ để sửa ngưỡng; phần xem vẫn công khai |
+| 3 | "Lọc đoạn bờ vượt ngưỡng cấu hình" (2.1) | Ngưỡng `min_erosion_rate` = 1,0 m/năm chỉ lọc **hotspot đã có**; ngưỡng phân loại của pipeline là LRR ≤ −2 m/năm | Hai ngưỡng khác nhau, người dùng dễ nhầm; đang chờ quyết định |
+| 4 | Bật/tắt "ranh giới AOI" trong bảng lớp (2.5) | AOI luôn hiển thị (nét đứt), có trong chú giải nhưng **không có công tắc** | |
+| 5 | WFS phục vụ chọn đối tượng và lọc (2.5) | Việc chọn transect và lọc đi qua REST API của Laravel; WFS được công bố và kiểm tra nhưng giao diện không gọi | |
+| 6 | API dùng `ST_Distance`, `ST_Intersection` để tính sẵn (2.5) | Chỉ truy vấn tổng hợp hotspot dùng hàm không gian; chỉ số do pipeline tính sẵn, Laravel không tính lại | Phù hợp nguyên tắc "web chỉ đọc" |
+| 7 | Sạt lở tham chiếu 2019–2020 làm dữ liệu kiểm chứng | 2 sự kiện, vị trí số hoá từ nguồn báo chí/UBND tỉnh, có vùng cảnh báo ~3,3 km; 0/2 sự kiện nằm trong 500 m của hotspot | Chưa có dữ liệu thật từ UBND xã hay Ban chỉ huy PCTT-TKCN An Giang (yêu cầu liên hệ); xem [`docs/checklist-yeu-cau.md`](docs/checklist-yeu-cau.md) |
+| 8 | Chọn chỉ số nước theo F1 trung bình, hoà thì xét RMSE | F1 tốt nhất là `awei` (0,9457), nhưng chỉ số mặc định đang dùng `mndwi` (0,9456); chưa có bước xét RMSE trong mã | Chênh không đáng kể |
+| 9 | (không có trong đề cương) | Có thêm `/gioi-thieu`, `/huong-dan`, `/bao-cao`, liên kết chia sẻ, xuất GeoJSON/CSV, nền tự phục vụ, giao diện di động | Bổ sung ngoài phạm vi |
+| 10 | Số liệu nhất quán | Trang `/bao-cao` ghi cố định "2 hotspot lùi mạnh (3 transect lùi mạnh)" (`web/resources/views/report/index.blade.php`, dòng 53), trong khi dữ liệu hiện có 1 hotspot và 1 transect lùi mạnh (sau khi chốt tiêu chí t(df = n − 2), LRR ≤ −2) | Số liệu trên trang cũ, cần sửa |
+
+Yêu cầu trong `yeu-cau.txt` (chốt trước tiêu chí lùi bờ mạnh, công thức độ bất định có nguồn, văn phong đề cương, bảng 15 tuần) thuộc
+phần tài liệu; tình trạng từng mục xem [`docs/checklist-yeu-cau.md`](docs/checklist-yeu-cau.md).
 
 ## Dữ liệu
 
