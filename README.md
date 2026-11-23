@@ -13,7 +13,7 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ## Tính năng
 
-- **Bản đồ tương tác** — đường bờ theo năm, transect tô màu theo mức biến động, điểm nóng xói lở, sự kiện sạt lở tham chiếu (Leaflet + WMS GeoServer).
+- **Bản đồ tương tác** — đường bờ theo năm, transect tô màu theo mức biến động, điểm nóng xói lở, sự kiện sạt lở tham chiếu (Leaflet + WMS GeoServer; dữ liệu vector còn truy vấn được qua WFS).
 - **Phân tích transect** — biểu đồ chuỗi khoảng cách theo năm, chỉ số NSM/EPR/LRR/R² và độ bất định.
 - **Tổng quan** — thống kê theo mức biến động, lọc điểm nóng theo ngưỡng, liên kết chia sẻ (permalink).
 - **Xuất dữ liệu** — tải các lớp dưới dạng GeoJSON/CSV qua REST API.
@@ -53,7 +53,7 @@ flowchart LR
         API[REST API] --> PG
         API --> MY[(MySQL<br/>người dùng, cấu hình)]
     end
-    PG --> GS[GeoServer<br/>WMS]
+    PG --> GS[GeoServer<br/>WMS + WFS]
     GS --> UI[Leaflet + Chart.js]
     API --> UI
 ```
@@ -144,7 +144,7 @@ Hai CSDL, theo các migration trong `web/database/migrations/`.
 | `shorelines` | đường bờ theo năm, `MultiLineString`; `year`, `water_index`, `source_image_date`; unique `(year, water_index)` |
 | `transects` | `transect_code` (unique), `baseline_id` → `baseline`, `geom` |
 | `transect_shoreline_distances` | khoảng cách baseline → bờ `distance_m` theo `(transect_id, year)` |
-| `shoreline_change_stats` | mỗi transect một dòng: `nsm_m`, `epr_m_per_year`, `lrr_m_per_year`, `se_lrr`, `r_squared`, `is_significant`, `change_class` (`accretion` \| `stable` \| `mild_erosion` \| `severe_erosion`), `consecutive_erosion_periods`, `u_shoreline_avg` |
+| `shoreline_change_stats` | mỗi transect một dòng: `nsm_m`, `epr_m_per_year`, `lrr_m_per_year`, `se_lrr`, `unc_lrr` (nửa bề rộng KTC 95% của LRR, Student t df = n − 2), `r_squared`, `is_significant`, `change_class` (`accretion` \| `stable` \| `mild_erosion` \| `severe_erosion`), `consecutive_erosion_periods`, `u_shoreline_avg` |
 | `erosion_hotspots` | đoạn lùi bờ mạnh: `severity` (m/năm), `period_start_year`, `period_end_year`, `notes` |
 | `reference_landslide_events` | sạt lở tham chiếu: `event_date`, `description`, `source`, `danger_level` (`dac_biet_nguy_hiem` \| `nguy_hiem` \| `binh_thuong`), `length_m`, `location` |
 | `transects_styled` (view) | `transects` ghép `shoreline_change_stats`, dùng cho GeoServer (lọc `is_significant` bằng CQL_FILTER) |
@@ -153,18 +153,20 @@ Hai CSDL, theo các migration trong `web/database/migrations/`.
 
 Trích từ `pipeline/output/*.json` (bản demo, sinh bởi pipeline).
 
-**Tổng quan** (`summary.json`): 267 transect, chỉ số nước đang dùng `mndwi`, 13 quan sát bị khử đột biến, 2 hotspot.
+**Tổng quan** (`summary.json`): 267 transect, chỉ số nước đang dùng `mndwi`, 13 quan sát bị khử đột biến, 1 hotspot.
 
 | Lớp biến động | Số transect |
 |---|---|
-| Bồi (`accretion`) | 96 |
-| Ổn định (`stable`) | 143 |
-| Lùi nhẹ (`mild_erosion`) | 25 |
-| Lùi mạnh (`severe_erosion`) | 3 |
+| Bồi (`accretion`) | 81 |
+| Ổn định (`stable`) | 167 |
+| Lùi nhẹ (`mild_erosion`) | 18 |
+| Lùi mạnh (`severe_erosion`) | 1 |
 
-Ngưỡng lùi mạnh = M − S = −1,804 m/năm (M = −1,356; S = 0,448 theo LRR của các transect lùi bờ).
-Hotspot (`hotspots.json`, giai đoạn 2018–2026): đoạn T0094–T0095 (2 transect, ~100 m, 2,21 m/năm) và T0138 (1 transect, ~50 m, 1,83 m/năm).
-Độ bất định đường bờ `u_shoreline` theo năm: 19,93 m (2018), 22,52 m (2022), 23,85 m (các năm còn lại); `u_classify_is_placeholder = false`.
+Tiêu chí chốt trước khi chạy lại (không chỉnh theo kết quả): có ý nghĩa thống kê khi |LRR| > t(0,975; n − 2)·SE (n = 9 năm thì t = 2,365);
+lùi mạnh khi có ý nghĩa, LRR ≤ −2 m/năm và khoảng cách giảm liên tục ≥ 3 mốc năm liền nhau; R² &lt; 0,3 chỉ là cờ chất lượng.
+Trước đó dùng z = 1,96 và ngưỡng M − S = −1,804 m/năm (tính trên chính kết quả, hậu nghiệm): 124 transect có ý nghĩa, 3 lùi mạnh, 2 hotspot.
+Hotspot (`hotspots.json`, giai đoạn 2018–2026): 1 đoạn gồm T0094 (1 transect, ~50 m, LRR −2,56 m/năm).
+Độ bất định đường bờ `u_shoreline` (1σ, U_georef quy từ 12 m ở 95,5% về 6 m) theo năm: 17,00 m (2018), 19,98 m (2022), 21,47 m (các năm còn lại).
 
 **Đánh giá so với ground truth số hoá** (`evaluation.json`, 5 ô mẫu mỗi năm, 18.000 pixel/chỉ số). Giá trị F1 / IoU:
 
