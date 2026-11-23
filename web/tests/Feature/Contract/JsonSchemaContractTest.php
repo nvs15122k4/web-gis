@@ -60,7 +60,7 @@ class JsonSchemaContractTest extends TestCase
             $this->assertIsFloat($t[$k]['lrr_m_per_year']);
         }
         $this->assertSame(['count', 'years'], $this->keys($j['shorelines']));
-        $this->assertContainsOnly('int', $j['shorelines']['years']);
+        $this->assertContainsOnlyInt($j['shorelines']['years']);
         $this->assertSame(['count', 'length_m'], $this->keys($j['hotspots']));
         $this->assertSame(['by_level', 'count'], $this->keys($j['reference_events']));
     }
