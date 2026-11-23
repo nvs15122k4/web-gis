@@ -45,3 +45,9 @@ export async function clickAt(page: Page, lat: number, lng: number) {
     }, [lat, lng]);
     await page.mouse.click(pt.x, pt.y);
 }
+
+/** Mở trang giới thiệu & phương pháp và chờ tiêu đề hiển thị. */
+export async function openAbout(page: Page) {
+    await page.goto('/gioi-thieu');
+    await expect(page.getByRole('heading', { level: 1, name: /Giới thiệu/ })).toBeVisible();
+}
