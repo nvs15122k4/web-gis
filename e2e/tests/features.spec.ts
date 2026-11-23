@@ -51,15 +51,16 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
     test('15c chi tiết transect thiếu u_shoreline_avg (T05): ghi "Đang cập nhật", không NaN', async ({ page }) => {
         await openMap(page);
         const t = await API.transect(page, 'T05');
-        // Giả lập bản ghi chưa có độ bất định: gỡ u_shoreline_avg khỏi phản hồi chi tiết.
+        // Giả lập bản ghi chưa có độ bất định: gỡ u_shoreline_avg, unc_lrr và se_lrr (KTC có thể suy từ SE tuỳ bản build) khỏi phản hồi chi tiết.
         await page.route(new RegExp(`/api/transects/${t.id}$`), async (route) => {
             const body = await (await route.fetch()).json();
-            body.stats = { ...body.stats, u_shoreline_avg: null };
+            body.stats = { ...body.stats, u_shoreline_avg: null, unc_lrr: null, se_lrr: null };
             await route.fulfill({ json: body });
         });
         await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.id);
         await expect(page.locator('#transect-code')).toHaveText('T05');
         await expect(page.locator('#stat-u')).toHaveText('Đang cập nhật');
+        await expect(page.locator('#stat-ci')).toHaveText('Đang cập nhật');
         await expect(page.locator('#transect-detail')).not.toContainText(/NaN|undefined/);
         await expect(page.locator('#stat-nsm')).not.toBeEmpty();
     });
