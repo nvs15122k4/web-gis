@@ -49,6 +49,11 @@ class E2eFixtureSeeder extends Seeder
             ['name' => 'Viewer', 'password' => 'password', 'role' => 'viewer']
         );
 
+        // E2E_SKIP_PG_SEED=1 (slot song song): chỉ nạp MySQL; PostGIS dùng chung với GeoServer nên không xoá/nạp lại khi phiên khác đang chạy.
+        if (env('E2E_SKIP_PG_SEED')) {
+            return;
+        }
+
         $pg = DB::connection('pgsql');
         foreach ([
             'reference_landslide_events', 'erosion_hotspots', 'shoreline_change_stats',
