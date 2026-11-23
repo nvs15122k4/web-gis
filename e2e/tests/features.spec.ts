@@ -3,7 +3,7 @@ import { openMap, openTab, API } from './helpers';
 
 /** Các tính năng tham khảo từ DEA Coastlines, USGS Coastal Change Hazards Portal và bản đồ sạt lở ĐBSCL. */
 test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
-    test('13 tổng quan: đếm đúng 4 mức, bấm transect lùi mạnh nhất mở chi tiết', async ({ page }) => {
+    test('13 tổng quan: đếm đúng 4 mức, bấm transect lùi mạnh nhất mở chi tiết', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await openMap(page);
         await expect(page.locator('#kpi-transects')).toHaveText('10');
         await expect(page.locator('#summary [data-class="severe_erosion"]')).toHaveText('3');
@@ -12,7 +12,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         await expect(page.locator('#transect-code')).toHaveText('T10');
     });
 
-    test('14 lọc ý nghĩa thống kê: WMS transect gửi CQL_FILTER is_significant=true', async ({ page }) => {
+    test('14 lọc ý nghĩa thống kê: WMS transect gửi CQL_FILTER is_significant=true', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         const req = page.waitForRequest((r) => /transects/.test(r.url()) && /cql_filter=is_significant%3Dtrue/i.test(r.url()));
@@ -23,7 +23,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         await off;
     });
 
-    test('15 chi tiết transect: ý nghĩa thống kê, KTC 95%, số năm quan trắc', async ({ page }) => {
+    test('15 chi tiết transect: ý nghĩa thống kê, KTC 95%, số năm quan trắc', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await openMap(page);
         const t = await API.transect(page, 'T05');
         await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.id);
@@ -32,7 +32,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         await expect(page.locator('#stat-ci')).toContainText('m/năm');
     });
 
-    test('16 liên kết chia sẻ: mở lại đúng khung nhìn và transect', async ({ page }) => {
+    test('16 liên kết chia sẻ: mở lại đúng khung nhìn và transect', { tag: ['@happy'] }, async ({ page }) => {
         const t = await API.transect(page, 'T09');
         await page.goto(`/#map=16/10.59200/105.20700&t=${t.id}`);
         await page.waitForFunction(() => (window as any).__webgis?.map);
@@ -43,7 +43,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         expect(await page.evaluate(() => location.hash)).toContain(`t=${t.id}`);
     });
 
-    test('17 sạt lở tham chiếu: popup có mức độ QĐ 01/2011, thiếu dữ liệu ghi "Đang cập nhật"', async ({ page }) => {
+    test('17 sạt lở tham chiếu: popup có mức độ QĐ 01/2011, thiếu dữ liệu ghi "Đang cập nhật"', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         const fc = await (await page.request.get('/api/reference-events')).json();
         const [lng, lat] = fc.features[0].geometry.coordinates;
@@ -63,7 +63,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         expect(texts.find((s: string) => s.includes('2020-03-02'))).toContain('Đang cập nhật');
     });
 
-    test('18 nền bản đồ: mặc định nền tự phục vụ, chuyển sang ảnh vệ tinh', async ({ page }) => {
+    test('18 nền bản đồ: mặc định nền tự phục vụ, chuyển sang ảnh vệ tinh', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         // Nền mặc định lấy từ GeoServer của dự án (không có "đường lưỡi bò"), không phải tile bên thứ ba.
         await expect(page.locator('.leaflet-basemap-pane img[src*="nen_ban_do"]').first()).toBeAttached();
@@ -76,7 +76,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         expect(z[0]).toBeLessThan(z[1]);
     });
 
-    test('21 khung nhìn neo vào đoạn sông Hậu – xã Bình Mỹ, vẫn thu phóng được', async ({ page }) => {
+    test('21 khung nhìn neo vào đoạn sông Hậu – xã Bình Mỹ, vẫn thu phóng được', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await page.goto('/#map=8/13.50000/111.00000');
         await page.waitForFunction(() => (window as any).__webgis?.map);
         const inArea = (c: { lat: number; lng: number }) => c.lat >= 10.40 && c.lat <= 10.62 && c.lng >= 105.12 && c.lng <= 105.42;
@@ -96,7 +96,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         expect(inArea(view.center)).toBe(true);
     });
 
-    test('19 trang giới thiệu & tải dữ liệu', async ({ page }) => {
+    test('19 trang giới thiệu & tải dữ liệu', { tag: ['@happy'] }, async ({ page }) => {
         await page.goto('/gioi-thieu');
         await expect(page.getByRole('heading', { name: 'Tiêu chí phân loại mức biến động (Mục 2.5 đề cương)' })).toBeVisible();
         await expect(page.locator('td[data-layer="transects"]')).toHaveText('10 bản ghi');
@@ -105,7 +105,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         expect((await res.json()).features).toHaveLength(2);
     });
 
-    test('20 chưa có dữ liệu: các panel ghi "Đang cập nhật", không crash', async ({ page }) => {
+    test('20 chưa có dữ liệu: các panel ghi "Đang cập nhật", không crash', { tag: ['@edge'] }, async ({ page }) => {
         const down = { status: 503, contentType: 'application/json', body: '{"message":"Dữ liệu đang cập nhật.","status":"updating"}' };
         for (const path of ['summary', 'erosion-hotspots', 'config/thresholds']) {
             await page.route(`**/api/${path}**`, (r) => r.fulfill(down));
