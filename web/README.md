@@ -94,7 +94,7 @@ cd ../e2e && npm install && npx playwright install && npx playwright test
 
 `.env.testing` / `.env.e2e` mang thông tin kết nối riêng (không commit). Global setup của Playwright tự nạp lại
 fixture cố định (`E2eFixtureSeeder`: năm 2022 thiếu composite, transect T05 thiếu 2020–2021, sạt lở tham chiếu chỉ ở phía bắc).
-WebKit trên Linux cần thư viện hệ thống (`sudo npx playwright install-deps`).
+WebKit trên Linux cần thư viện hệ thống (`sudo npx playwright install-deps`). Trên Ubuntu mới hơn 24.04 (vd. 26.04) bản WebKit của Playwright không khởi chạy được vì thiếu `libicu74`/`libjxl0.8`; khi đó chạy `cd e2e && npm run test:no-webkit` (chỉ Chromium và Firefox).
 
 ## Ghi chú
 
