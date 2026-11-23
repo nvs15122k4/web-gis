@@ -74,7 +74,7 @@
             <tr><td><span class="legend-swatch inline" style="background:var(--c-accretion)"></span> Bồi</td><td>Có ý nghĩa thống kê và LRR &gt; 0</td></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-stable)"></span> Ổn định</td><td>|LRR| ≤ t × SE(LRR), chưa đủ cơ sở kết luận biến động</td></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-mild-erosion)"></span> Lùi nhẹ</td><td>Lùi bờ có ý nghĩa thống kê nhưng không đủ cả hai điều kiện "lùi mạnh"</td></tr>
-            <tr><td><span class="legend-swatch inline" style="background:var(--c-severe-erosion)"></span> Lùi mạnh</td><td>Lùi bờ có ý nghĩa thống kê, LRR ≤ −2 m/năm (ngưỡng tuyệt đối đặt trước, không phụ thuộc phân phối kết quả)
+            <tr><td><span class="legend-swatch inline" style="background:var(--c-severe-erosion)"></span> Lùi mạnh</td><td>Lùi bờ có ý nghĩa thống kê, LRR ≤ −2 m/năm (ngưỡng tuyệt đối đặt trước, không phụ thuộc phân phối kết quả; quy ước của đồ án, tham chiếu khoảng phân lớp xói của Luijendijk và cs. 2018 và Nguyen &amp; Khoi 2020)
                 <em>và</em> khoảng cách giảm liên tục ở ít nhất 3 mốc năm liên tiếp</td></tr>
         </table></div>
         <p>R² không phải ngưỡng loại trừ. Transect có <strong>R² &lt; 0,3</strong> vẫn giữ nếu có ý nghĩa thống kê, nhưng được ghi chú
@@ -87,7 +87,9 @@
             (nửa pixel 10 m), U<sub>georef</sub> theo thông số ESA, U<sub>classify</sub> = RMSE so với đường bờ số hóa thủ công.
             Mọi thành phần quy về cùng chuẩn 1σ: U<sub>georef</sub> = 12 m ở độ tin cậy 95,5% (2σ) nên dùng 6 m (1σ).
             Độ bất định LRR (95%) = t × SE(LRR); độ bất định EPR (95%) = 1,96 × √(U(t1)² + U(t2)²) / |t2 − t1|.
-            Năm không có ground truth dùng U<sub>classify</sub> lớn nhất đã đo (20 m); các thành phần chưa có nguồn trích dẫn đang chờ xác nhận.</p>
+            Năm không có ground truth dùng U<sub>classify</sub> lớn nhất đã đo (20 m); 
+            U<sub>pixel</sub> lấy theo nửa pixel (Vos và cs. 2019), U<sub>georef</sub> theo đặc tả định vị của ESA và Clerc và cs.; công thức gộp từng đường bờ,
+            phép quy 12 m (95,5%) về 6 m (1σ) và ngưỡng khử đột biến 50 m là suy luận/giả định của đồ án, không gán cho nguồn. Cách lan truyền sang EPR và khoảng tin cậy của LRR theo DSAS (Himmelstoss và cs. 2021).</p>
     </section>
 
     <section id="sat-lo">
@@ -151,7 +153,11 @@
             <li><a href="https://marine.usgs.gov/coastalchangehazardsportal/" rel="noopener">USGS Coastal Change Hazards Portal</a> — tốc độ biến động theo transect (DSAS), tải dữ liệu, chia sẻ liên kết.</li>
             <li><a href="https://shorelinemonitor.deltares.nl/" rel="noopener">Deltares ShorelineMonitor</a> — biến động bờ toàn cầu, màu đỏ (xói) / xanh (bồi).</li>
             <li>Bản đồ trực tuyến sạt lở bờ sông, bờ biển ĐBSCL — Tổng cục Phòng chống thiên tai (2018).</li>
-            <li>Himmelstoss và cộng sự (2018), <em>Digital Shoreline Analysis System (DSAS) v5.0 User Guide</em>, USGS.</li>
+            <li>Himmelstoss, Henderson, Kratzmann &amp; Farris (2021), <em>Digital Shoreline Analysis System (DSAS) version 5.1 User Guide</em>, USGS Open-File Report 2021-1091, doi:10.3133/ofr20211091.</li>
+            <li>Luijendijk và cs. (2018), <em>The State of the World's Beaches</em>, Scientific Reports 8:6641, doi:10.1038/s41598-018-24630-6.</li>
+            <li>Nguyen &amp; Khoi (2020), Science &amp; Technology Development Journal 2(SI2):SI53–SI62, doi:10.32508/stdjet.v2isi2.444.</li>
+            <li>Vos và cs. (2019), CoastSat, Environmental Modelling &amp; Software 122:104528, doi:10.1016/j.envsoft.2019.104528.</li>
+            <li>Clerc và cs., đánh giá định vị Sentinel-2 (CE95 &lt; 12,5 m); ESA, đặc tả sản phẩm Sentinel-2 L1C (định vị tuyệt đối &lt; 12 m ở 95,5%).</li>
         </ul>
     </section>
 </main>
