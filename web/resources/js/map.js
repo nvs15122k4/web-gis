@@ -72,6 +72,8 @@ function initSidebarToggle(map) {
     const setCollapsed = (collapsed) => {
         sidebar.classList.toggle('collapsed', collapsed);
         toggle.setAttribute('aria-expanded', String(!collapsed));
+        // Thanh bên trượt ra ngoài màn hình trên điện thoại: chặn Tab/trình đọc màn hình vào phần đang ẩn.
+        sidebar.inert = collapsed && mobile.matches;
     };
     if (mobile.matches) {
         setCollapsed(true);
