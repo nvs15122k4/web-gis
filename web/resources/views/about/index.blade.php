@@ -68,13 +68,13 @@
 
     <section id="phan-loai">
         <h2>Tiêu chí phân loại mức biến động (Mục 2.5 đề cương)</h2>
-        <p>Transect có xu hướng biến động thực sự khi <strong>|LRR| &gt; 1,96 × SE(LRR)</strong>, tức khoảng tin cậy 95% không chứa 0.</p>
+        <p>Các tiêu chí dưới đây được chốt trước khi chạy lại pipeline và không điều chỉnh theo kết quả. Transect có xu hướng biến động thực sự khi <strong>|LRR| &gt; t × SE(LRR)</strong>, với t là hệ số phân phối Student (hai phía, độ tin cậy 95%, bậc tự do n − 2 của từng transect; chuỗi 9 năm có t = 2,365), tức khoảng tin cậy 95% của LRR không chứa 0.</p>
         <div class="table-wrap"><table>
             <tr><th>Mức</th><th>Điều kiện</th></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-accretion)"></span> Bồi</td><td>Có ý nghĩa thống kê và LRR &gt; 0</td></tr>
-            <tr><td><span class="legend-swatch inline" style="background:var(--c-stable)"></span> Ổn định</td><td>|LRR| ≤ 1,96 × SE(LRR), chưa đủ cơ sở kết luận biến động</td></tr>
+            <tr><td><span class="legend-swatch inline" style="background:var(--c-stable)"></span> Ổn định</td><td>|LRR| ≤ t × SE(LRR), chưa đủ cơ sở kết luận biến động</td></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-mild-erosion)"></span> Lùi nhẹ</td><td>Lùi bờ có ý nghĩa thống kê nhưng không đủ cả hai điều kiện "lùi mạnh"</td></tr>
-            <tr><td><span class="legend-swatch inline" style="background:var(--c-severe-erosion)"></span> Lùi mạnh</td><td>LRR ≤ M − S (M, S là trung bình và độ lệch chuẩn LRR của các transect lùi bờ có ý nghĩa)
+            <tr><td><span class="legend-swatch inline" style="background:var(--c-severe-erosion)"></span> Lùi mạnh</td><td>Lùi bờ có ý nghĩa thống kê, LRR ≤ −2 m/năm (ngưỡng tuyệt đối đặt trước, không phụ thuộc phân phối kết quả)
                 <em>và</em> khoảng cách giảm liên tục ở ít nhất 3 mốc năm liên tiếp</td></tr>
         </table></div>
         <p>R² không phải ngưỡng loại trừ. Transect có <strong>R² &lt; 0,3</strong> vẫn giữ nếu có ý nghĩa thống kê, nhưng được ghi chú
@@ -85,7 +85,9 @@
         <h2>Độ bất định</h2>
         <p class="formula">U<sub>shoreline</sub> = √(U<sub>pixel</sub>² + U<sub>georef</sub>² + U<sub>classify</sub>²), với U<sub>pixel</sub> = 5 m
             (nửa pixel 10 m), U<sub>georef</sub> theo thông số ESA, U<sub>classify</sub> = RMSE so với đường bờ số hóa thủ công.
-            Độ bất định LRR = 1,96 × SE(LRR); độ bất định EPR = √(U(t1)² + U(t2)²) / |t2 − t1|.</p>
+            Mọi thành phần quy về cùng chuẩn 1σ: U<sub>georef</sub> = 12 m ở độ tin cậy 95,5% (2σ) nên dùng 6 m (1σ).
+            Độ bất định LRR (95%) = t × SE(LRR); độ bất định EPR (95%) = 1,96 × √(U(t1)² + U(t2)²) / |t2 − t1|.
+            Năm không có ground truth dùng U<sub>classify</sub> lớn nhất đã đo (20 m); các thành phần chưa có nguồn trích dẫn đang chờ xác nhận.</p>
     </section>
 
     <section id="sat-lo">
@@ -124,6 +126,22 @@
     <section id="tai-du-lieu">
         <h2>Tải dữ liệu</h2>
         @include('partials.downloads')
+        @php
+            $gs = config('services.geoserver');
+            $ows = rtrim($gs['url'], '/').'/'.$gs['workspace'];
+            $wfsGet = $ows.'/wfs?'.http_build_query(['service' => 'WFS', 'version' => '1.0.0', 'request' => 'GetFeature', 'outputFormat' => 'application/json']);
+        @endphp
+        <h3>Dịch vụ OGC (GeoServer)</h3>
+        <p>Bản đồ hiển thị bằng <strong>WMS</strong>; dữ liệu vector truy vấn được qua <strong>WFS</strong> (GeoJSON, lọc bằng CQL_FILTER hoặc bbox).</p>
+        <ul class="downloads" id="ogc-services">
+            <li><span>Năng lực dịch vụ</span><span class="download-links">
+                <a class="pill" href="{{ $ows }}/wms?service=WMS&amp;request=GetCapabilities" rel="noopener">WMS</a>
+                <a class="pill" href="{{ $ows }}/wfs?service=WFS&amp;request=GetCapabilities" rel="noopener">WFS</a></span></li>
+            <li><span>Transect lùi mạnh qua WFS</span><span class="download-links">
+                <a class="pill" href="{{ $wfsGet }}&amp;typeName={{ $gs['workspace'] }}:transects&amp;CQL_FILTER=change_class%3D%27severe_erosion%27" rel="noopener">GeoJSON</a></span></li>
+            <li><span>Hotspot lùi bờ qua WFS</span><span class="download-links">
+                <a class="pill" href="{{ $wfsGet }}&amp;typeName={{ $gs['workspace'] }}:erosion_hotspots" rel="noopener">GeoJSON</a></span></li>
+        </ul>
     </section>
 
     <section id="tham-khao">
