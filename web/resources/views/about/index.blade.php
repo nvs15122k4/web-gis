@@ -21,7 +21,7 @@
     <a href="#tai-du-lieu">Tải dữ liệu</a>
     <a href="#tham-khao">Tham khảo</a>
 </nav>
-<main class="doc" id="about">
+<main class="doc" id="main-content" tabindex="-1">
     <h1>Giới thiệu &amp; phương pháp</h1>
     <p class="lead">WebGIS giám sát biến động bờ sông Hậu tại xã Bình Mỹ, tỉnh An Giang, giai đoạn
         {{ $years[0] }}–{{ end($years) }}. Kết quả được tính sẵn bằng pipeline Python từ ảnh vệ tinh; web chỉ đọc và hiển thị,
