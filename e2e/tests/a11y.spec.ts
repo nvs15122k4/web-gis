@@ -3,7 +3,7 @@ import { openMap, openTab } from './helpers';
 
 test.describe('Trợ năng (a11y)', () => {
     for (const path of ['/', '/gioi-thieu', '/admin']) {
-        test(`Y01 ${path}: landmark chính, h1/h2 có nội dung, mọi nút/ liên kết có tên`, async ({ page }) => {
+        test(`Y01 ${path}: landmark chính, h1/h2 có nội dung, mọi nút/ liên kết có tên`, { tag: ['@a11y'] }, async ({ page }) => {
             await page.goto(path);
             await expect(page.locator('header.appbar')).toBeVisible();
             await expect(page.getByRole('navigation', { name: 'Điều hướng chính' })).toBeVisible();
@@ -16,7 +16,7 @@ test.describe('Trợ năng (a11y)', () => {
         });
     }
 
-    test('Y02 trang bản đồ: mọi input/select có nhãn (label, aria-label)', async ({ page }) => {
+    test('Y02 trang bản đồ: mọi input/select có nhãn (label, aria-label)', { tag: ['@a11y'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         const bad = await page.evaluate(() =>
@@ -27,7 +27,7 @@ test.describe('Trợ năng (a11y)', () => {
         expect(bad).toEqual([]);
     });
 
-    test('Y03 ảnh/biểu tượng SVG trang trí ẩn khỏi trình đọc màn hình, <img> có alt', async ({ page }) => {
+    test('Y03 ảnh/biểu tượng SVG trang trí ẩn khỏi trình đọc màn hình, <img> có alt', { tag: ['@a11y'] }, async ({ page }) => {
         await openMap(page);
         const noAlt = await page.evaluate(() => [...document.querySelectorAll('img:not(.leaflet-tile):not(.leaflet-marker-icon):not(.leaflet-marker-shadow)')]
             .filter((i) => !i.hasAttribute('alt')).map((i) => i.getAttribute('src')));
@@ -36,7 +36,7 @@ test.describe('Trợ năng (a11y)', () => {
         expect(svgBad).toBe(0);
     });
 
-    test('Y04 tab: roving tabindex, chỉ tab đang chọn tabindex != -1, liên kết aria-controls đúng', async ({ page }) => {
+    test('Y04 tab: roving tabindex, chỉ tab đang chọn tabindex != -1, liên kết aria-controls đúng', { tag: ['@a11y'] }, async ({ page }) => {
         await openMap(page);
         for (const name of ['overview', 'layers', 'hotspots', 'share']) {
             await openTab(page, name);
@@ -51,7 +51,7 @@ test.describe('Trợ năng (a11y)', () => {
         }
     });
 
-    test('Y05 bàn phím: Tab đưa focus qua nút và vòng focus nhìn thấy được', async ({ page }) => {
+    test('Y05 bàn phím: Tab đưa focus qua nút và vòng focus nhìn thấy được', { tag: ['@a11y'] }, async ({ page }) => {
         await page.goto('/');
         await page.keyboard.press('Tab');
         const info = await page.evaluate(() => {
@@ -63,7 +63,7 @@ test.describe('Trợ năng (a11y)', () => {
         expect(info.outline || info.shadow).toBe(true);
     });
 
-    test('Y06 bàn phím: nút Lọc kích hoạt bằng Enter trong ô ngưỡng và bằng Space trên nút', async ({ page }) => {
+    test('Y06 bàn phím: nút Lọc kích hoạt bằng Enter trong ô ngưỡng và bằng Space trên nút', { tag: ['@a11y'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'hotspots');
         await page.fill('#min-rate', '3');
@@ -75,7 +75,7 @@ test.describe('Trợ năng (a11y)', () => {
         await expect(page.locator('#hotspot-count')).toContainText('từ 4 m/năm');
     });
 
-    test('Y07 bàn phím: nút sidebar mở/đóng bằng Enter và aria-expanded đổi theo (mobile)', async ({ page }) => {
+    test('Y07 bàn phím: nút sidebar mở/đóng bằng Enter và aria-expanded đổi theo (mobile)', { tag: ['@a11y'] }, async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 700 });
         await openMap(page);
         const btn = page.locator('#sidebar-toggle');
@@ -85,27 +85,27 @@ test.describe('Trợ năng (a11y)', () => {
         await expect(btn).not.toHaveAttribute('aria-expanded', before!);
     });
 
-    test('Y08 vùng thông báo (status/banner) có role=status để đọc tự động', async ({ page }) => {
+    test('Y08 vùng thông báo (status/banner) có role=status để đọc tự động', { tag: ['@a11y'] }, async ({ page }) => {
         await openMap(page);
         await expect(page.locator('#status')).toHaveAttribute('role', 'status');
         await expect(page.locator('#data-banner')).toHaveAttribute('role', 'status');
         await expect(page.locator('#hotspot-count')).toHaveAttribute('role', 'status');
     });
 
-    test('Y09 form đăng nhập: nhãn gắn với ô, thông báo role=status, autocomplete đúng', async ({ page }) => {
+    test('Y09 form đăng nhập: nhãn gắn với ô, thông báo role=status, autocomplete đúng', { tag: ['@a11y'] }, async ({ page }) => {
         await page.goto('/admin');
         await expect(page.getByLabel('Email')).toHaveAttribute('autocomplete', 'username');
         await expect(page.getByLabel('Mật khẩu')).toHaveAttribute('autocomplete', 'current-password');
         await expect(page.locator('#admin-message')).toHaveAttribute('role', 'status');
     });
 
-    test('Y10 nút đóng chi tiết transect có tên truy cập, thẻ chi tiết gắn tiêu đề', async ({ page }) => {
+    test('Y10 nút đóng chi tiết transect có tên truy cập, thẻ chi tiết gắn tiêu đề', { tag: ['@a11y'] }, async ({ page }) => {
         await openMap(page);
         await expect(page.getByRole('button', { name: 'Đóng chi tiết transect', includeHidden: true })).toHaveCount(1);
         await expect(page.locator('#inspector')).toHaveAttribute('aria-labelledby', 'inspector-title');
     });
 
-    test('Y11 tab order trong trang admin: email -> mật khẩu -> Đăng nhập', async ({ page }) => {
+    test('Y11 tab order trong trang admin: email -> mật khẩu -> Đăng nhập', { tag: ['@a11y'] }, async ({ page }) => {
         await page.goto('/admin');
         await page.focus('#login-form [name=email]');
         await page.keyboard.press('Tab');
@@ -114,7 +114,7 @@ test.describe('Trợ năng (a11y)', () => {
         await expect(page.getByRole('button', { name: 'Đăng nhập' })).toBeFocused();
     });
 
-    test('Y12 Enter trong form đăng nhập gửi biểu mẫu', async ({ page }) => {
+    test('Y12 Enter trong form đăng nhập gửi biểu mẫu', { tag: ['@a11y'] }, async ({ page }) => {
         await page.goto('/admin');
         await page.fill('#login-form [name=email]', 'admin@webgis.test');
         await page.fill('#login-form [name=password]', 'password');
@@ -122,7 +122,7 @@ test.describe('Trợ năng (a11y)', () => {
         await expect(page.locator('#admin-panel')).toBeVisible();
     });
 
-    test('Y13 prefers-reduced-motion không làm hỏng trang', async ({ browser }) => {
+    test('Y13 prefers-reduced-motion không làm hỏng trang', { tag: ['@a11y'] }, async ({ browser }) => {
         const ctx = await browser.newContext({ reducedMotion: 'reduce' });
         const page = await ctx.newPage();
         await openMap(page);
