@@ -22,6 +22,7 @@ class ExportShowExtraTest extends BaseUnitTest
             return array_map(fn ($r) => (object) $r, $rows);
         });
         DB::shouldReceive('connection')->with('pgsql')->andReturn($conn);
+        DB::shouldReceive('getConnections')->andReturn([]); // Laravel mới gọi khi teardown
 
         return (new ExportController)->show($layer, $format);
     }

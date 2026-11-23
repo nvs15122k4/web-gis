@@ -23,6 +23,7 @@ class CompareReferenceEventsExtraTest extends BaseUnitTest
         $conn = Mockery::mock(Connection::class);
         $conn->shouldReceive('select')->once()->andReturn($rows);
         DB::shouldReceive('connection')->with('pgsql')->once()->andReturn($conn);
+        DB::shouldReceive('getConnections')->andReturn([]); // Laravel mới gọi khi teardown
         $out = new BufferedOutput;
         $code = Artisan::call('webgis:compare-reference', $args, $out);
 
@@ -123,6 +124,7 @@ class CompareReferenceEventsExtraTest extends BaseUnitTest
             return true;
         }))->andReturn([]);
         DB::shouldReceive('connection')->with('pgsql')->andReturn($conn);
+        DB::shouldReceive('getConnections')->andReturn([]); // Laravel mới gọi khi teardown
         Artisan::call('webgis:compare-reference');
         $this->assertStringContainsString('::geography', $sql);
         $this->assertStringContainsString('LEFT JOIN erosion_hotspots h ON TRUE', $sql);
