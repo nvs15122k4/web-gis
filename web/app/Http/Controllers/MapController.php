@@ -44,4 +44,16 @@ class MapController extends Controller
     {
         return view('admin.index');
     }
+
+    /** Hướng dẫn sử dụng: mọi người dùng xem được. */
+    public function guide(): View
+    {
+        return view('guide.index');
+    }
+
+    /** Báo cáo công việc đã làm: chỉ admin (middleware auth + admin ở routes/web.php). */
+    public function report(): View
+    {
+        return view('report.index');
+    }
 }

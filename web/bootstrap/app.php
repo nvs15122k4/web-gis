@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Khách chưa đăng nhập vào trang cần quyền thì chuyển tới form đăng nhập (API vẫn trả 401 JSON).
+        $middleware->redirectGuestsTo('/dang-nhap');
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
         ]);

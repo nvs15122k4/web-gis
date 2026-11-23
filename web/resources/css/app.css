@@ -466,3 +466,35 @@ main:focus { outline: none; }
     .popup-table th { color: #5a6876; }
     .home-control { color: #16222d !important; background: #fff !important; }
 }
+
+/* ================= Hướng dẫn, báo cáo, đăng nhập ================= */
+.nav-logout { display: contents; }
+.nav-logout button {
+    padding: .4rem .75rem; border: 0; border-radius: var(--radius-sm); background: transparent; cursor: pointer;
+    color: rgba(255, 255, 255, .78); font: inherit; font-weight: 500; font-size: .88rem; white-space: nowrap;
+}
+.nav-logout button:hover { color: #fff; background: rgba(255, 255, 255, .1); }
+.nav-logout button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 640px) {
+    .topnav { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    .topnav a, .nav-logout button { flex: none; padding: .35rem .45rem; font-size: .8rem; }
+    .brand-text { display: none; }
+}
+.doc .steps { padding-left: 1.2rem; }
+.doc .steps li { margin: .4rem 0; }
+.doc kbd { padding: .05rem .35rem; border: 1px solid var(--border-strong); border-radius: 4px; background: var(--surface-2); font-size: .82em; }
+.doc .badge { display: inline-block; padding: .05rem .5rem; border-radius: 999px; font-size: .74rem; font-weight: 600; white-space: nowrap; }
+.doc .badge-done { color: var(--ok); background: var(--surface-2); border: 1px solid var(--ok); }
+.doc .badge-part { color: var(--warn-text); background: var(--warn-bg); border: 1px solid var(--warn-border); }
+.doc .badge-todo { color: var(--muted); background: var(--surface-2); border: 1px solid var(--border-strong); }
+.doc .timeline { list-style: none; padding-left: 0; border-left: 2px solid var(--border); margin-left: .4rem; }
+.doc .timeline li { position: relative; margin: 0 0 1rem; padding-left: 1.1rem; }
+.doc .timeline li::before { content: ""; position: absolute; left: -.42rem; top: .55rem; width: .62rem; height: .62rem; border-radius: 50%; background: var(--primary); }
+.doc .timeline time { display: block; font-weight: 600; }
+.doc .figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: .75rem; margin: 1rem 0; }
+.doc .figures div { padding: .7rem .85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
+.doc .figures b { display: block; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.doc .figures span { font-size: .78rem; color: var(--muted); }
+.doc .progress { height: .6rem; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+.doc .progress i { display: block; height: 100%; background: var(--primary); }
+.admin .field-error { margin: 0; color: var(--error); font-size: .82rem; }
