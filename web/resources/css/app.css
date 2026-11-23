@@ -17,7 +17,7 @@
     --border-strong: #cfd7df;
     --text: #16222d;
     --muted: #5a6876;
-    --faint: #8794a1;
+    --faint: #66727f;           /* ≥4.5:1 trên nền trắng và --bg */
 
     --brand: #0c2d3f;          /* thanh tiêu đề */
     --primary: #0f6e8c;        /* xanh nước sông */
@@ -95,7 +95,7 @@ input[type=number], input[type=email], input[type=password], input[type=text], s
     font: .9rem var(--font); color: var(--text);
     border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface);
 }
-input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+input:focus, select:focus { border-color: var(--primary); }
 input[type=checkbox] { accent-color: var(--primary); }
 
 .input-group { display: flex; gap: .5rem; align-items: center; }
@@ -380,4 +380,43 @@ body.page { min-height: 100vh; }
     .doc { padding: 1.25rem 1rem; }
     .doc h1 { font-size: 1.4rem; }
     .doc table { font-size: .82rem; }
+}
+
+/* ================= Truy cập & cảm ứng ================= */
+.skip-link {
+    position: absolute; left: .5rem; top: -4rem; z-index: 3000;
+    padding: .55rem .9rem; border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text); font-weight: 600; text-decoration: none; box-shadow: var(--shadow-lg);
+}
+.skip-link:focus { top: .5rem; }
+main:focus { outline: none; }
+.appbar :focus-visible { outline-color: #fff; }
+.switch:focus-visible, .year-chip:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.map-legend summary:focus-visible { outline-offset: -2px; border-radius: var(--radius); }
+
+/* màn hình cảm ứng: vùng chạm tối thiểu 44×44px */
+@media (pointer: coarse) {
+    .btn, .icon-btn, input[type=number], input[type=email], input[type=password], input[type=text], select { min-height: 44px; }
+    .icon-btn { width: 44px; height: 44px; }
+    .topnav a, .brand { display: inline-flex; align-items: center; min-height: 44px; }
+    .tab { min-height: 48px; }
+    .year-chip, .switch-row { min-height: 44px; }
+    .item-list button { min-height: 44px; }
+    .pill { padding: .45rem .8rem; }
+    .doc-toc a { padding-block: .5rem; }
+    .leaflet-bar a { width: 40px !important; height: 40px !important; line-height: 40px !important; }
+}
+
+/* người dùng tắt hiệu ứng chuyển động */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    .skeleton { animation: none; }
+}
+
+/* chế độ tương phản cao của hệ điều hành */
+@media (forced-colors: active) {
+    .switch { border: 1px solid ButtonText; }
+    .switch:checked { background: Highlight; }
+    .tab[aria-selected=true] { border-bottom-color: Highlight; }
+    .class-badge { border: 1px solid CanvasText; }
 }
