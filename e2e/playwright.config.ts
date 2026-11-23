@@ -29,6 +29,8 @@ export default defineConfig({
     projects: [
         { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
         { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-        { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+        // WebKit của Playwright chỉ có bản build cho Ubuntu 24.04 trở xuống; trên bản mới hơn (vd. 26.04) không khởi chạy được.
+        // Đặt E2E_NO_WEBKIT=1 (hoặc dùng `npm run test:no-webkit`) để bỏ qua project này.
+        ...(process.env.E2E_NO_WEBKIT ? [] : [{ name: 'webkit', use: { ...devices['Desktop Safari'] } }]),
     ],
 });
