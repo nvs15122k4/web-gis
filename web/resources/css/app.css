@@ -420,3 +420,49 @@ main:focus { outline: none; }
     .tab[aria-selected=true] { border-bottom-color: Highlight; }
     .class-badge { border: 1px solid CanvasText; }
 }
+
+/* ================= Giao diện tối (theo cài đặt hệ điều hành) ================= */
+:root { color-scheme: light; --chart-line: #0f6e8c; }
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --bg: #0f1820;
+        --surface: #16212b;
+        --surface-2: #1c2a36;
+        --border: #2a3947;
+        --border-strong: #3a4c5c;
+        --text: #e6edf3;
+        --muted: #a3b1bf;
+        --faint: #8d9cab;
+        --brand: #081c28;
+        --primary: #3aa6c9;
+        --primary-hover: #5bbad8;
+        --primary-soft: #16394a;
+        --focus: #6cc3e0;
+        --warn-bg: #2d2410;
+        --warn-border: #6b5420;
+        --warn-text: #f0cd85;
+        --ok: #6fcf8e;
+        --error: #ff8a80;
+        --chart-line: #5bbad8;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 16px rgba(0, 0, 0, .35);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, .55);
+    }
+    .btn-primary { color: #06212d; }
+    .btn-primary:hover { color: #06212d; }
+    .brand-mark { background: #0f6e8c; }
+    .switch::after { background: #e6edf3; }
+    .msg-error { background: #3a1a18; }
+    .msg-ok { background: #15301f; }
+    .skeleton { background: linear-gradient(90deg, var(--surface-2), var(--border), var(--surface-2)); background-size: 200% 100%; }
+    .kpi.is-alert b { color: #ff7a74; }
+    .item-list .rate { color: #ff7a74; }
+    /* nền bản đồ vẫn là bản đồ sáng: chú giải, ô toạ độ và hộp điều khiển nổi trên bản đồ giữ nền sáng, chữ tối */
+    .map-legend, .leaflet-control.coords { color: #16222d; }
+    .map-legend summary::after { border-color: #5a6876; }
+    .legend-body h3 { color: #5a6876; }
+    .map-legend, .leaflet-control-layers, .leaflet-bar a, .leaflet-popup-content-wrapper, .leaflet-popup-tip { color-scheme: light; }
+    .leaflet-popup-content { color: #16222d; }
+    .popup-table th { color: #5a6876; }
+    .home-control { color: #16222d !important; background: #fff !important; }
+}
