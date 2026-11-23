@@ -20,7 +20,8 @@ export default defineConfig({
     use: { baseURL: BASE, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
     globalSetup: './global-setup.ts',
     webServer: {
-        command: 'php artisan serve --env=e2e --host=127.0.0.1 --port=8010',
+        // .env.e2e đặt SESSION_DRIVER=array (mỗi yêu cầu một phiên mới); các trang cần đăng nhập bằng phiên (/bao-cao) cần driver lưu được.
+        command: 'SESSION_DRIVER=file php artisan serve --env=e2e --host=127.0.0.1 --port=8010',
         cwd: laravel,
         url: `${BASE}/up`,
         reuseExistingServer: !process.env.CI,
