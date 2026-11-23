@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
  *   baseline.json   1 feature LineString
  *   shorelines.json properties: year, water_index, source_image_date?
  *   transects.json  properties: transect_code, distances{"2018": m,...}, stats{nsm_m, epr_m_per_year,
- *                      lrr_m_per_year, se_lrr, r_squared, is_significant, change_class,
+ *                      lrr_m_per_year, se_lrr, unc_lrr, r_squared, is_significant, change_class,
  *                      consecutive_erosion_periods, u_shoreline_avg}
  *   hotspots.json   properties: severity, period_start_year, period_end_year, notes
  *   reference.json  properties: event_date, description, source, danger_level?, length_m?, location?
@@ -138,7 +138,7 @@ class ImportPipelineOutput extends Command
 
             if (! empty($p['stats'])) {
                 $s = $p['stats'];
-                $cols = ['nsm_m', 'epr_m_per_year', 'lrr_m_per_year', 'se_lrr', 'r_squared', 'is_significant',
+                $cols = ['nsm_m', 'epr_m_per_year', 'lrr_m_per_year', 'se_lrr', 'unc_lrr', 'r_squared', 'is_significant',
                     'change_class', 'consecutive_erosion_periods', 'u_shoreline_avg'];
                 $vals = array_map(fn ($c) => $s[$c] ?? ($c === 'is_significant' ? false : ($c === 'consecutive_erosion_periods' ? 0 : null)), $cols);
                 $set = implode(', ', array_map(fn ($c) => "{$c} = EXCLUDED.{$c}", $cols));
