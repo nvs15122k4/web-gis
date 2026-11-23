@@ -3,7 +3,8 @@
     "private": true,
     "scripts": {
         "test": "playwright test",
-        "test:chromium": "playwright test --project=chromium"
+        "test:chromium": "playwright test --project=chromium",
+        "test:no-webkit": "E2E_NO_WEBKIT=1 playwright test"
     },
     "devDependencies": {
         "@playwright/test": "^1.50.0"
