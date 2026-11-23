@@ -3,7 +3,7 @@ import { openMap, openTab, centerOnTransect, clickAt, API } from './helpers';
 import { appErrors } from './helpers-journey';
 
 test.describe('Hành trình người dùng', () => {
-    test('J01 xem bản đồ -> lọc hotspot -> chọn transect -> xem lịch sử -> tải về', async ({ page, request }) => {
+    test('J01 xem bản đồ -> lọc hotspot -> chọn transect -> xem lịch sử -> tải về', { tag: ['@happy'] }, async ({ page, request }) => {
         const errors = await openMap(page);
 
         // 1. bản đồ + tổng quan khớp API
@@ -42,7 +42,7 @@ test.describe('Hành trình người dùng', () => {
         expect(appErrors(errors)).toEqual([]);
     });
 
-    test('J02 hành trình tải GeoJSON: tệp tải về parse được và đủ 10 transect', async ({ page }) => {
+    test('J02 hành trình tải GeoJSON: tệp tải về parse được và đủ 10 transect', { tag: ['@happy'] }, async ({ page }) => {
         await page.goto('/');
         await openTab(page, 'share');
         const [dl] = await Promise.all([
@@ -55,7 +55,7 @@ test.describe('Hành trình người dùng', () => {
         expect(fc.features).toHaveLength(10);
     });
 
-    test('J03 so sánh 2019 và 2024 rồi chọn transect: hai thao tác không làm mất nhau', async ({ page }) => {
+    test('J03 so sánh 2019 và 2024 rồi chọn transect: hai thao tác không làm mất nhau', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         await page.selectOption('#compare-a', '2019');
@@ -70,7 +70,7 @@ test.describe('Hành trình người dùng', () => {
         await expect(page.locator('#compare-b')).toHaveValue('2024');
     });
 
-    test('J04 chọn từ danh sách hotspot rồi đóng chi tiết bằng Escape', async ({ page }) => {
+    test('J04 chọn từ danh sách hotspot rồi đóng chi tiết bằng Escape', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'hotspots');
         await page.locator('#hotspot-list li button').first().click();
@@ -82,7 +82,7 @@ test.describe('Hành trình người dùng', () => {
         await expect(page.locator('#inspector')).toBeHidden();
     });
 
-    test('J05 đóng chi tiết bằng nút: hash bỏ tham số t', async ({ page, request }) => {
+    test('J05 đóng chi tiết bằng nút: hash bỏ tham số t', { tag: ['@happy'] }, async ({ page, request }) => {
         await openMap(page);
         const t = await API.transect(page, 'T03');
         await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.id);
@@ -92,7 +92,7 @@ test.describe('Hành trình người dùng', () => {
         await expect.poll(() => page.evaluate(() => location.hash)).not.toContain('t=');
     });
 
-    test('J06 chọn transect khác: panel đổi mã và số liệu theo transect mới', async ({ page, request }) => {
+    test('J06 chọn transect khác: panel đổi mã và số liệu theo transect mới', { tag: ['@happy'] }, async ({ page, request }) => {
         await openMap(page);
         for (const code of ['T02', 'T07']) {
             const t = await API.transect(page, code);
@@ -105,7 +105,7 @@ test.describe('Hành trình người dùng', () => {
 });
 
 test.describe('Popup, tooltip, đồng bộ URL', () => {
-    test('U01 popup transect hiện mã và mức biến động', async ({ page }) => {
+    test('U01 popup transect hiện mã và mức biến động', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         const { lat, lng } = await centerOnTransect(page, 'T01');
         await clickAt(page, lat, lng);
@@ -114,7 +114,7 @@ test.describe('Popup, tooltip, đồng bộ URL', () => {
         await expect(popup).toContainText(/Bồi|Ổn định|Lùi nhẹ|Lùi mạnh/);
     });
 
-    test('U02 popup hotspot: có tốc độ lùi bờ khớp danh sách', async ({ page }) => {
+    test('U02 popup hotspot: có tốc độ lùi bờ khớp danh sách', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'hotspots');
         const first = page.locator('#hotspot-list li').first();
@@ -123,7 +123,7 @@ test.describe('Popup, tooltip, đồng bộ URL', () => {
         await expect(page.locator('.leaflet-popup-content')).toContainText(`Tốc độ lùi bờ: ${sev} m/năm`);
     });
 
-    test('U03 tooltip (title) giải thích NSM/EPR/LRR', async ({ page }) => {
+    test('U03 tooltip (title) giải thích NSM/EPR/LRR', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         const t = await API.transect(page, 'T01');
         await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.id);
@@ -132,7 +132,7 @@ test.describe('Popup, tooltip, đồng bộ URL', () => {
         await expect(page.locator('.stat-tile[title="Linear Regression Rate"]')).toContainText('LRR');
     });
 
-    test('U04 hash đồng bộ khi chọn transect và đổi khi di chuyển', async ({ page }) => {
+    test('U04 hash đồng bộ khi chọn transect và đổi khi di chuyển', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         const t = await API.transect(page, 'T04');
         await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.id);
@@ -143,7 +143,7 @@ test.describe('Popup, tooltip, đồng bộ URL', () => {
         expect(await page.evaluate(() => location.hash)).not.toBe(before);
     });
 
-    test('U05 mở thẳng URL có hash: bản đồ đúng tâm/zoom và transect được chọn', async ({ page }) => {
+    test('U05 mở thẳng URL có hash: bản đồ đúng tâm/zoom và transect được chọn', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         const t = await API.transect(page, 'T06');
         await page.goto(`/#map=15/10.58000/105.21000&t=${t.id}`);
         await page.waitForFunction(() => (window as any).__webgis?.map);
@@ -152,7 +152,7 @@ test.describe('Popup, tooltip, đồng bộ URL', () => {
         expect(v.z).toBeGreaterThanOrEqual(15);
     });
 
-    test('U06 reload giữ khung nhìn và transect đã chọn', async ({ page }) => {
+    test('U06 reload giữ khung nhìn và transect đã chọn', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         const t = await API.transect(page, 'T08');
         await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.id);
@@ -165,7 +165,7 @@ test.describe('Popup, tooltip, đồng bộ URL', () => {
         expect(hash).toContain('map=');
     });
 
-    test('U07 hash hỏng (map=abc, t=-5): bỏ qua, bản đồ vẫn dùng được, không lỗi console', async ({ page }) => {
+    test('U07 hash hỏng (map=abc, t=-5): bỏ qua, bản đồ vẫn dùng được, không lỗi console', { tag: ['@edge'] }, async ({ page }) => {
         const errors: string[] = [];
         page.on('pageerror', (e) => errors.push(e.message));
         await page.goto('/#map=abc/x/y&t=-5');
@@ -175,7 +175,7 @@ test.describe('Popup, tooltip, đồng bộ URL', () => {
         expect(errors).toEqual([]);
     });
 
-    test('U08 hash trỏ transect không tồn tại: không crash', async ({ page }) => {
+    test('U08 hash trỏ transect không tồn tại: không crash', { tag: ['@edge'] }, async ({ page }) => {
         const errors: string[] = [];
         page.on('pageerror', (e) => errors.push(e.message));
         await page.goto('/#map=15/10.58000/105.21000&t=999999');
@@ -186,7 +186,7 @@ test.describe('Popup, tooltip, đồng bộ URL', () => {
 });
 
 test.describe('Đa tab', () => {
-    test('T01 hai tab cùng context có khung nhìn và lựa chọn độc lập', async ({ context }) => {
+    test('T01 hai tab cùng context có khung nhìn và lựa chọn độc lập', { tag: ['@happy'] }, async ({ context }) => {
         const a = await context.newPage();
         const b = await context.newPage();
         await openMap(a);
@@ -201,7 +201,7 @@ test.describe('Đa tab', () => {
         await expect(b.locator('#inspector')).toBeHidden();
     });
 
-    test('T02 mở liên kết chia sẻ ở tab mới tái tạo đúng khung nhìn', async ({ context }) => {
+    test('T02 mở liên kết chia sẻ ở tab mới tái tạo đúng khung nhìn', { tag: ['@happy'] }, async ({ context }) => {
         const a = await context.newPage();
         await openMap(a);
         await a.evaluate(() => (window as any).__webgis.map.setView([10.585, 105.205], 15, { animate: false }));
