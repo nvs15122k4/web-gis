@@ -38,7 +38,7 @@ class SummaryController extends Controller
         $years = Shoreline::query()->distinct()->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all();
 
         $hotspots = ErosionHotspot::query()
-            ->selectRaw('COUNT(*) AS n, COALESCE(SUM(ST_Length(geom::geography)), 0) AS length_m')
+            ->selectRaw('COUNT(*) AS n, COALESCE(SUM(CASE WHEN GeometryType(geom) LIKE \'%LINESTRING\' THEN ST_Length(geom::geography) ELSE ST_MaxDistance(ST_Transform(geom, 32648), ST_Transform(geom, 32648)) END), 0) AS length_m')
             ->first();
 
         $reference = ReferenceLandslideEvent::query()
