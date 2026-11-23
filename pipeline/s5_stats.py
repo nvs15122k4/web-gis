@@ -2,10 +2,11 @@
 
 Quy ước dấu: khoảng cách đo từ baseline (trên đất) ra sông, nên giảm = bờ lùi vào đất (xói), tăng = bồi.
   NSM = d(năm cuối) − d(năm đầu);  EPR = NSM / Δt;  LRR = hệ số góc OLS trên toàn chuỗi, kèm SE(LRR), R².
-  Có ý nghĩa thống kê khi |LRR| > 1,96·SE(LRR).
+  Có ý nghĩa thống kê khi |LRR| > t(0,975; n−2)·SE(LRR), tức khoảng tin cậy 95% của LRR không chứa 0
+  (phân phối Student t, bậc tự do n−2 của từng transect — n=9 năm thì t = 2,365, không phải 1,96).
   accretion: có ý nghĩa & LRR > 0 · stable: không có ý nghĩa · erosion: có ý nghĩa & LRR < 0
-  severe_erosion: erosion & LRR ≤ M − S (M, S tính trên tập erosion) & khoảng cách giảm liên tục ≥ 3 mốc năm liền nhau
-  mild_erosion: erosion còn lại.
+  severe_erosion: erosion & LRR ≤ config.SEVERE_LRR (ngưỡng tuyệt đối đặt trước) & khoảng cách giảm liên tục ≥ 3 mốc năm liền nhau
+  mild_erosion: erosion còn lại. R² chỉ là cờ chất lượng (low_r2_caution), không đổi nhóm.
 consecutive_erosion_periods = số giai đoạn (khoảng giữa 2 năm liền nhau) giảm liên tục dài nhất; 3 mốc ⇔ 2 giai đoạn.
 Đầu ra: output/{baseline,shorelines,transects,hotspots}.json (EPSG:4326) + output/summary.json.
 """
@@ -13,6 +14,7 @@ import json
 
 import geopandas as gpd
 import numpy as np
+from scipy import stats as sps
 from shapely.geometry import LineString
 
 import config as C
@@ -20,7 +22,13 @@ import config as C
 MIN_POINTS = 3
 
 
+def t_crit(n):
+    """Hệ số t hai phía ở độ tin cậy C.CONFIDENCE với bậc tự do n − 2 (hồi quy LRR có n điểm)."""
+    return float(sps.t.ppf(1 - (1 - C.CONFIDENCE) / 2, n - 2))
+
+
 def u_shoreline(year):
+    """Độ bất định đường bờ một năm, 1σ (mọi thành phần cùng chuẩn 1σ)."""
     u_cls = C.U_CLASSIFY.get(year, C.U_CLASSIFY_DEFAULT)
     return float(np.sqrt(C.U_PIXEL ** 2 + C.U_GEOREF ** 2 + u_cls ** 2))
 
@@ -58,16 +66,18 @@ def stats(distances):
     r2 = float(1 - (resid ** 2).sum() / sst) if sst > 0 else 0.0
     nsm = d[-1] - d[0]
     dt = t[-1] - t[0]
+    tc = t_crit(n)
     u_first, u_last = u_shoreline(int(t[0])), u_shoreline(int(t[-1]))
     return {
         "nsm_m": round(float(nsm), 2),
         "epr_m_per_year": round(float(nsm / dt), 3),
-        "unc_epr": round(float(np.hypot(u_first, u_last) / dt), 3),
+        "unc_epr": round(float(C.Z95 * np.hypot(u_first, u_last) / dt), 3),   # 95%
         "lrr_m_per_year": round(float(slope), 3),
         "se_lrr": round(se, 4),
-        "unc_lrr": round(C.Z95 * se, 3),
+        "unc_lrr": round(tc * se, 3),   # nửa bề rộng khoảng tin cậy 95% của LRR (t, df = n − 2)
+        "t_crit": round(tc, 3),
         "r_squared": round(r2, 3),
-        "is_significant": bool(abs(slope) > C.Z95 * se),
+        "is_significant": bool(abs(slope) > tc * se),
         "consecutive_erosion_periods": longest_decline(s),
         "u_shoreline_avg": round(float(np.mean([u_shoreline(int(y)) for y in t])), 2),
         "n_years": n,
@@ -77,6 +87,7 @@ def stats(distances):
 
 
 def classify(rows):
+    # M, S chỉ để mô tả (tóm tắt), KHÔNG dùng làm ngưỡng: ngưỡng là C.SEVERE_LRR đặt trước
     ero = [r["stats"]["lrr_m_per_year"] for r in rows if r["stats"] and r["stats"]["is_significant"]
            and r["stats"]["lrr_m_per_year"] < 0]
     M, S = (float(np.mean(ero)), float(np.std(ero, ddof=1))) if len(ero) > 1 else (None, None)
@@ -90,7 +101,7 @@ def classify(rows):
             cls = "stable"
         elif lrr > 0:
             cls = "accretion"
-        elif M is not None and lrr <= M - S and st["consecutive_erosion_periods"] >= need_periods:
+        elif lrr <= C.SEVERE_LRR and st["consecutive_erosion_periods"] >= need_periods:
             cls = "severe_erosion"
         else:
             cls = "mild_erosion"
@@ -180,7 +191,9 @@ def main():
         counts[k] = counts.get(k, 0) + 1
     summary = {"transects": len(rows), "classes": counts,
                "despiked_observations": sum((r["stats"] or {}).get("despiked", 0) for r in rows), "M_lrr_erosion": M, "S_lrr_erosion": S,
-               "severe_threshold_M_minus_S": (M - S) if M is not None else None,
+               "severe_threshold_lrr": C.SEVERE_LRR, "min_consecutive_decline": C.MIN_CONSECUTIVE_DECLINE,
+               "confidence": C.CONFIDENCE, "ci_distribution": "student_t_df_n_minus_2",
+               "u_georef_sigma_m": C.U_GEOREF,
                "hotspots": len(hs), "water_index": C.DEFAULT_INDEX,
                "u_shoreline_by_year": {y: round(u_shoreline(y), 2) for y in shores},
                "u_classify_is_placeholder": not C.U_CLASSIFY}
