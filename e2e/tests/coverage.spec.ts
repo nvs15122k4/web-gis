@@ -3,7 +3,7 @@ import { openMap, openTab } from './helpers';
 import { collectErrors, apiLogin } from './helpers-extra';
 
 test.describe('Điều hướng & trang tĩnh', () => {
-    test('N01 menu: Bản đồ -> Phương pháp -> Quản trị, mục hiện tại có aria-current', async ({ page }) => {
+    test('N01 menu: Bản đồ -> Phương pháp -> Quản trị, mục hiện tại có aria-current', { tag: ['@smoke', '@happy'] }, async ({ page }) => {
         await page.goto('/');
         const nav = page.getByRole('navigation', { name: 'Điều hướng chính' });
         await expect(nav.getByRole('link', { name: 'Bản đồ' })).toHaveAttribute('aria-current', 'page');
@@ -19,19 +19,19 @@ test.describe('Điều hướng & trang tĩnh', () => {
         await expect(page.locator('#map')).toBeVisible();
     });
 
-    test('N02 logo thương hiệu đưa về trang bản đồ', async ({ page }) => {
+    test('N02 logo thương hiệu đưa về trang bản đồ', { tag: ['@happy'] }, async ({ page }) => {
         await page.goto('/gioi-thieu');
         await page.locator('a.brand').click();
         await expect(page).toHaveURL(/\/(#.*)?$/);
         await expect(page.locator('#map')).toBeVisible();
     });
 
-    test('N03 trang không tồn tại trả 404', async ({ page }) => {
+    test('N03 trang không tồn tại trả 404', { tag: ['@negative'] }, async ({ page }) => {
         const res = await page.goto('/khong-ton-tai-xyz');
         expect(res!.status()).toBe(404);
     });
 
-    test('N04 API không tồn tại / id không hợp lệ trả 404', async ({ page }) => {
+    test('N04 API không tồn tại / id không hợp lệ trả 404', { tag: ['@negative'] }, async ({ page }) => {
         expect((await page.request.get('/api/khong-co', { headers: { Accept: 'application/json' } })).status()).toBe(404);
         expect((await page.request.get('/api/transects/abc', { headers: { Accept: 'application/json' } })).status()).toBe(404);
         expect((await page.request.get('/api/transects/99999999', { headers: { Accept: 'application/json' } })).status()).toBe(404);
@@ -39,7 +39,7 @@ test.describe('Điều hướng & trang tĩnh', () => {
     });
 
     for (const path of ['/', '/gioi-thieu', '/admin']) {
-        test(`N05 ${path}: có <title>, lang=vi và không có lỗi console`, async ({ page }) => {
+        test(`N05 ${path}: có <title>, lang=vi và không có lỗi console`, { tag: ['@smoke'] }, async ({ page }) => {
             const errs = collectErrors(page);
             await page.goto(path);
             await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
@@ -49,7 +49,7 @@ test.describe('Điều hướng & trang tĩnh', () => {
         });
     }
 
-    test('N06 trang giới thiệu: bảng trạng thái dữ liệu khớp API export', async ({ page }) => {
+    test('N06 trang giới thiệu: bảng trạng thái dữ liệu khớp API export', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await page.goto('/gioi-thieu');
         await expect(page.locator('td[data-layer="transects"]')).toHaveText('10 bản ghi');
         const shore = (await (await page.request.get('/api/export/shorelines.geojson')).json()).features.length;
@@ -60,7 +60,7 @@ test.describe('Điều hướng & trang tĩnh', () => {
 });
 
 test.describe('Bản đồ: bố cục và tab', () => {
-    test('M01 bốn tab: chuyển tab đổi panel hiển thị và aria-selected', async ({ page }) => {
+    test('M01 bốn tab: chuyển tab đổi panel hiển thị và aria-selected', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         for (const name of ['overview', 'layers', 'hotspots', 'share']) {
             await openTab(page, name);
@@ -73,7 +73,7 @@ test.describe('Bản đồ: bố cục và tab', () => {
         }
     });
 
-    test('M02 chú giải: đủ 4 mức biến động, thu gọn/mở được', async ({ page }) => {
+    test('M02 chú giải: đủ 4 mức biến động, thu gọn/mở được', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         const legend = page.locator('#legend');
         for (const t of ['Bồi', 'Ổn định', 'Lùi nhẹ', 'Lùi mạnh', 'Đặc biệt nguy hiểm', 'Chưa phân loại']) {
@@ -85,7 +85,7 @@ test.describe('Bản đồ: bố cục và tab', () => {
         await expect(legend.locator('.legend-body')).toBeVisible();
     });
 
-    test('M03 điều khiển zoom: tăng rồi giảm mức phóng', async ({ page }) => {
+    test('M03 điều khiển zoom: tăng rồi giảm mức phóng', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         const zoom = () => page.evaluate(() => (window as any).__webgis.map.getZoom());
         const z0 = await zoom();
@@ -96,7 +96,7 @@ test.describe('Bản đồ: bố cục và tab', () => {
         await expect.poll(zoom).toBe(z0);
     });
 
-    test('M04 kéo bản đồ làm đổi tâm và cập nhật hash liên kết', async ({ page }) => {
+    test('M04 kéo bản đồ làm đổi tâm và cập nhật hash liên kết', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         const c0 = await page.evaluate(() => (window as any).__webgis.map.getCenter());
         const box = (await page.locator('#map').boundingBox())!;
@@ -108,7 +108,7 @@ test.describe('Bản đồ: bố cục và tab', () => {
         await expect.poll(() => page.evaluate(() => location.hash)).toMatch(/^#map=\d+\/[\d.]+\/[\d.]+/);
     });
 
-    test('M05 dữ liệu sẵn sàng: banner "đang cập nhật" ẩn, status không báo lỗi', async ({ page }) => {
+    test('M05 dữ liệu sẵn sàng: banner "đang cập nhật" ẩn, status không báo lỗi', { tag: ['@smoke'] }, async ({ page }) => {
         await openMap(page);
         await expect(page.locator('#data-banner')).toBeHidden();
         const st = await (await page.request.get('/api/status')).json();
@@ -118,7 +118,7 @@ test.describe('Bản đồ: bố cục và tab', () => {
 });
 
 test.describe('Lớp dữ liệu', () => {
-    test('L01 danh sách năm: mỗi năm có checkbox, năm chưa có ảnh bị đánh dấu', async ({ page }) => {
+    test('L01 danh sách năm: mỗi năm có checkbox, năm chưa có ảnh bị đánh dấu', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         const items = page.locator('#year-list input[type=checkbox]');
@@ -128,7 +128,7 @@ test.describe('Lớp dữ liệu', () => {
         await expect(page.locator('#year-2022')).toBeAttached();
     });
 
-    test('L02 bật hai năm cùng lúc: cả hai lớp trên bản đồ, tắt một năm không ảnh hưởng năm kia', async ({ page }) => {
+    test('L02 bật hai năm cùng lúc: cả hai lớp trên bản đồ, tắt một năm không ảnh hưởng năm kia', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         await page.locator('#year-2019').check();
@@ -141,7 +141,7 @@ test.describe('Lớp dữ liệu', () => {
         expect(await on(2024)).toBe(true);
     });
 
-    test('L03 bật lớp hotspot: tắt/bật theo checkbox', async ({ page }) => {
+    test('L03 bật lớp hotspot: tắt/bật theo checkbox', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         const has = () => page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.hotspots); });
@@ -153,7 +153,7 @@ test.describe('Lớp dữ liệu', () => {
         expect(await has()).toBe(true);
     });
 
-    test('L04 bỏ so sánh: gỡ cả hai lớp so sánh khỏi bản đồ', async ({ page }) => {
+    test('L04 bỏ so sánh: gỡ cả hai lớp so sánh khỏi bản đồ', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         await page.selectOption('#compare-a', '2019');
@@ -165,7 +165,7 @@ test.describe('Lớp dữ liệu', () => {
         expect(await state()).toBe(false);
     });
 
-    test('L05 lớp sạt lở tham chiếu mặc định tắt, bật lên gọi API reference-events', async ({ page }) => {
+    test('L05 lớp sạt lở tham chiếu mặc định tắt, bật lên gọi API reference-events', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
         await expect(page.locator('#layer-reference')).not.toBeChecked();
@@ -176,7 +176,7 @@ test.describe('Lớp dữ liệu', () => {
 });
 
 test.describe('Tổng quan, bộ lọc, chi tiết', () => {
-    test('F01 tổng quan khớp /api/summary', async ({ page }) => {
+    test('F01 tổng quan khớp /api/summary', { tag: ['@sanity', '@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         const s = await (await page.request.get('/api/summary')).json();
         const body = JSON.stringify(s);
@@ -186,7 +186,7 @@ test.describe('Tổng quan, bộ lọc, chi tiết', () => {
         expect(sum).toBe(10);
     });
 
-    test('F02 hotspot: danh sách khớp API erosion-hotspots với cùng ngưỡng', async ({ page }) => {
+    test('F02 hotspot: danh sách khớp API erosion-hotspots với cùng ngưỡng', { tag: ['@sanity', '@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'hotspots');
         const min = await page.inputValue('#min-rate');
@@ -195,7 +195,7 @@ test.describe('Tổng quan, bộ lọc, chi tiết', () => {
         await expect(page.locator('#hotspot-list li')).toHaveCount(n);
     });
 
-    test('F03 lọc ngưỡng gọi API với tham số người dùng nhập', async ({ page }) => {
+    test('F03 lọc ngưỡng gọi API với tham số người dùng nhập', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'hotspots');
         await page.fill('#min-rate', '3');
@@ -204,7 +204,7 @@ test.describe('Tổng quan, bộ lọc, chi tiết', () => {
         await req;
     });
 
-    test('F04 bấm hotspot trong danh sách: bản đồ phóng tới đoạn bờ đó', async ({ page }) => {
+    test('F04 bấm hotspot trong danh sách: bản đồ phóng tới đoạn bờ đó', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'hotspots');
         const z0 = await page.evaluate(() => (window as any).__webgis.map.getZoom());
@@ -213,7 +213,7 @@ test.describe('Tổng quan, bộ lọc, chi tiết', () => {
         await expect.poll(() => page.evaluate(() => location.hash)).toMatch(/^#map=/);
     });
 
-    test('F05 chi tiết transect T10 qua showTransect: số liệu khớp API, biểu đồ có điểm', async ({ page }) => {
+    test('F05 chi tiết transect T10 qua showTransect: số liệu khớp API, biểu đồ có điểm', { tag: ['@sanity', '@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         const fc = await (await page.request.get('/api/transects')).json();
         const f = fc.features.find((x: any) => x.properties.transect_code === 'T10');
@@ -226,7 +226,7 @@ test.describe('Tổng quan, bộ lọc, chi tiết', () => {
         await expect(page.locator('#history-chart')).toHaveAttribute('data-points', String(hist.length));
     });
 
-    test('F06 liên kết chia sẻ: nút hiển thị thông báo và URL chứa khung nhìn', async ({ page, context, browserName }) => {
+    test('F06 liên kết chia sẻ: nút hiển thị thông báo và URL chứa khung nhìn', { tag: ['@happy'] }, async ({ page, context, browserName }) => {
         if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
         await openMap(page);
         await openTab(page, 'share');
@@ -235,7 +235,7 @@ test.describe('Tổng quan, bộ lọc, chi tiết', () => {
         expect(await page.evaluate(() => location.hash)).toMatch(/^#map=\d+\/[\d.]+\/[\d.]+/);
     });
 
-    test('F07 tải dữ liệu: link GeoJSON/CSV trả đúng content-type và dữ liệu', async ({ page }) => {
+    test('F07 tải dữ liệu: link GeoJSON/CSV trả đúng content-type và dữ liệu', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await page.goto('/');
         await openTab(page, 'share');
         const links = page.locator('#panel-share .downloads a');
@@ -252,7 +252,7 @@ test.describe('Tổng quan, bộ lọc, chi tiết', () => {
 });
 
 test.describe('API từ giao diện', () => {
-    test('A01 tải trang bản đồ gọi các API chính đều trả 2xx', async ({ page }) => {
+    test('A01 tải trang bản đồ gọi các API chính đều trả 2xx', { tag: ['@smoke'] }, async ({ page }) => {
         const bad: string[] = [];
         const seen = new Set<string>();
         page.on('response', (r) => {
@@ -265,7 +265,7 @@ test.describe('API từ giao diện', () => {
         for (const p of ['/api/summary', '/api/erosion-hotspots']) expect(seen).toContain(p);
     });
 
-    test('A02 API trả JSON đúng cấu trúc: transects là FeatureCollection 10 đối tượng', async ({ page }) => {
+    test('A02 API trả JSON đúng cấu trúc: transects là FeatureCollection 10 đối tượng', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
         const fc = await (await page.request.get('/api/transects')).json();
         expect(fc.type).toBe('FeatureCollection');
         expect(fc.features).toHaveLength(10);
@@ -274,7 +274,7 @@ test.describe('API từ giao diện', () => {
         for (const f of fc.features) expect(f.geometry.type).toBe('LineString');
     });
 
-    test('A03 UI lỗi 500 từ summary: panel không crash, bản đồ vẫn dùng được', async ({ page }) => {
+    test('A03 UI lỗi 500 từ summary: panel không crash, bản đồ vẫn dùng được', { tag: ['@negative'] }, async ({ page }) => {
         await page.route('**/api/summary**', (r) => r.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"loi"}' }));
         const errs = collectErrors(page);
         await page.goto('/');
@@ -287,14 +287,14 @@ test.describe('API từ giao diện', () => {
 });
 
 test.describe('Đăng nhập & phân quyền', () => {
-    test('P01 form đăng nhập: đúng nhãn, trường bắt buộc, panel admin ẩn lúc đầu', async ({ page }) => {
+    test('P01 form đăng nhập: đúng nhãn, trường bắt buộc, panel admin ẩn lúc đầu', { tag: ['@smoke'] }, async ({ page }) => {
         await page.goto('/admin');
         await expect(page.locator('#login-form [name=email]')).toHaveAttribute('required', '');
         await expect(page.locator('#login-form [name=password]')).toHaveAttribute('type', 'password');
         await expect(page.locator('#admin-panel')).toBeHidden();
     });
 
-    test('P02 để trống mật khẩu: trình duyệt chặn gửi, không gọi API', async ({ page }) => {
+    test('P02 để trống mật khẩu: trình duyệt chặn gửi, không gọi API', { tag: ['@negative'] }, async ({ page }) => {
         await page.goto('/admin');
         let called = false;
         page.on('request', (r) => { if (r.url().includes('/api/auth/login')) called = true; });
@@ -305,7 +305,7 @@ test.describe('Đăng nhập & phân quyền', () => {
         await expect(page.locator('#admin-panel')).toBeHidden();
     });
 
-    test('P03 email sai định dạng: bị chặn ở form', async ({ page }) => {
+    test('P03 email sai định dạng: bị chặn ở form', { tag: ['@negative'] }, async ({ page }) => {
         await page.goto('/admin');
         await page.fill('#login-form [name=email]', 'khong-phai-email');
         await page.fill('#login-form [name=password]', 'x');
@@ -314,7 +314,7 @@ test.describe('Đăng nhập & phân quyền', () => {
         await expect(page.locator('#admin-panel')).toBeHidden();
     });
 
-    test('P04 email không tồn tại: báo lỗi, không lưu token', async ({ page }) => {
+    test('P04 email không tồn tại: báo lỗi, không lưu token', { tag: ['@negative'] }, async ({ page }) => {
         await page.goto('/admin');
         await page.fill('#login-form [name=email]', 'khongco@webgis.test');
         await page.fill('#login-form [name=password]', 'password');
@@ -324,7 +324,7 @@ test.describe('Đăng nhập & phân quyền', () => {
         expect(await page.evaluate(() => sessionStorage.getItem('webgis_admin_token'))).toBeNull();
     });
 
-    test('P05 đăng nhập admin: hiện email+vai trò, danh sách ngưỡng, rồi đăng xuất quay về form', async ({ page }) => {
+    test('P05 đăng nhập admin: hiện email+vai trò, danh sách ngưỡng, rồi đăng xuất quay về form', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await page.goto('/admin');
         await page.fill('#login-form [name=email]', 'admin@webgis.test');
         await page.fill('#login-form [name=password]', 'password');
@@ -340,7 +340,7 @@ test.describe('Đăng nhập & phân quyền', () => {
         expect(await page.evaluate(() => sessionStorage.getItem('webgis_admin_token'))).toBeNull();
     });
 
-    test('P06 phiên không giữ qua tab mới (token ở sessionStorage)', async ({ page, context }) => {
+    test('P06 phiên không giữ qua tab mới (token ở sessionStorage)', { tag: ['@negative'] }, async ({ page, context }) => {
         await page.goto('/admin');
         await page.fill('#login-form [name=email]', 'admin@webgis.test');
         await page.fill('#login-form [name=password]', 'password');
@@ -352,7 +352,7 @@ test.describe('Đăng nhập & phân quyền', () => {
         await expect(p2.locator('#admin-panel')).toBeHidden();
     });
 
-    test('P07 API: đăng nhập sai 401, thiếu trường 422, đúng trả token + vai trò', async ({ page }) => {
+    test('P07 API: đăng nhập sai 401, thiếu trường 422, đúng trả token + vai trò', { tag: ['@negative'] }, async ({ page }) => {
         const bad = await page.request.post('/api/auth/login', { data: { email: 'admin@webgis.test', password: 'sai' }, headers: { Accept: 'application/json' } });
         expect(bad.status()).toBe(401);
         const empty = await page.request.post('/api/auth/login', { data: {}, headers: { Accept: 'application/json' } });
@@ -364,7 +364,7 @@ test.describe('Đăng nhập & phân quyền', () => {
         expect(ok.body.user).not.toHaveProperty('password');
     });
 
-    test('P08 phân quyền backend: không token 401, viewer 403, ngưỡng không đổi', async ({ page }) => {
+    test('P08 phân quyền backend: không token 401, viewer 403, ngưỡng không đổi', { tag: ['@negative', '@security'] }, async ({ page }) => {
         const before = await (await page.request.get('/api/config/thresholds')).json();
         const url = `/api/admin/config/thresholds/${before[0].key}`;
         const anon = await page.request.put(url, { data: { value: 9 }, headers: { Accept: 'application/json' } });
@@ -377,7 +377,7 @@ test.describe('Đăng nhập & phân quyền', () => {
         expect(after).toEqual(before);
     });
 
-    test('P09 admin nhập giá trị âm: phải bị từ chối 422, ngưỡng không đổi', async ({ page }) => {
+    test('P09 admin nhập giá trị âm: phải bị từ chối 422, ngưỡng không đổi', { tag: ['@negative'] }, async ({ page }) => {
         const before = await (await page.request.get('/api/config/thresholds')).json();
         const key = before[0].key;
         const a = await apiLogin(page, 'admin@webgis.test', 'password');
@@ -394,7 +394,7 @@ test.describe('Đăng nhập & phân quyền', () => {
 });
 
 test.describe('Responsive & giao diện', () => {
-    test('R01 mobile 375px: không tràn ngang ở cả 3 trang', async ({ page }) => {
+    test('R01 mobile 375px: không tràn ngang ở cả 3 trang', { tag: ['@responsive'] }, async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 700 });
         for (const p of ['/', '/gioi-thieu', '/admin']) {
             await page.goto(p);
@@ -403,7 +403,7 @@ test.describe('Responsive & giao diện', () => {
         }
     });
 
-    test('R02 mobile: nút sidebar đóng/mở đổi aria-expanded', async ({ page }) => {
+    test('R02 mobile: nút sidebar đóng/mở đổi aria-expanded', { tag: ['@responsive'] }, async ({ page }) => {
         await page.setViewportSize({ width: 400, height: 800 });
         await openMap(page);
         const btn = page.locator('#sidebar-toggle');
@@ -414,7 +414,7 @@ test.describe('Responsive & giao diện', () => {
         await expect(btn).toHaveAttribute('aria-expanded', 'false');
     });
 
-    test('R03 mobile: form đăng nhập admin dùng được ở 375px', async ({ page }) => {
+    test('R03 mobile: form đăng nhập admin dùng được ở 375px', { tag: ['@responsive'] }, async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 700 });
         await page.goto('/admin');
         await page.fill('#login-form [name=email]', 'admin@webgis.test');
@@ -423,21 +423,21 @@ test.describe('Responsive & giao diện', () => {
         await expect(page.locator('#admin-panel')).toBeVisible();
     });
 
-    test('R04 desktop: sidebar mở sẵn cạnh bản đồ', async ({ page }) => {
+    test('R04 desktop: sidebar mở sẵn cạnh bản đồ', { tag: ['@responsive'] }, async ({ page }) => {
         await page.setViewportSize({ width: 1280, height: 800 });
         await openMap(page);
         await expect(page.locator('#sidebar')).not.toHaveClass(/collapsed/);
         await expect(page.locator('#sidebar')).toBeVisible();
     });
 
-    test('R05 dark mode: trang tải được và chữ/nền tương phản', async ({ page }) => {
+    test('R05 dark mode: trang tải được và chữ/nền tương phản', { tag: ['@responsive'] }, async ({ page }) => {
         await page.emulateMedia({ colorScheme: 'dark' });
         await page.goto('/gioi-thieu');
         const c = await page.evaluate(() => { const s = getComputedStyle(document.body); return { fg: s.color, bg: s.backgroundColor }; });
         expect(c.fg).not.toBe(c.bg);
     });
 
-    test('R06 bàn phím: Tab đến được liên kết đầu tiên của menu và Enter điều hướng', async ({ page }) => {
+    test('R06 bàn phím: Tab đến được liên kết đầu tiên của menu và Enter điều hướng', { tag: ['@responsive'] }, async ({ page }) => {
         await page.goto('/');
         await page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Phương pháp' }).focus();
         await page.keyboard.press('Enter');
