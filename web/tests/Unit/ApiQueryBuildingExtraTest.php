@@ -222,7 +222,9 @@ class ApiQueryBuildingExtraTest extends PretendQueryCase
         $this->assertStringContainsString('AVG(epr_m_per_year)', $sql);
         $this->assertStringContainsString('select distinct "year"', $sql);
         $this->assertStringContainsString("COALESCE(danger_level, 'chua_phan_loai')", $sql);
-        $this->assertStringContainsString('COALESCE(SUM(ST_Length(geom::geography)), 0)', $sql);
+        // Hotspot một transect là vùng đệm (polygon): đo bằng ST_MaxDistance thay vì ST_Length = 0 m.
+        $this->assertStringContainsString('ST_Length(geom::geography)', $sql);
+        $this->assertStringContainsString('ST_MaxDistance(', $sql);
         $this->assertCount(5, $r['queries']); // 2 truy vấn cực trị chỉ chạy sau khi dựng $total (pretend trả null nên dừng sớm)
     }
 
