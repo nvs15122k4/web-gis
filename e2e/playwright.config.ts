@@ -1,9 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'node:path';
+import { BASE, PORT, LARAVEL_ENV, SLOT } from './env';
 
 const laravel = path.resolve(__dirname, '../web');
-// Cổng riêng: không bao giờ tái sử dụng nhầm server dev (:8000, CSDL phát triển; artisan serve tự nhảy sang 8001, 8002… khi cổng bận) khi đang chạy song song.
-const BASE = 'http://127.0.0.1:8010';
+// Cổng/CSDL lấy từ ./env.ts (mặc định 8010; đặt E2E_SLOT=<tên> để mỗi phiên chạy song song có cổng + CSDL riêng).
 
 /**
  * E2E chạy trên CSDL riêng (`*_e2e`, nạp bởi E2eFixtureSeeder) và workspace GeoServer riêng `songhau_e2e`,
@@ -11,17 +11,20 @@ const BASE = 'http://127.0.0.1:8010';
  */
 export default defineConfig({
     testDir: './tests',
+    // Mỗi slot có thư mục kết quả/báo cáo riêng để các lần chạy song song không ghi đè trace của nhau.
+    outputDir: SLOT ? `test-results-${SLOT}` : 'test-results',
     fullyParallel: false,
     workers: 1,
     retries: 1,
     timeout: 45_000,
     expect: { timeout: 10_000 },
-    reporter: [['list'], ['html', { open: 'never' }]],
+    reporter: [['list'], ['html', { open: 'never', outputFolder: SLOT ? `playwright-report-${SLOT}` : 'playwright-report' }]],
     use: { baseURL: BASE, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
     globalSetup: './global-setup.ts',
     webServer: {
         // .env.e2e đặt SESSION_DRIVER=array (mỗi yêu cầu một phiên mới); các trang cần đăng nhập bằng phiên (/bao-cao) cần driver lưu được.
-        command: 'SESSION_DRIVER=file php artisan serve --env=e2e --host=127.0.0.1 --port=8010',
+        command: `SESSION_DRIVER=file php artisan serve --env=e2e --host=127.0.0.1 --port=${PORT}`,
+        env: { ...(process.env as Record<string, string>), ...LARAVEL_ENV },
         cwd: laravel,
         url: `${BASE}/up`,
         reuseExistingServer: !process.env.CI,
