@@ -49,8 +49,8 @@
         <div class="figures">
             <div><b>372</b><span>commit trên nhánh chính</span></div>
             <div><b>5</b><span>ngày có commit (27/09 – 23/11/2026)</span></div>
-            <div><b>267</b><span>transect phân tích</span></div>
-            <div><b>2</b><span>hotspot lùi mạnh (3 transect lùi mạnh)</span></div>
+            <div><b>{{ $transectCount }}</b><span>transect phân tích</span></div>
+            <div><b>{{ $hotspotCount }}</b><span>hotspot lùi mạnh ({{ $severeCount }} transect lùi mạnh)</span></div>
             <div><b>9</b><span>năm đường bờ (2018–2026)</span></div>
             <div><b>{{ $done }}/{{ $total }}</b><span>hạng mục đề cương hoàn thành</span></div>
         </div>
