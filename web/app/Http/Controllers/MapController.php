@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ErosionHotspot;
 use App\Models\Shoreline;
+use App\Models\ShorelineChangeStat;
 use Illuminate\Contracts\View\View;
 use Throwable;
 
@@ -54,6 +56,10 @@ class MapController extends Controller
     /** Báo cáo công việc đã làm: chỉ admin (middleware auth + admin ở routes/web.php). */
     public function report(): View
     {
-        return view('report.index');
+        return view('report.index', [
+            'transectCount' => ShorelineChangeStat::count(),
+            'hotspotCount' => ErosionHotspot::count(),
+            'severeCount' => ShorelineChangeStat::where('change_class', 'severe_erosion')->count(),
+        ]);
     }
 }
