@@ -1,7 +1,9 @@
 import Chart from 'chart.js/auto';
 
 Chart.defaults.font.family = "'Be Vietnam Pro', system-ui, sans-serif";
-Chart.defaults.color = '#5a6876';
+
+/** Lấy màu theo giao diện hiện tại (sáng/tối) từ biến CSS; dự phòng khi chưa có biến. */
+const cssVar = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
 /**
  * Vẽ khoảng cách baseline→bờ theo năm. Trục X là số thực (năm) nên năm thiếu dữ liệu chỉ tạo khoảng trống,
@@ -18,14 +20,18 @@ export function renderHistoryChart(canvas, history) {
         empty.textContent = 'Chưa có số liệu vị trí đường bờ — đang cập nhật.';
     }
     if (!history.length) return null;
+    const muted = cssVar('--muted', '#5a6876');
+    const line = cssVar('--chart-line', '#0f6e8c');
+    const grid = cssVar('--border', '#e2e7ec');
+    Chart.defaults.color = muted;
     return new Chart(canvas, {
         type: 'line',
         data: {
             datasets: [{
                 label: 'Khoảng cách tới baseline (m)',
                 data: history.map((h) => ({ x: h.year, y: h.distance_m })),
-                borderColor: '#0f6e8c',
-                backgroundColor: '#0f6e8c',
+                borderColor: line,
+                backgroundColor: line,
                 pointRadius: 3.5,
                 tension: 0,
                 segment: { borderDash: (ctx) => (ctx.p1.parsed.x - ctx.p0.parsed.x > 1 ? [6, 4] : undefined) },
@@ -35,8 +41,8 @@ export function renderHistoryChart(canvas, history) {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                x: { type: 'linear', ticks: { stepSize: 1, precision: 0, maxRotation: 0, autoSkipPadding: 6, callback: (v) => String(v) }, title: { display: true, text: 'Năm' } },
-                y: { title: { display: true, text: 'Cách baseline (m)' } },
+                x: { type: 'linear', ticks: { stepSize: 1, precision: 0, maxRotation: 0, autoSkipPadding: 6, callback: (v) => String(v) }, title: { display: true, text: 'Năm' }, grid: { color: grid } },
+                y: { title: { display: true, text: 'Cách baseline (m)' }, grid: { color: grid } },
             },
         },
     });
