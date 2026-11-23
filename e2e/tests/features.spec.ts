@@ -8,8 +8,60 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         await expect(page.locator('#kpi-transects')).toHaveText('10');
         await expect(page.locator('#summary [data-class="severe_erosion"]')).toHaveText('3');
         await expect(page.locator('#summary [data-class="accretion"]')).toHaveText('2');
+        await expect(page.locator('#summary [data-class="stable"]')).toHaveText('3');
+        await expect(page.locator('#summary [data-class="mild_erosion"]')).toHaveText('2');
         await page.locator('#kpi-max-erosion a').click();
         await expect(page.locator('#transect-code')).toHaveText('T10');
+    });
+
+    test('13b tổng quan: tổng 4 lớp bằng số transect hiển thị và khớp /api/summary', async ({ page }) => {
+        await openMap(page);
+        const counts = await page.locator('#summary [data-class]').evaluateAll((els) =>
+            Object.fromEntries(els.map((e) => [(e as HTMLElement).dataset.class!, Number(e.textContent)])));
+        expect(Object.keys(counts).sort()).toEqual(['accretion', 'mild_erosion', 'severe_erosion', 'stable']);
+        const sum = Object.values(counts).reduce((a, b) => a + b, 0);
+        await expect(page.locator('#kpi-transects')).toHaveText(String(sum));
+
+        const res = await page.request.get('/api/summary');
+        expect(res.ok()).toBeTruthy();
+        const api = (await res.json()).transects;
+        expect(api.total).toBe(sum);
+        expect(api.by_class).toMatchObject(counts);
+    });
+
+    test('13c chú giải: nhóm mức biến động có đủ 4 mức theo thứ tự bồi → lùi mạnh', async ({ page }) => {
+        await openMap(page);
+        const legend = page.locator('#legend');
+        await expect(legend).toBeVisible();
+        const items = legend.locator('.legend-body > h3').first().locator('xpath=following-sibling::div[contains(@class,"legend-item")]').filter({ has: page.locator('.legend-swatch') });
+        await expect(items).toHaveText(['Bồi', 'Ổn định', 'Lùi nhẹ', 'Lùi mạnh']);
+        await expect(legend.getByText('Lùi mạnh')).toHaveCount(1);
+    });
+
+    test('15b chi tiết transect: độ bất định ± m (SE LRR …) và KTC có dấu ±', async ({ page }) => {
+        await openMap(page);
+        const t = await API.transect(page, 'T08');
+        await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.id);
+        await expect(page.locator('#stat-u')).toHaveText(/±\d+(,|\.)?\d* m \(SE LRR/);
+        await expect(page.locator('#stat-ci')).toContainText('±');
+        await expect(page.locator('#stat-ci')).toHaveText(/±\d+(,|\.)?\d* m\/năm/);
+        await expect(page.locator('#transect-detail')).not.toContainText('NaN');
+    });
+
+    test('15c chi tiết transect thiếu u_shoreline_avg (T05): ghi "Đang cập nhật", không NaN', async ({ page }) => {
+        await openMap(page);
+        const t = await API.transect(page, 'T05');
+        // Giả lập bản ghi chưa có độ bất định: gỡ u_shoreline_avg khỏi phản hồi chi tiết.
+        await page.route(new RegExp(`/api/transects/${t.id}$`), async (route) => {
+            const body = await (await route.fetch()).json();
+            body.stats = { ...body.stats, u_shoreline_avg: null };
+            await route.fulfill({ json: body });
+        });
+        await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.id);
+        await expect(page.locator('#transect-code')).toHaveText('T05');
+        await expect(page.locator('#stat-u')).toHaveText('Đang cập nhật');
+        await expect(page.locator('#transect-detail')).not.toContainText(/NaN|undefined/);
+        await expect(page.locator('#stat-nsm')).not.toBeEmpty();
     });
 
     test('14 lọc ý nghĩa thống kê: WMS transect gửi CQL_FILTER is_significant=true', async ({ page }) => {
