@@ -33,7 +33,7 @@ class ExportEndpointTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('layers')]
-    public function test_csv_export(string $layer, int $count): void
+    public function test_csv_export(string $layer, int $count, string $geomType): void
     {
         $r = $this->get("/api/export/{$layer}.csv")->assertOk()
             ->assertHeader('Content-Disposition', "attachment; filename=\"webgis_songhau_{$layer}.csv\"");
