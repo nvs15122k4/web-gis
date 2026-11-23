@@ -12,7 +12,7 @@ for (const vp of VIEWPORTS) {
     test.describe(`Viewport ${vp.name}px`, () => {
         test.use({ viewport: { width: vp.width, height: vp.height } });
 
-        test(`V01 ${vp.name}: bản đồ hiển thị, không tràn ngang, không lỗi console`, async ({ page }) => {
+        test(`V01 ${vp.name}: bản đồ hiển thị, không tràn ngang, không lỗi console`, { tag: ['@responsive'] }, async ({ page }) => {
             const errors = await openMap(page);
             expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
             const box = await page.locator('#map').boundingBox();
@@ -21,7 +21,7 @@ for (const vp of VIEWPORTS) {
             expect(appErrors(errors)).toEqual([]);
         });
 
-        test(`V02 ${vp.name}: tab và sidebar dùng được, chọn transect mở chi tiết`, async ({ page }) => {
+        test(`V02 ${vp.name}: tab và sidebar dùng được, chọn transect mở chi tiết`, { tag: ['@responsive'] }, async ({ page }) => {
             await openMap(page);
             if (vp.width < 600) {
                 await page.click('#sidebar-toggle');
@@ -37,14 +37,14 @@ for (const vp of VIEWPORTS) {
             expect(ins!.x).toBeGreaterThanOrEqual(-1);
         });
 
-        test(`V03 ${vp.name}: trang giới thiệu và quản trị không tràn ngang`, async ({ page }) => {
+        test(`V03 ${vp.name}: trang giới thiệu và quản trị không tràn ngang`, { tag: ['@responsive'] }, async ({ page }) => {
             for (const p of ['/gioi-thieu', '/admin']) {
                 await page.goto(p);
                 expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), p).toBe(true);
             }
         });
 
-        test(`V04 ${vp.name}: sidebar ${vp.width >= 1000 ? 'mở sẵn' : 'tuỳ thiết bị'} và nút điều hướng nằm trong màn hình`, async ({ page }) => {
+        test(`V04 ${vp.name}: sidebar ${vp.width >= 1000 ? 'mở sẵn' : 'tuỳ thiết bị'} và nút điều hướng nằm trong màn hình`, { tag: ['@responsive'] }, async ({ page }) => {
             await openMap(page);
             if (vp.width >= 1000) await expect(page.locator('#sidebar')).not.toHaveClass(/collapsed/);
             const nav = await page.locator('.topnav a').first().boundingBox();
@@ -54,7 +54,7 @@ for (const vp of VIEWPORTS) {
 }
 
 test.describe('Hiệu năng cơ bản', () => {
-    test('H01 trang bản đồ: DOMContentLoaded < 3s, dữ liệu API chính < 2s mỗi cuộc gọi', async ({ page }) => {
+    test('H01 trang bản đồ: DOMContentLoaded < 3s, dữ liệu API chính < 2s mỗi cuộc gọi', { tag: ['@performance'] }, async ({ page }) => {
         const durations: Record<string, number> = {};
         page.on('requestfinished', async (r) => {
             if (r.url().includes('/api/')) durations[new URL(r.url()).pathname] = r.timing().responseEnd;
@@ -70,7 +70,7 @@ test.describe('Hiệu năng cơ bản', () => {
         expect(Object.keys(durations).length).toBeGreaterThan(0);
     });
 
-    test('H02 API chính phản hồi nhanh (< 1.5s) và gọn (< 1MB)', async ({ request }) => {
+    test('H02 API chính phản hồi nhanh (< 1.5s) và gọn (< 1MB)', { tag: ['@performance'] }, async ({ request }) => {
         for (const p of ['/api/transects', '/api/summary', '/api/erosion-hotspots', '/api/status', '/api/config/thresholds']) {
             const t0 = Date.now();
             const res = await request.get(p);
@@ -81,7 +81,7 @@ test.describe('Hiệu năng cơ bản', () => {
         }
     });
 
-    test('H03 số request tải trang hợp lý và không có API gọi lặp', async ({ page }) => {
+    test('H03 số request tải trang hợp lý và không có API gọi lặp', { tag: ['@performance'] }, async ({ page }) => {
         const api: string[] = [];
         page.on('request', (r) => { if (r.url().includes('/api/')) api.push(new URL(r.url()).pathname + new URL(r.url()).search); });
         await openMap(page);
