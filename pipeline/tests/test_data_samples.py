@@ -94,6 +94,11 @@ def test_transects_class_logic_consistent(output_dir, load_json):
         assert st["low_r2_caution"] == (st["r_squared"] < C.R2_CAUTION)
         if st["change_class"] == "severe_erosion":
             assert st["consecutive_erosion_periods"] >= C.MIN_CONSECUTIVE_DECLINE - 1
+            assert st["lrr_m_per_year"] <= C.SEVERE_LRR
+        if st["change_class"] == "mild_erosion":
+            assert st["lrr_m_per_year"] > C.SEVERE_LRR or st["consecutive_erosion_periods"] < C.MIN_CONSECUTIVE_DECLINE - 1
+        if abs(abs(st["lrr_m_per_year"]) - st["unc_lrr"]) > 0.01:   # bỏ vùng sát biên do làm tròn
+            assert st["is_significant"] == (abs(st["lrr_m_per_year"]) > st["unc_lrr"])
 
 
 def test_shorelines_schema(output_dir, load_json):
@@ -151,8 +156,9 @@ def test_summary_consistent_with_transects(output_dir, load_json):
     assert got == s["classes"]
     assert s["water_index"] == C.DEFAULT_INDEX
     assert s["hotspots"] == len(fc_of(load_json, output_dir / "hotspots.json")["features"])
-    if s["M_lrr_erosion"] is not None:
-        assert s["severe_threshold_M_minus_S"] == pytest.approx(s["M_lrr_erosion"] - s["S_lrr_erosion"])
+    assert s["severe_threshold_lrr"] == C.SEVERE_LRR
+    assert s["confidence"] == C.CONFIDENCE
+    assert s["ci_distribution"] == "student_t_df_n_minus_2"
 
 
 def test_summary_u_shoreline_matches_formula(output_dir, load_json):
