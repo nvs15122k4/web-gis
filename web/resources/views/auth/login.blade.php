@@ -22,10 +22,10 @@
 
             <form method="post" action="/dang-nhap" id="session-login-form">
                 @csrf
-                <label>Email <input type="email" name="email" value="{{ old('email') }}" autocomplete="username" required></label>
-                <label>Mật khẩu <input type="password" name="password" autocomplete="current-password" required></label>
+                <label>Email <input type="email" name="email" value="{{ old('email') }}" autocomplete="username" required @if ($errors->any()) aria-describedby="login-error" aria-invalid="true" @endif></label>
+                <label>Mật khẩu <input type="password" name="password" autocomplete="current-password" required @if ($errors->any()) aria-describedby="login-error" aria-invalid="true" @endif></label>
                 @if ($errors->any())
-                    <p class="field-error" role="alert">{{ $errors->first() }}</p>
+                    <p class="field-error" id="login-error" role="alert">{{ $errors->first() }}</p>
                 @endif
                 <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
             </form>

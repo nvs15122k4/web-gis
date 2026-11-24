@@ -36,7 +36,7 @@
 
     <section id="bat-dau">
         <h2>Bắt đầu</h2>
-        <ol class="steps">
+        <ol class="steps" role="list">
             <li>Mở trang <a href="/">Bản đồ</a>. Bản đồ tự căn khung vào đoạn sông Hậu thuộc xã Bình Mỹ; bạn vẫn kéo và thu phóng tự do.</li>
             <li>Bảng điều khiển bên trái có bốn thẻ: <strong>Tổng quan</strong>, <strong>Lớp dữ liệu</strong>, <strong>Hotspot</strong>
                 và <strong>Chia sẻ</strong>. Trên điện thoại, bấm nút ba gạch ở góc trái thanh tiêu đề để mở hoặc đóng bảng này.</li>
@@ -63,7 +63,7 @@
 
     <section id="transect">
         <h2>Xem chi tiết một transect</h2>
-        <ol class="steps">
+        <ol class="steps" role="list">
             <li>Phóng to bản đồ rồi bấm vào một transect.</li>
             <li>Thẻ chi tiết hiện các chỉ số <strong>NSM</strong>, <strong>EPR</strong>, <strong>LRR</strong>, <strong>R²</strong>, độ bất định,
                 mức biến động và biểu đồ khoảng cách đường bờ theo năm.</li>
