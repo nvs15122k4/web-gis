@@ -35,7 +35,7 @@ Khung nhìn neo vào phạm vi đề tài (đoạn sông Hậu – xã Bình M�
 ## 2. Migrate & seed
 
 ```bash
-php artisan migrate            # 3 bảng MySQL + 7 bảng PostGIS + view transects_styled
+php artisan migrate            # bảng ứng dụng + 7 bảng PostGIS + view transects_styled (MySQL nếu DB_CONNECTION=mysql, ngược lại cùng Postgres)
 php artisan db:seed            # admin@webgis.test / password + ngưỡng mặc định (đổi mật khẩu khi triển khai thật)
 ```
 
@@ -95,6 +95,34 @@ cd ../e2e && npm install && npx playwright install && npx playwright test
 `.env.testing` / `.env.e2e` mang thông tin kết nối riêng (không commit). Global setup của Playwright tự nạp lại
 fixture cố định (`E2eFixtureSeeder`: năm 2022 thiếu composite, transect T05 thiếu 2020–2021, sạt lở tham chiếu chỉ ở phía bắc).
 WebKit trên Linux cần thư viện hệ thống (`sudo npx playwright install-deps`). Trên Ubuntu mới hơn 24.04 (vd. 26.04) bản WebKit của Playwright không khởi chạy được vì thiếu `libicu74`/`libjxl0.8`; khi đó chạy `cd e2e && npm run test:no-webkit` (chỉ Chromium và Firefox).
+
+## 6. Triển khai: Supabase + Vercel + UptimeRobot
+
+Sản phẩm chạy với **một** CSDL Supabase Postgres + PostGIS (kết nối `pgsql`; bảng người dùng/ngưỡng và bảng không gian cùng nằm trong đó). Các bước dưới đây do chủ dự án tự làm trên dashboard; mã nguồn đã sẵn `vercel.json`, `api/index.php` và route `/healthz`.
+
+**Supabase**
+1. Tạo project, vào *Database > Extensions* bật `postgis` (hoặc để migration tự `CREATE EXTENSION`).
+2. *Project Settings > Database > Connection pooling*: lấy host/user của pooler **Transaction**, cổng **6543** (`DB_PGSQL_HOST`, `DB_PGSQL_USERNAME` dạng `postgres.<ref>`, `DB_PGSQL_PASSWORD`).
+3. Migrate/seed một lần từ máy cá nhân với `.env` trỏ tới Supabase: `php artisan migrate --force && php artisan db:seed --force`, rồi `php artisan webgis:import ../pipeline/output`. Đổi mật khẩu `admin@webgis.test` ngay sau khi seed.
+4. Khác biệt so với MySQL: tìm email/khóa ngưỡng phân biệt hoa thường.
+
+**Vercel** (import repo GitHub, *Root Directory* = `web`, nhánh production = `main`). Build dùng `npm run build`; runtime PHP là `vercel-php` (khai trong `vercel.json`); session/cache/log đã đặt `cookie`/`array`/`stderr`. Biến môi trường cần nhập (*Settings > Environment Variables*):
+
+| Biến | Giá trị |
+|---|---|
+| `APP_KEY` | kết quả `php artisan key:generate --show` |
+| `APP_URL` | URL Vercel (https) |
+| `DB_PGSQL_HOST`, `DB_PGSQL_PORT=6543`, `DB_PGSQL_DATABASE`, `DB_PGSQL_USERNAME`, `DB_PGSQL_PASSWORD` | thông tin pooler Supabase (hoặc chỉ `DB_PGSQL_URL`) |
+| `DB_PGSQL_SCHEMA` | `public,extensions` |
+| `GEOSERVER_URL`, `GEOSERVER_WORKSPACE` | GeoServer host ngoài Vercel (HTTPS, bật CORS cho domain Vercel) |
+| `VIETMAP_API_KEY` | tuỳ chọn |
+
+`APP_ENV`, `APP_DEBUG`, `LOG_CHANNEL`, `SESSION_DRIVER`, `CACHE_STORE`, `DB_CONNECTION`, `DB_PGSQL_EMULATE_PREPARES`, `DB_PGSQL_SSLMODE` đã có trong `vercel.json`. GeoServer **không** chạy trên Vercel.
+
+**UptimeRobot** (giữ hàm/CSDL không ngủ và báo khi sập)
+1. *Add New Monitor* > loại **HTTP(s)**, URL `https://<ten-mien>/healthz`.
+2. Chu kỳ 5 phút; *Keyword* tuỳ chọn: `"status":"ok"`.
+3. `/healthz` trả 200 `{"status":"ok"}` khi `SELECT 1` thành công, 503 `{"status":"error"}` khi mất CSDL; hỗ trợ cả GET và HEAD.
 
 ## Ghi chú
 
