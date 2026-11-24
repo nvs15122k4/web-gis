@@ -29,6 +29,15 @@
 </head>
 <body class="page">
 @include('partials.nav')
+<header class="page-hero">
+    <div class="page-hero-inner">
+        <p class="eyebrow">Trang nội bộ · chỉ quản trị viên</p>
+        <h1>Báo cáo công việc đã làm</h1>
+        <p class="lead">Tổng hợp từ lịch sử git và các tính năng đã hoàn thành của đề tài “WebGIS giám sát biến động bờ sông Hậu, xã Bình Mỹ, An Giang”,
+        đối chiếu với đề cương. Trang nội bộ, chỉ tài khoản admin xem được. Số liệu chốt ngày 23/11/2026.</p>
+        <p class="hero-meta"><span class="chip">Dành cho tài khoản admin</span></p>
+    </div>
+</header>
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
     <p>Mục lục</p>
@@ -40,9 +49,6 @@
     <a href="#con-lai">Việc còn lại</a>
 </nav>
 <main class="doc" id="main-content" tabindex="-1">
-    <h1>Báo cáo công việc đã làm</h1>
-    <p class="lead">Tổng hợp từ lịch sử git và các tính năng đã hoàn thành của đề tài “WebGIS giám sát biến động bờ sông Hậu, xã Bình Mỹ, An Giang”,
-        đối chiếu với đề cương. Trang nội bộ, chỉ tài khoản admin xem được. Số liệu chốt ngày 23/11/2026.</p>
 
     <section id="so-lieu">
         <h2>Số liệu chung</h2>
