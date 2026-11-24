@@ -39,7 +39,7 @@
                 <button type="submit" title="Đang đăng nhập: {{ auth()->user()->email }}">Đăng xuất</button>
             </form>
         @else
-            <a href="/dang-nhap" @class(['active' => request()->is('dang-nhap')])>{!! $icon('login') !!}Đăng nhập</a>
+            <a href="/dang-nhap" @class(['active' => request()->is('dang-nhap')]) @if (request()->is('dang-nhap')) aria-current="page" @endif>{!! $icon('login') !!}Đăng nhập</a>
         @endauth
     </nav>
 </header>
