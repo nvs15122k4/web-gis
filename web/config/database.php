@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -85,8 +85,11 @@ return [
         ],
 
         // Kết nối dữ liệu không gian (PostgreSQL/PostGIS) — dùng cho các model đọc shoreline/transect...
+        // Supabase: dùng pooler (Supavisor) cổng 6543, chế độ transaction -> PDO phải giả lập prepared statement.
+        // Có thể dán nguyên chuỗi kết nối vào DB_PGSQL_URL thay cho các biến DB_PGSQL_* riêng lẻ.
         'pgsql' => [
             'driver' => 'pgsql',
+            'url' => env('DB_PGSQL_URL'),
             'host' => env('DB_PGSQL_HOST', '127.0.0.1'),
             'port' => env('DB_PGSQL_PORT', '5432'),
             'database' => env('DB_PGSQL_DATABASE', 'webgis_spatial'),
@@ -97,6 +100,9 @@ return [
             'prefix_indexes' => true,
             'search_path' => env('DB_PGSQL_SCHEMA', 'public'),
             'sslmode' => env('DB_PGSQL_SSLMODE', 'prefer'),
+            'options' => [
+                \PDO::ATTR_EMULATE_PREPARES => (bool) env('DB_PGSQL_EMULATE_PREPARES', false),
+            ],
         ],
 
         'sqlsrv' => [
