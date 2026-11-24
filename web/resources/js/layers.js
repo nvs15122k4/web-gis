@@ -4,7 +4,9 @@ import { api } from './api';
 import { setStatus, UPDATING } from './status';
 
 const { geoserver, years } = window.WEBGIS;
-const wmsUrl = `${geoserver.url}/${geoserver.workspace}/wms`;
+/** Có GEOSERVER_URL thì vẽ bằng WMS (như cũ); không có thì vẽ GeoJSON từ /api/* bằng Leaflet. */
+export const USE_WMS = Boolean(geoserver?.url);
+const wmsUrl = USE_WMS ? `${geoserver.url}/${geoserver.workspace}/wms` : null;
 
 /** Layer WMS từ GeoServer; lọc năm bằng CQL_FILTER (không tạo layer riêng mỗi năm). */
 export function wms(name, params = {}) {
@@ -18,7 +20,7 @@ export function wms(name, params = {}) {
 }
 
 export const WMS_URL = wmsUrl;
-export const TRANSECT_LAYER = `${geoserver.workspace}:transects`;
+export const TRANSECT_LAYER = USE_WMS ? `${geoserver.workspace}:transects` : null;
 
 const YEAR_COLORS = ['#6a3d9a', '#1f78b4', '#33a02c', '#e31a8c', '#ff7f00', '#a6761d', '#00838f', '#5c6bc0', '#546e7a'];
 const COMPARE_COLORS = { a: '#1f6feb', b: '#f0883e' };
@@ -26,7 +28,47 @@ const COMPARE_COLORS = { a: '#1f6feb', b: '#f0883e' };
 const hex = (c) => c.replace('#', '');
 
 function shorelineLayer(year, color) {
-    return wms('shorelines', { cql_filter: `year=${year}`, env: `color:${hex(color)}` });
+    if (USE_WMS) return wms('shorelines', { cql_filter: `year=${year}`, env: `color:${hex(color)}` });
+    // Chế độ GeoJSON: tải đường bờ của đúng năm khi lớp được tạo, vẽ vào lớp rỗng đã trả về.
+    const layer = L.geoJSON(null, { style: { color, weight: 3, opacity: 0.9 }, interactive: false });
+    api.shorelines(year).then((fc) => layer.addData(fc)).catch(() => {
+        setStatus(`Dữ liệu đường bờ năm ${year}: ${UPDATING.toLowerCase()}.`);
+    });
+    return layer;
+}
+
+/** Callback khi bấm một transect trong chế độ GeoJSON (transect-panel gán, tránh import vòng). */
+export const handlers = { onTransectClick: null };
+
+/**
+ * Lớp transect GeoJSON: tô theo change_class, lọc "chỉ có ý nghĩa thống kê" ở phía trình duyệt.
+ * Dùng canvas với vùng bấm rộng vì transect mảnh.
+ */
+function geoJsonTransects() {
+    const layer = L.geoJSON(null, {
+        renderer: L.canvas({ tolerance: 6 }),
+        style: (f) => ({ color: colors[f.properties.change_class] ?? '#888888', weight: 3, opacity: 0.9 }),
+        onEachFeature: (f, l) => l.on('click', (e) => {
+            L.DomEvent.stopPropagation(e);
+            handlers.onTransectClick?.(f, e.latlng);
+        }),
+    });
+    let all = null;
+    let significantOnly = false;
+    const redraw = () => {
+        layer.clearLayers();
+        if (!all) return;
+        layer.addData({ ...all, features: all.features.filter((f) => !significantOnly || f.properties.is_significant) });
+    };
+    layer.setSignificantOnly = (flag) => {
+        significantOnly = flag;
+        redraw();
+    };
+    api.transects().then((fc) => {
+        all = fc;
+        redraw();
+    }).catch(() => setStatus(`Dữ liệu transect: ${UPDATING.toLowerCase()}.`));
+    return layer;
 }
 
 /** Trạng thái các lớp, để bật/tắt và để kiểm thử truy cập. */
@@ -54,7 +96,7 @@ let mapRef = null;
 
 export function initLayers(map) {
     mapRef = map;
-    layers.transects = warnOnTileError(wms('transects', { styles: '' })).addTo(map);
+    layers.transects = (USE_WMS ? warnOnTileError(wms('transects', { styles: '' })) : geoJsonTransects()).addTo(map);
     layers.hotspots.addTo(map);
 
     bindToggle('layer-transects', map, () => layers.transects);
@@ -76,6 +118,10 @@ function bindToggle(id, map, getLayer) {
 function bindSignificanceFilter() {
     document.getElementById('only-significant').addEventListener('change', (e) => {
         layers.transectFilter = e.target.checked ? 'is_significant=true' : null;
+        if (!USE_WMS) {
+            layers.transects.setSignificantOnly(e.target.checked);
+            return;
+        }
         // GeoServer bỏ qua CQL_FILTER rỗng không được: gửi INCLUDE để tắt lọc.
         layers.transects.setParams({ cql_filter: layers.transectFilter ?? 'INCLUDE' });
     });
