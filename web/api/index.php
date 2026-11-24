@@ -35,4 +35,10 @@ require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 $app->useStoragePath("$tmp/storage");
 
+// Hàm nằm ở /api/index.php nên Symfony tự coi "/api" là base URL và cắt khỏi đường dẫn,
+// làm mọi route /api/* thành 404. Giả lập script ở gốc (như public/index.php).
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
+$_SERVER['SCRIPT_FILENAME'] = dirname(__DIR__).'/public/index.php';
+
 $app->handleRequest(Request::capture());
