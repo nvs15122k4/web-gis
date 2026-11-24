@@ -1,13 +1,14 @@
 # Web — ứng dụng WebGIS (Laravel)
 
-Thành phần web của dự án (xem [README gốc](../README.md)): Laravel (MVC) · PostgreSQL/PostGIS · MySQL · GeoServer (WMS + WFS) ·
-Leaflet + Chart.js. Dịch vụ nền chạy nhanh bằng `docker compose up -d` (MySQL :3307, PostGIS :5432, GeoServer :8080).
+Thành phần web của dự án (xem [README gốc](../README.md)): Laravel (MVC) · PostgreSQL/PostGIS · MySQL · Leaflet + Chart.js; **GeoServer (WMS + WFS) là tuỳ chọn**
+(không đặt `GEOSERVER_URL` thì bản đồ vẽ GeoJSON từ `/api/*`, đủ để deploy Vercel + Supabase). Dịch vụ nền chạy nhanh bằng
+`docker compose up -d` (MySQL :3307, PostGIS :5432, GeoServer :8080).
 
 Hệ thống **chỉ đọc**: NSM/EPR/LRR/R² và mức biến động được pipeline Python tính sẵn; Laravel không tính lại.
 
 ## Yêu cầu
 
-PHP ≥ 8.4 (`pdo_mysql`, `pdo_pgsql`), Composer, Node ≥ 20, MySQL 8+, PostgreSQL 14+ với **PostGIS**, Java 17 + GeoServer 2.27, `curl`.
+PHP ≥ 8.4 (`pdo_mysql`, `pdo_pgsql`), Composer, Node ≥ 20, MySQL 8+, PostgreSQL 14+ với **PostGIS**, `curl`; Java 17 + GeoServer 2.27 chỉ khi dùng chế độ GeoServer (tuỳ chọn).
 
 ## 1. Cài đặt
 
@@ -19,7 +20,12 @@ cp .env.example .env && php artisan key:generate   # chỉnh DB_* (MySQL) và DB
 Tạo sẵn 2 CSDL rỗng: MySQL `webgis_app`, PostgreSQL `webgis_spatial` (migration tự `CREATE EXTENSION postgis`,
 tài khoản cần đủ quyền).
 
-**Bản đồ nền:** mặc định là nền **tự phục vụ trên GeoServer của dự án** (layer group `nen_ban_do`, mục 3) — không lấy tile
+**Lớp bản đồ:** không đặt `GEOSERVER_URL` thì transect, đường bờ theo năm, hotspot, sạt lở tham chiếu và ranh giới AOI đều là GeoJSON
+từ `/api/*` (Leaflet; canvas cho transect), nền là VIETMAP nếu có `VIETMAP_API_KEY`, không thì OpenStreetMap + ảnh vệ tinh Esri
+(OSM ở mức thu nhỏ vẽ "đường lưỡi bò"; dự phòng này chỉ dùng khi không có nền VIETMAP/GeoServer, nên đặt `VIETMAP_API_KEY` khi công bố).
+Đặt `GEOSERVER_URL` thì quay lại chế độ WMS/WFS như mô tả dưới đây.
+
+**Bản đồ nền (chế độ GeoServer):** nền **tự phục vụ trên GeoServer của dự án** (layer group `nen_ban_do`, mục 3) — không lấy tile
 bên thứ ba, đã bỏ mọi nền có vẽ "đường lưỡi bò". Dữ liệu: Natural Earth 1:10m bản theo quan điểm Việt Nam (quần đảo Hoàng Sa
 thuộc TP Đà Nẵng, quần đảo Trường Sa thuộc tỉnh Khánh Hòa, ghi "Biển Đông"), 34 tỉnh sau sáp nhập 01/07/2025 (đối chiếu
 63 → 34 tỉnh từ [provinces.open-api.vn](https://provinces.open-api.vn), lưu ở `geoserver/basemap/provinces_2025.csv`) và
@@ -27,7 +33,7 @@ OpenStreetMap quanh vùng nghiên cứu (đường, sông/kênh, mặt nước, 
 Nền phụ: ảnh vệ tinh Esri (không nhãn, không ranh giới). Đã bỏ nền Google vì chỉ ghi "quần đảo Hoàng Sa/Trường Sa",
 "East Sea" mà không thể hiện thuộc Việt Nam. Điền `VIETMAP_API_KEY=` trong `.env` (key tại
 [maps.vietmap.vn](https://maps.vietmap.vn), nên giới hạn theo domain vì key lộ ra trình duyệt) để thêm nền VIETMAP.
-Không dùng nền OpenStreetMap/CARTO dạng tile có sẵn vì ở mức thu nhỏ chúng vẽ "đường lưỡi bò".
+Ở chế độ GeoServer không dùng nền OpenStreetMap/CARTO dạng tile có sẵn vì ở mức thu nhỏ chúng vẽ "đường lưỡi bò".
 File GeoJSON trong repo lưu đuôi `.json` (không dùng `.geojson`) vì GitHub tự vẽ file `.geojson` lên bản đồ nền có "đường lưỡi bò".
 Khung nhìn neo vào phạm vi đề tài (đoạn sông Hậu – xã Bình Mỹ, hằng `AREA` trong `resources/js/map.js`): không kéo ra ngoài
 được, kể cả khi mở liên kết chia sẻ trỏ ra xa, nhưng vẫn phóng to/thu nhỏ tự do (thu nhỏ tối đa ra toàn Việt Nam).
@@ -51,7 +57,9 @@ php artisan webgis:compare-reference                    # đối chiếu hotspot
 Chưa có dữ liệu thật? Nạp dữ liệu **tổng hợp** để xem giao diện: `php artisan db:seed --class=E2eFixtureSeeder`
 (ghi đè bảng không gian — chỉ dùng trên DB dev/test).
 
-## 3. GeoServer
+## 3. GeoServer (tuỳ chọn)
+
+Bỏ qua mục này nếu không dùng GeoServer (xem đầu mục 1).
 
 ```bash
 python3 geoserver/enable-cors.py $GEOSERVER_HOME     # bật CORS cho Leaflet, rồi (re)start GeoServer
@@ -114,10 +122,10 @@ Sản phẩm chạy với **một** CSDL Supabase Postgres + PostGIS (kết nố
 | `APP_URL` | URL Vercel (https) |
 | `DB_PGSQL_HOST`, `DB_PGSQL_PORT=6543`, `DB_PGSQL_DATABASE`, `DB_PGSQL_USERNAME`, `DB_PGSQL_PASSWORD` | thông tin pooler Supabase (hoặc chỉ `DB_PGSQL_URL`) |
 | `DB_PGSQL_SCHEMA` | `public,extensions` |
-| `GEOSERVER_URL`, `GEOSERVER_WORKSPACE` | GeoServer host ngoài Vercel (HTTPS, bật CORS cho domain Vercel) |
-| `VIETMAP_API_KEY` | tuỳ chọn |
+| `VIETMAP_API_KEY` | tuỳ chọn (không có thì nền dự phòng OpenStreetMap + Esri) |
+| `GEOSERVER_URL`, `GEOSERVER_WORKSPACE` | **không bắt buộc**; chỉ đặt khi có GeoServer host ngoài Vercel (HTTPS, bật CORS cho domain Vercel) |
 
-`APP_ENV`, `APP_DEBUG`, `LOG_CHANNEL`, `SESSION_DRIVER`, `CACHE_STORE`, `DB_CONNECTION`, `DB_PGSQL_EMULATE_PREPARES`, `DB_PGSQL_SSLMODE` đã có trong `vercel.json`. GeoServer **không** chạy trên Vercel.
+`APP_ENV`, `APP_DEBUG`, `LOG_CHANNEL`, `SESSION_DRIVER`, `CACHE_STORE`, `DB_CONNECTION`, `DB_PGSQL_EMULATE_PREPARES`, `DB_PGSQL_SSLMODE` đã có trong `vercel.json`. GeoServer **không** chạy trên Vercel; để trống `GEOSERVER_URL` thì ẩn liên kết WMS/WFS ở `/gioi-thieu` và `/api/status` trả `geoserver: null` (không báo lỗi).
 
 **UptimeRobot** (giữ hàm/CSDL không ngủ và báo khi sập)
 1. *Add New Monitor* > loại **HTTP(s)**, URL `https://<ten-mien>/healthz`.
@@ -126,5 +134,5 @@ Sản phẩm chạy với **một** CSDL Supabase Postgres + PostGIS (kết nố
 
 ## Ghi chú
 
-- `GET /api/*` trả GeoJSON EPSG:4326; GeoServer reproject sang 3857 khi cần.
+- `GET /api/*` trả GeoJSON EPSG:4326; khi có GeoServer, GeoServer reproject sang 3857 khi cần.
 - Chỉ 1 vai trò phụ `admin` (sửa ngưỡng hiển thị `min_erosion_rate`), token Sanctum; mọi thay đổi ngưỡng ghi vào `activity_logs`.
