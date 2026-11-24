@@ -36,6 +36,7 @@ jobs:
           --health-cmd="pg_isready -U postgres"
           --health-interval=5s --health-timeout=5s --health-retries=20
     env:
+      DB_CONNECTION: mysql   # .env.example mặc định pgsql (Supabase); CI cần migrate MySQL cho ứng dụng
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_DATABASE: webgis_app_test
