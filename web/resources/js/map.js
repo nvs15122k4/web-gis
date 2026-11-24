@@ -8,17 +8,14 @@ import { initTransectPanel, showTransect, zoomToTransect } from './transect-pane
 
 const DEFAULT_CENTER = [10.545, 105.29];
 const DEFAULT_ZOOM = 13;
-/**
- * Phạm vi đề tài: đoạn bờ sông Hậu thuộc xã Bình Mỹ, An Giang (đề cương). Khung bao ranh giới xã (public/data/aoi.json)
- * nới vài km để thấy cả hai bờ sông. Khung nhìn neo vào khung này (kéo không ra ngoài) nhưng vẫn phóng to/thu nhỏ tự do.
- */
-const AREA = L.latLngBounds([10.40, 105.12], [10.62, 105.42]);
 /** Thu nhỏ tối đa ra toàn Việt Nam (nền ghi Hoàng Sa, Trường Sa, Biển Đông). */
-const MIN_ZOOM = 5;
+const MIN_ZOOM = 4;
+/** Cho kéo tới cả Hoàng Sa, Trường Sa (Việt Nam) nhưng không ra khỏi khu vực Biển Đông. */
+const VIET_NAM = L.latLngBounds([4.5, 100.0], [24.5, 119.5]);
 
 export function initMap() {
     const link = readPermalink();
-    const map = L.map('map', { minZoom: MIN_ZOOM, maxBounds: AREA, maxBoundsViscosity: 1 })
+    const map = L.map('map', { minZoom: MIN_ZOOM, maxBounds: VIET_NAM, maxBoundsViscosity: 1 })
         .setView(link.view?.center ?? DEFAULT_CENTER, link.view?.zoom ?? DEFAULT_ZOOM);
 
     initBasemaps(map, window.WEBGIS.vietmapKey);

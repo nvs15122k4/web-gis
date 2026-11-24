@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import { initSovereignty, addVietnamButton } from './sovereignty';
 
 const STORAGE_KEY = 'webgis_basemap';
 /**
@@ -35,6 +36,30 @@ const OSM = {
     }),
 };
 
+/**
+ * Nền vector offline (không cần GeoServer, không cần khoá): Natural Earth 1:10m bản quan điểm Việt Nam, đã cắt khu vực
+ * Đông Nam Á (public/data/basemap_vn.geojson). Hoàng Sa, Trường Sa là lãnh thổ Việt Nam, không có "đường lưỡi bò".
+ */
+function vectorVietnam() {
+    const group = L.layerGroup();
+    fetch('/data/basemap_vn.geojson')
+        .then((r) => r.json())
+        .then((data) => {
+            L.geoJSON(data, {
+                pane: BASEMAP_PANE,
+                interactive: false,
+                style: (f) => (f.properties.NAME_EN === 'Vietnam'
+                    ? { color: '#8a6d3b', weight: 0.8, fillColor: '#f1e9cf', fillOpacity: 1 }
+                    : { color: '#9aa5ad', weight: 0.6, fillColor: '#e4e6e1', fillOpacity: 1 }),
+            }).addTo(group);
+        })
+        .catch((e) => console.warn('Không tải được nền vector Việt Nam.', e));
+    group.options = { attribution: 'Nền: <a href="https://www.naturalearthdata.com" rel="noopener">Natural Earth</a> (quan điểm Việt Nam)' };
+    return group;
+}
+
+const VECTOR_VN = { 'Bản đồ Việt Nam (vector)': vectorVietnam };
+
 const esri = (service, attribution) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`, {
     attribution: `Tiles &copy; Esri &mdash; ${attribution}`,
     maxNativeZoom: 19,
@@ -56,7 +81,7 @@ const ESRI_IMAGERY = { 'Ảnh vệ tinh (Esri)': () => esri('World_Imagery', 'Es
 async function basemapDefs(vietmapKey) {
     const hasGeoServer = Boolean(window.WEBGIS?.geoserver?.url);
     const base = hasGeoServer ? SELF_HOSTED : {};
-    const fallback = hasGeoServer ? {} : OSM;
+    const fallback = hasGeoServer ? {} : { ...VECTOR_VN, ...OSM };
     if (vietmapKey) {
         try {
             const { vietmapBasemaps } = await import('./vietmap');
@@ -79,7 +104,10 @@ function remembered() {
 export async function initBasemaps(map, vietmapKey = null) {
     map.createPane(BASEMAP_PANE).style.zIndex = 150;
     L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
+    map.getContainer().classList.add('has-sea-bg');
     initCoordinates(map);
+    initSovereignty(map);
+    addVietnamButton(map);
 
     const defs = await basemapDefs(vietmapKey);
     const layers = Object.fromEntries(Object.entries(defs).map(([name, make]) => [name, make()]));

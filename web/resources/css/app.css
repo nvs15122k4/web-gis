@@ -498,3 +498,10 @@ main:focus { outline: none; }
 .doc .progress { height: .6rem; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
 .doc .progress i { display: block; height: 100%; background: var(--primary); }
 .admin .field-error { margin: 0; color: var(--error); font-size: .82rem; }
+
+/* Nền vector offline: màu biển; nhãn chủ quyền Hoàng Sa, Trường Sa luôn hiện trên mọi nền */
+.has-sea-bg { background: #bcd8e8; }
+.sovereignty-label span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; text-align: center; font: 700 12px/1.2 var(--sans, system-ui); color: #7a0f14; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 5px #fff; pointer-events: none; }
+.sovereignty-label small { display: block; font-weight: 500; font-size: 10px; }
+.sovereignty-sea span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font: 600 italic 13px/1 var(--sans, system-ui); letter-spacing: .3em; color: #2b5d7c; text-shadow: 0 0 3px #fff; pointer-events: none; }
+.leaflet-control.vn-fit { display: block; width: 30px; height: 30px; line-height: 30px; text-align: center; font-weight: 700; font-size: 12px; background: #fff; color: #222; }
