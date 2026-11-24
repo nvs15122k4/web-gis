@@ -6,7 +6,7 @@
         ['2.3', 'Pipeline xử lý ảnh và trích xuất đường bờ', 'done', 'Composite trung vị, NDWI/MNDWI/AWEI + Otsu, vector hoá dưới pixel, baseline và transect vuông góc (pipeline/s1–s4).'],
         ['2.4', 'Đánh giá độ chính xác và kiểm chứng', 'done', 'Ground truth số hoá 5 ô mẫu (2018, 2022, 2026), RMSE đường bờ 15,1–20,0 m đưa vào U_classify; đối chiếu chéo ESA WorldCover và Impact Observatory LULC.'],
         ['2.5', 'Tiêu chí phân loại và độ bất định', 'done', 'NSM/EPR/LRR/R², kiểm định |LRR| > 1,96 × SE, bốn mức biến động, U_georef chốt 12 m.'],
-        ['2.6', 'Kiến trúc, cơ sở dữ liệu và giao diện WebGIS', 'done', 'MySQL (người dùng, cấu hình) + PostGIS (không gian), GeoServer WMS, Leaflet + Chart.js; giao diện sáng/tối, hỗ trợ bàn phím và cảm ứng.'],
+        ['2.6', 'Kiến trúc, cơ sở dữ liệu và giao diện WebGIS', 'done', 'MySQL (người dùng, cấu hình) + PostGIS (không gian), GeoServer WMS (tuỳ chọn), Leaflet + Chart.js; giao diện sáng/tối, hỗ trợ bàn phím và cảm ứng.'],
         ['3.5', 'Đối chiếu với sạt lở tham chiếu 2019–2020', 'part', 'Nguồn công khai chỉ có lý trình Km, chưa có toạ độ nên dùng vùng cảnh báo ~3,3 km; kết quả hiện không phát hiện đoạn lùi bờ trong vùng này (đã ghi rõ ở trang Phương pháp).'],
         ['3.6.2', 'REST API và bảo mật', 'done', 'Sanctum, khoá đăng nhập sau 5 lần sai theo email + IP, token hết hạn sau 480 phút, kiểm tra đầu vào, ghi nhật ký thay đổi ngưỡng.'],
         ['3.6.3', 'Giao diện người dùng', 'done', 'Bản đồ, biểu đồ transect, hotspot, so sánh hai năm, chia sẻ liên kết, tải GeoJSON/CSV, trang Phương pháp, Quản trị, Hướng dẫn và Báo cáo.'],
@@ -104,13 +104,13 @@
         <h3>Ứng dụng web (Laravel)</h3>
         <ul>
             <li>REST API tra cứu đường bờ, transect, hotspot, sự kiện tham chiếu, thống kê; xuất GeoJSON/CSV.</li>
-            <li>Bản đồ tương tác: lớp WMS, tô màu theo mức biến động, so sánh hai năm, lọc hotspot, chia sẻ liên kết.</li>
+            <li>Bản đồ tương tác: lớp bản đồ (GeoJSON từ API, hoặc WMS khi có GeoServer), tô màu theo mức biến động, so sánh hai năm, lọc hotspot, chia sẻ liên kết.</li>
             <li>Trang Phương pháp, Quản trị ngưỡng (có nhật ký), Hướng dẫn sử dụng và Báo cáo công việc (chỉ admin, chặn phía máy chủ).</li>
             <li>Giao diện sáng/tối, hỗ trợ bàn phím, trình đọc màn hình và màn hình cảm ứng.</li>
         </ul>
         <h3>Hạ tầng</h3>
         <ul>
-            <li>GeoServer với style SLD và layer group nền bản đồ tự phục vụ; PostGIS cho dữ liệu không gian, MySQL cho người dùng và cấu hình.</li>
+            <li>GeoServer (tuỳ chọn) với style SLD và layer group nền bản đồ tự phục vụ; PostGIS cho dữ liệu không gian, MySQL cho người dùng và cấu hình.</li>
             <li>CI GitHub Actions; E2E chạy trên CSDL và workspace GeoServer riêng.</li>
         </ul>
     </section>
