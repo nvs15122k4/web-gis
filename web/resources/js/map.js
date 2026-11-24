@@ -13,7 +13,7 @@ const DEFAULT_ZOOM = 13;
  * nới vài km để thấy cả hai bờ sông. Khung nhìn neo vào khung này (kéo không ra ngoài) nhưng vẫn phóng to/thu nhỏ tự do.
  */
 const AREA = L.latLngBounds([10.40, 105.12], [10.62, 105.42]);
-/** Thu nhỏ tối đa ra toàn Việt Nam (nền GeoServer ghi Hoàng Sa, Trường Sa, Biển Đông). */
+/** Thu nhỏ tối đa ra toàn Việt Nam (nền ghi Hoàng Sa, Trường Sa, Biển Đông). */
 const MIN_ZOOM = 5;
 
 export function initMap() {
