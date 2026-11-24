@@ -212,9 +212,15 @@ class BootstrapConfigRoutingExtraTest extends PretendQueryCase
 
     public function test_geoserver_url_khong_ket_thuc_bang_gach_cheo_hoac_ghi_ro(): void
     {
+        config(['services.geoserver.url' => 'http://gs.test/geoserver']);
         $url = config('services.geoserver.url');
         $this->assertMatchesRegularExpression('#^https?://#', $url);
         $this->assertDoesNotMatchRegularExpression('#/$#', $url, 'URL kết thúc bằng "/" sẽ tạo "//workspace/wms"');
+    }
+
+    public function test_geoserver_url_la_tuy_chon_khong_dat_thi_null(): void
+    {
+        $this->assertNull(config('services.geoserver.url'), 'GEOSERVER_URL không đặt thì phải là null (chế độ GeoJSON)');
     }
 
     public function test_workspace_geoserver_khong_chua_ky_tu_la(): void
