@@ -6,6 +6,7 @@ use App\Models\ErosionHotspot;
 use App\Models\Shoreline;
 use App\Models\ShorelineChangeStat;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class MapController extends Controller
@@ -29,7 +30,8 @@ class MapController extends Controller
     private function availableYears(): array
     {
         try {
-            return Shoreline::query()->distinct()->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all();
+            // Danh sách năm chỉ đổi khi chạy lại pipeline: nhớ 60s để trang chủ không truy vấn PostGIS mỗi lượt tải.
+            return Cache::remember('map.available_years', 60, fn () => Shoreline::query()->distinct()->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all());
         } catch (Throwable $e) {
             report($e);
 

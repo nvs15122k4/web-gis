@@ -32,7 +32,7 @@ class HeadersCorsCacheTest extends TestCase
 
     public static function uncachedEndpoints(): array
     {
-        return array_map(fn ($u) => [$u], ['/api/status', '/api/config/thresholds']);
+        return array_map(fn ($u) => [$u], ['/api/config/thresholds']);
     }
 
     #[DataProvider('cachedEndpoints')]
@@ -60,8 +60,15 @@ class HeadersCorsCacheTest extends TestCase
         $this->get($url, ['If-None-Match' => $first->headers->get('ETag')])->assertStatus(304);
     }
 
+    public function test_status_is_cached_briefly_at_cdn(): void
+    {
+        $r = $this->get('/api/status');
+        $this->assertStringContainsString('s-maxage=30', $r->headers->get('Cache-Control'));
+        $this->assertNotNull($r->headers->get('ETag'));
+    }
+
     #[DataProvider('uncachedEndpoints')]
-    public function test_status_and_thresholds_are_not_publicly_cached(string $url): void
+    public function test_thresholds_are_not_publicly_cached(string $url): void
     {
         $r = $this->get($url);
         $this->assertStringNotContainsString('public', (string) $r->headers->get('Cache-Control'));
