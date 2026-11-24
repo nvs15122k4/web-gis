@@ -52,6 +52,22 @@ describe('initBasemaps', () => {
         expect(map.addedLayers.some((l) => l._url?.includes('nen_ban_do'))).toBe(false);
     });
 
+    it('nền vector tải thêm ranh giới tỉnh, sông, hồ và hiện nhãn tên tỉnh khi phóng đủ lớn', async () => {
+        window.WEBGIS = { geoserver: { url: null, workspace: 'songhau' } };
+        const empty = { type: 'FeatureCollection', features: [] };
+        const prov = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: { ten: 'Cần Thơ', lat: 10.03, lng: 105.78 }, geometry: { type: 'Polygon', coordinates: [[[105.6, 9.9], [105.9, 9.9], [105.9, 10.2], [105.6, 9.9]]] } }] };
+        globalThis.fetch = vi.fn((url) => Promise.resolve({ json: () => Promise.resolve(url.includes('tinh_vn') ? prov : empty) }));
+        const { initBasemaps } = await load();
+        const { map } = makeMap();
+        await initBasemaps(map);
+        await new Promise((r) => setTimeout(r, 0));
+        ['tinh_vn', 'song_vn', 'ho_vn'].forEach((n) => expect(globalThis.fetch).toHaveBeenCalledWith(`/data/${n}.geojson`));
+        map.setZoom(7);
+        expect(document.body.innerHTML).toContain('Cần Thơ');
+        map.setZoom(4);
+        expect(document.body.innerHTML).not.toContain('vn-label-province');
+    });
+
     it('luôn có lớp nhãn Hoàng Sa, Trường Sa trên mọi nền', async () => {
         const { initBasemaps } = await load();
         const { map } = makeMap();

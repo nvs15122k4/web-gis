@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { initSovereignty, addVietnamButton } from './sovereignty';
+import { initSovereignty, addVietnamButton, ARCHIPELAGOS } from './sovereignty';
 
 const STORAGE_KEY = 'webgis_basemap';
 /**
@@ -40,21 +40,95 @@ const OSM = {
  * Nền vector offline (không cần GeoServer, không cần khoá): Natural Earth 1:10m bản quan điểm Việt Nam, đã cắt khu vực
  * Đông Nam Á (public/data/basemap_vn.geojson). Hoàng Sa, Trường Sa là lãnh thổ Việt Nam, không có "đường lưỡi bò".
  */
+const DETAIL_MIN_ZOOM = 8;
+/** Pane tile chi tiết nằm trên pane vector (SVG cùng pane sẽ che ảnh tile). */
+const DETAIL_PANE = 'basemap-detail';
+
+/**
+ * Nền lai: vector Việt Nam luôn nằm dưới; từ zoom 8 trở lên, khi khung nhìn không chạm vùng Hoàng Sa, Trường Sa,
+ * chồng thêm tile OpenStreetMap để có sông, đường, địa danh. Khung nhìn có hai quần đảo thì chỉ dùng nền vector + nhãn chủ quyền.
+ */
+const PROVINCE_STYLE = { color: '#b59a5b', weight: 0.8, dashArray: '3 3', fill: false };
+const LAKE_STYLE = { color: '#7fb0cf', weight: 0.6, fillColor: '#bcd9ea', fillOpacity: 1 };
+const RIVER_COLOR = '#7fb0cf';
+/** Nhãn tỉnh hiện từ zoom này; nhãn sông, hồ hiện từ zoom 7. */
+const PROVINCE_LABEL_ZOOM = 6;
+const WATER_LABEL_ZOOM = 7;
+
+/** Tạo nhãn chữ (tên tỉnh, sông, hồ) lấy từ thuộc tính ten/lat/lng của dữ liệu GeoJSON; trả về các nhóm theo ngưỡng zoom. */
+function nameLabels(provinces, rivers, lakes) {
+    const mk = (fc, cls) => L.layerGroup((fc?.features ?? [])
+        .filter((f) => f.properties?.ten && f.properties.lat != null)
+        .map((f) => L.marker([f.properties.lat, f.properties.lng], {
+            pane: BASEMAP_PANE,
+            interactive: false,
+            keyboard: false,
+            icon: L.divIcon({ className: cls, html: `<span>${f.properties.ten}</span>`, iconSize: [0, 0] }),
+        })));
+    return [
+        { minZoom: PROVINCE_LABEL_ZOOM, layer: mk(provinces, 'vn-label vn-label-province') },
+        { minZoom: WATER_LABEL_ZOOM, layer: L.layerGroup([mk(rivers, 'vn-label vn-label-water'), mk(lakes, 'vn-label vn-label-water')]) },
+    ];
+}
+
+const hybridClass = () => L.LayerGroup.extend({
+    onAdd(map) {
+        L.LayerGroup.prototype.onAdd.call(this, map);
+        this._sync = () => this.syncDetail();
+        map.on('moveend zoomend', this._sync);
+        this.syncDetail();
+    },
+    onRemove(map) {
+        map.off('moveend zoomend', this._sync);
+        L.LayerGroup.prototype.onRemove.call(this, map);
+    },
+    syncDetail() {
+        const map = this._map;
+        if (!map) return;
+        const nearIslands = ARCHIPELAGOS.some((a) => map.getBounds().intersects(a.bounds));
+        const want = map.getZoom() >= DETAIL_MIN_ZOOM && !nearIslands;
+        const has = this.hasLayer(this.detail);
+        if (want && !has) this.addLayer(this.detail);
+        if (!want && has) this.removeLayer(this.detail);
+        (this.labels ?? []).forEach(({ minZoom, layer }) => {
+            const show = map.getZoom() >= minZoom;
+            if (show && !this.hasLayer(layer)) this.addLayer(layer);
+            if (!show && this.hasLayer(layer)) this.removeLayer(layer);
+        });
+    },
+});
+
 function vectorVietnam() {
-    const group = L.layerGroup();
-    fetch('/data/basemap_vn.geojson')
-        .then((r) => r.json())
-        .then((data) => {
-            L.geoJSON(data, {
-                pane: BASEMAP_PANE,
-                interactive: false,
+    const group = new (hybridClass())();
+    group.options = { attribution: 'Nền: <a href="https://www.naturalearthdata.com" rel="noopener">Natural Earth</a> (quan điểm Việt Nam), '
+        + '&copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>' };
+    group.detail = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, pane: DETAIL_PANE });
+    const load = (url) => fetch(url).then((r) => r.json());
+    // Tải đồng thời rồi thêm theo thứ tự: nước -> tỉnh -> sông/hồ -> nhãn, để lớp sau luôn nằm trên lớp trước.
+    Promise.all([
+        load('/data/basemap_vn.geojson'),
+        load('/data/tinh_vn.geojson').catch(() => null),
+        load('/data/ho_vn.geojson').catch(() => null),
+        load('/data/song_vn.geojson').catch(() => null),
+    ])
+        .then(([countries, provinces, lakes, rivers]) => {
+            const opts = { pane: BASEMAP_PANE, interactive: false };
+            L.geoJSON(countries, {
+                ...opts,
                 style: (f) => (f.properties.NAME_EN === 'Vietnam'
                     ? { color: '#8a6d3b', weight: 0.8, fillColor: '#f1e9cf', fillOpacity: 1 }
                     : { color: '#9aa5ad', weight: 0.6, fillColor: '#e4e6e1', fillOpacity: 1 }),
             }).addTo(group);
+            if (provinces) L.geoJSON(provinces, { ...opts, style: PROVINCE_STYLE }).addTo(group);
+            if (lakes) L.geoJSON(lakes, { ...opts, style: LAKE_STYLE }).addTo(group);
+            if (rivers) {
+                L.geoJSON(rivers, { ...opts, style: (f) => ({ color: RIVER_COLOR, weight: f.properties.scalerank <= 4 ? 1.6 : 1, opacity: 0.9 }) }).addTo(group);
+            }
+            const labels = nameLabels(provinces, rivers, lakes);
+            group.labels = labels;
+            group.syncDetail();
         })
         .catch((e) => console.warn('Không tải được nền vector Việt Nam.', e));
-    group.options = { attribution: 'Nền: <a href="https://www.naturalearthdata.com" rel="noopener">Natural Earth</a> (quan điểm Việt Nam)' };
     return group;
 }
 
@@ -103,6 +177,7 @@ function remembered() {
 
 export async function initBasemaps(map, vietmapKey = null) {
     map.createPane(BASEMAP_PANE).style.zIndex = 150;
+    map.createPane(DETAIL_PANE).style.zIndex = 152;
     L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
     map.getContainer().classList.add('has-sea-bg');
     initCoordinates(map);
