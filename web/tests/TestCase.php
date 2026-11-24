@@ -14,6 +14,11 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // Chế độ một CSDL (DB_CONNECTION=pgsql, như Supabase): chỉ còn kết nối pgsql, không có MySQL.
+        if (config('database.default') === 'pgsql') {
+            $this->connectionsToTransact = ['pgsql'];
+        }
+
         foreach ($this->connectionsToTransact as $name) {
             $this->app['db']->connection($name)->beginTransaction();
         }
