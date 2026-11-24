@@ -116,7 +116,7 @@ Web chỉ **đọc** kết quả: mọi chỉ số được pipeline tính sẵn
 | Web | Laravel 13, PostGIS, MySQL, GeoServer, Leaflet, Chart.js, Tailwind CSS | [`web/README.md`](web/README.md) |
 | E2E | Playwright (Chromium, Firefox, WebKit) | [`web/README.md#5-kiểm-thử`](web/README.md#5-kiểm-thử) |
 
-## Bắt đầu nhanh
+## Cài đặt nhanh
 
 Yêu cầu: PHP ≥ 8.4, Composer, Node ≥ 20, Docker (hoặc MySQL 8 + PostgreSQL/PostGIS + GeoServer cài sẵn).
 
@@ -125,10 +125,12 @@ git clone git@github.com:nvs15122k4/web-gis.git && cd web-gis/web
 
 docker compose up -d                       # MySQL :3307, PostGIS :5432, GeoServer :8080
 composer install && npm install
-cp .env.example .env && php artisan key:generate   # chỉnh DB_* và DB_PGSQL_*
+cp .env.example .env && php artisan key:generate
+# Mở .env, bỏ comment khối "Chế độ cục bộ (docker compose)" ở cuối file rồi xoá/ghi đè các dòng DB_PGSQL_* mặc định (Supabase)
 
 php artisan migrate --seed
 php artisan webgis:import ../pipeline/output       # nạp kết quả pipeline có sẵn trong repo
+set -a && . ./.env && set +a                  # build_basemap.py và provision.sh đọc DB_PGSQL_* từ môi trường
 python3 geoserver/basemap/build_basemap.py         # nền bản đồ tự phục vụ (Natural Earth quan điểm VN + OSM)
 geoserver/provision.sh songhau webgis_spatial      # workspace, store, style, layer, nền nen_ban_do
 
@@ -137,14 +139,21 @@ npm run build && php artisan serve                 # http://127.0.0.1:8000
 
 > Docker compose chiếm cổng 5432 và 8080; nếu máy đã chạy sẵn PostgreSQL/GeoServer, hãy dừng chúng hoặc đổi cổng trong `docker-compose.yml` và `.env`.
 
-Chạy lại pipeline từ ảnh gốc: xem [`pipeline/README.md`](pipeline/README.md).
+Chỉ cần xem giao diện, không dùng GeoServer: bỏ hai lệnh `build_basemap.py` / `provision.sh`, để trống `GEOSERVER_URL` — bản đồ vẽ GeoJSON từ `/api/*`.
+Sau khi chạy, đăng nhập `admin@webgis.test` / `password` tại `/dang-nhap` (xem mục [Tài khoản kiểm thử](#tài-khoản-kiểm-thử)).
+
+Chạy lại pipeline từ ảnh gốc: xem [`pipeline/README.md`](pipeline/README.md) và mục [Tái lập kết quả thực nghiệm](#tái-lập-kết-quả-thực-nghiệm).
 
 ## Kiểm thử
 
 ```bash
+cd pipeline && .venv/bin/python -m pytest -q                      # pytest: thống kê, phân loại, độ bất định, dữ liệu mẫu
+cd web && npm run test:js                                         # vitest: JavaScript giao diện
 cd web && php artisan migrate --env=testing && php artisan test   # PHPUnit
 cd e2e && npm ci && npx playwright test                           # Playwright E2E
 ```
+
+Số liệu các lần chạy được ghi ở [`docs/minh_chung/ketqua_e2e.txt`](docs/minh_chung/ketqua_e2e.txt).
 
 ### Chạy E2E song song nhiều phiên
 
@@ -259,6 +268,33 @@ RMSE này là gợi ý `U_classify` (15,1 / 18,39 / 19,99 m).
 | IO-LULC | 2022 | 0,8837 | 0,8917 | 51,92 |
 | IO-LULC | 2023 | 0,8871 | 0,8993 | 51,07 |
 
+## Tái lập kết quả thực nghiệm
+
+Repo chứa sẵn đầu vào trung gian và kết quả nên có thể kiểm tra mà không tải lại ảnh:
+
+| Cần gì | Có trong repo | Ở đâu |
+|---|---|---|
+| Danh sách ảnh dùng (ngày, mây) | có | `pipeline/data/composite/scenes.json` |
+| Đường bờ từng năm, baseline, transect | có | `pipeline/data/shoreline/`, `baseline.json`, `transects.json` |
+| Ground truth số hoá (5 ô mẫu × 2018/2022/2026) | có | `pipeline/data/ground_truth/ground_truth.gpkg`, project QGIS `so_hoa_ground_truth.qgz` |
+| Dữ liệu đối chiếu chéo (WorldCover, IO-LULC) | có (vector) | `pipeline/data/crosscheck/*.json` |
+| Kết quả: thống kê, hotspot, đánh giá, đối chiếu chéo | có | `pipeline/output/*.json` |
+| Ảnh composite Sentinel-2 (~300 MB), raster mặt nước | **không** (`.gitignore`) | sinh lại bằng `run.py` |
+
+Kiểm tra nhanh (vài giây, không cần mạng): `cd pipeline && .venv/bin/python -m pytest -q` (đối chiếu số liệu `output/*.json`, ngưỡng phân loại, công thức độ bất định), rồi `php artisan webgis:import ../pipeline/output` (267 transect, 1 hotspot).
+
+Tái lập đầy đủ từ ảnh gốc (cần mạng, ~15 phút; kết quả có thể lệch nhẹ nếu Planetary Computer cập nhật ảnh):
+
+```bash
+cd pipeline
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python run.py            # s1 composite → s2 chỉ số nước → s3 đường bờ → s4 transect → s5 thống kê → s6 tham chiếu
+.venv/bin/python s7_evaluate.py    # đánh giá F1/IoU/RMSE so với ground truth → output/evaluation.json
+.venv/bin/python s8_crosscheck.py  # đối chiếu chéo → output/crosscheck.json
+```
+
+Bảng kết quả (F1, IoU, RMSE, phân loại) ở mục [Kết quả thực nghiệm](#kết-quả-thực-nghiệm).
+
 ## Đối chiếu với đề cương và yêu cầu
 
 Đối chiếu bản web đang chạy (chụp ngày 23/11/2026, dữ liệu 267 transect) với đề cương đồ án (mục 2.1, 2.5, 3.5–3.7) và
@@ -278,13 +314,12 @@ API từ PostGIS; WMS/WFS qua GeoServer; MySQL lưu người dùng, ngưỡng, n
 | 4 | Bật/tắt "ranh giới AOI" trong bảng lớp (2.5) | AOI luôn hiển thị (nét đứt), có trong chú giải nhưng **không có công tắc** | |
 | 5 | WFS phục vụ chọn đối tượng và lọc (2.5) | Việc chọn transect và lọc đi qua REST API của Laravel; WFS được công bố và kiểm tra nhưng giao diện không gọi | |
 | 6 | API dùng `ST_Distance`, `ST_Intersection` để tính sẵn (2.5) | Chỉ truy vấn tổng hợp hotspot dùng hàm không gian; chỉ số do pipeline tính sẵn, Laravel không tính lại | Phù hợp nguyên tắc "web chỉ đọc" |
-| 7 | Sạt lở tham chiếu 2019–2020 làm dữ liệu kiểm chứng | 2 sự kiện, vị trí số hoá từ nguồn báo chí/UBND tỉnh, có vùng cảnh báo ~3,3 km; 0/2 sự kiện nằm trong 500 m của hotspot | Chưa có dữ liệu thật từ UBND xã hay Ban chỉ huy PCTT-TKCN An Giang (yêu cầu liên hệ); xem [`docs/checklist-yeu-cau.md`](docs/checklist-yeu-cau.md) |
+| 7 | Sạt lở tham chiếu 2019–2020 làm dữ liệu kiểm chứng | 2 sự kiện, vị trí số hoá từ nguồn báo chí/UBND tỉnh, có vùng cảnh báo ~3,3 km; 0/2 sự kiện nằm trong 500 m của hotspot | Chưa có dữ liệu thật từ UBND xã hay Ban chỉ huy PCTT-TKCN An Giang (yêu cầu liên hệ) |
 | 8 | Chọn chỉ số nước theo F1 trung bình, hoà thì xét RMSE | F1 tốt nhất là `awei` (0,9457), nhưng chỉ số mặc định đang dùng `mndwi` (0,9456); chưa có bước xét RMSE trong mã | Chênh không đáng kể |
 | 9 | (không có trong đề cương) | Có thêm `/gioi-thieu`, `/huong-dan`, `/bao-cao`, liên kết chia sẻ, xuất GeoJSON/CSV, nền tự phục vụ, giao diện di động | Bổ sung ngoài phạm vi |
-| 10 | Số liệu nhất quán | Trang `/bao-cao` ghi cố định "2 hotspot lùi mạnh (3 transect lùi mạnh)" (`web/resources/views/report/index.blade.php`, dòng 53), trong khi dữ liệu hiện có 1 hotspot và 1 transect lùi mạnh (sau khi chốt tiêu chí t(df = n − 2), LRR ≤ −2) | Số liệu trên trang cũ, cần sửa |
 
 Yêu cầu trong `yeu-cau.txt` (chốt trước tiêu chí lùi bờ mạnh, công thức độ bất định có nguồn, văn phong đề cương, bảng 15 tuần) thuộc
-phần tài liệu; tình trạng từng mục xem [`docs/checklist-yeu-cau.md`](docs/checklist-yeu-cau.md).
+phần tài liệu.
 
 ## Dữ liệu
 
