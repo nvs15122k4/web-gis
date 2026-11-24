@@ -6,6 +6,12 @@ use Tests\TestCase;
 
 class AboutLinksTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['services.geoserver.url' => 'http://localhost:8080/geoserver']);
+    }
+
     private function ows(): string
     {
         return rtrim(config('services.geoserver.url'), '/').'/'.config('services.geoserver.workspace');
@@ -17,6 +23,17 @@ class AboutLinksTest extends TestCase
 
         $this->assertStringContainsString('href="'.$this->ows().'/wms?service=WMS&amp;request=GetCapabilities"', $html);
         $this->assertStringContainsString('href="'.$this->ows().'/wfs?service=WFS&amp;request=GetCapabilities"', $html);
+    }
+
+    public function test_khong_cau_hinh_geoserver_thi_an_lien_ket_wms_wfs(): void
+    {
+        config(['services.geoserver.url' => null]);
+
+        $this->get('/gioi-thieu')->assertOk()
+            ->assertDontSee('id="ogc-services"', false)
+            ->assertDontSee('Dịch vụ OGC', false)
+            ->assertDontSee('/wms?service=WMS', false)
+            ->assertSee('/api/export/transects.geojson', false);
     }
 
     public function test_links_follow_config_changes(): void
