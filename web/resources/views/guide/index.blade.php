@@ -8,6 +8,15 @@
 </head>
 <body class="page">
 @include('partials.nav')
+<header class="page-hero">
+    <div class="page-hero-inner">
+        <p class="eyebrow">Hướng dẫn sử dụng</p>
+        <h1>Hướng dẫn sử dụng</h1>
+        <p class="lead">Cách xem và đọc kết quả giám sát biến động bờ sông Hậu tại xã Bình Mỹ, An Giang. Bạn không cần đăng nhập
+        để dùng các chức năng dưới đây.</p>
+        <p class="hero-meta"><span class="chip">Không cần đăng nhập</span></p>
+    </div>
+</header>
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
     <p>Mục lục</p>
@@ -23,9 +32,6 @@
     <a href="#hoi-dap">Hỏi đáp</a>
 </nav>
 <main class="doc" id="main-content" tabindex="-1">
-    <h1>Hướng dẫn sử dụng</h1>
-    <p class="lead">Cách xem và đọc kết quả giám sát biến động bờ sông Hậu tại xã Bình Mỹ, An Giang. Bạn không cần đăng nhập
-        để dùng các chức năng dưới đây.</p>
 
     <section id="bat-dau">
         <h2>Bắt đầu</h2>
