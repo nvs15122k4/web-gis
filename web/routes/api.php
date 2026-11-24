@@ -11,21 +11,27 @@ use App\Http\Controllers\Api\ThresholdConfigController;
 use App\Http\Controllers\Api\TransectController;
 use Illuminate\Support\Facades\Route;
 
+// Tình trạng hệ thống và ngưỡng cấu hình: không cache công khai (phản ánh trạng thái tức thời / admin vừa sửa).
 Route::get('/status', [StatusController::class, 'index']);
-Route::get('/summary', [SummaryController::class, 'index']);
-Route::get('/export/{layer}.{format}', [ExportController::class, 'show'])
-    ->whereIn('layer', ['transects', 'shorelines', 'hotspots', 'reference'])
-    ->whereIn('format', ['geojson', 'csv']);
-
-Route::get('/shorelines', [ShorelineController::class, 'index']);
-
-Route::get('/transects', [TransectController::class, 'index']);
-Route::get('/transects/{id}', [TransectController::class, 'show'])->where('id', '[0-9]{1,9}');
-Route::get('/transects/{id}/history', [TransectController::class, 'history'])->where('id', '[0-9]{1,9}');
-
-Route::get('/erosion-hotspots', [ErosionHotspotController::class, 'index']);
-Route::get('/reference-events', [ReferenceEventController::class, 'index']);
 Route::get('/config/thresholds', [ThresholdConfigController::class, 'index']);
+
+// Dữ liệu chỉ đổi khi chạy lại pipeline: cho trình duyệt cache 1 phút, CDN (Vercel) 5 phút, kèm ETag để xác thực 304
+// và stale-while-revalidate để người dùng không phải chờ truy vấn PostGIS khi cache hết hạn.
+Route::middleware('cache.headers:public;max_age=60;s_maxage=300;stale_while_revalidate=600;etag')->group(function () {
+    Route::get('/summary', [SummaryController::class, 'index']);
+    Route::get('/export/{layer}.{format}', [ExportController::class, 'show'])
+        ->whereIn('layer', ['transects', 'shorelines', 'hotspots', 'reference'])
+        ->whereIn('format', ['geojson', 'csv']);
+
+    Route::get('/shorelines', [ShorelineController::class, 'index']);
+
+    Route::get('/transects', [TransectController::class, 'index']);
+    Route::get('/transects/{id}', [TransectController::class, 'show'])->where('id', '[0-9]{1,9}');
+    Route::get('/transects/{id}/history', [TransectController::class, 'history'])->where('id', '[0-9]{1,9}');
+
+    Route::get('/erosion-hotspots', [ErosionHotspotController::class, 'index']);
+    Route::get('/reference-events', [ReferenceEventController::class, 'index']);
+});
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 
