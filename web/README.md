@@ -88,14 +88,14 @@ AOI (`public/data/aoi.json`) là vùng nghiên cứu — đoạn bờ sông Hậ
 ## 5. Kiểm thử
 
 ```bash
-# PHPUnit (Feature test cho 9 endpoint + import). Cần DB test đã migrate sẵn, mỗi test chạy trong transaction:
+# PHPUnit (hơn 1.000 test: Feature, Unit, bảo mật, import). Cần DB test đã migrate sẵn, mỗi test chạy trong transaction:
 #   tạo webgis_app_test (MySQL) và webgis_spatial_test (PostGIS), rồi:
 php artisan migrate --env=testing
 php artisan test
 ```
 
 ```bash
-# Playwright E2E (21 kịch bản) trên CSDL riêng *_e2e + workspace GeoServer songhau_e2e
+# Playwright E2E (163 kiểm thử × 2 trình duyệt) trên CSDL riêng *_e2e + workspace GeoServer songhau_e2e
 php artisan migrate --env=e2e && geoserver/provision.sh songhau_e2e webgis_spatial_e2e   # một lần
 cd ../e2e && npm install && npx playwright install && npx playwright test
 ```
