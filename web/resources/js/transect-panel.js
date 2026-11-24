@@ -4,7 +4,7 @@ import colors from './colors.json';
 import { api } from './api';
 import { renderHistoryChart } from './chart';
 import { setStatus, UPDATING } from './status';
-import { WMS_URL, TRANSECT_LAYER, layers } from './layers';
+import { WMS_URL, TRANSECT_LAYER, USE_WMS, handlers, layers } from './layers';
 
 const CLASS_LABEL = {
     accretion: 'Bồi',
@@ -25,13 +25,28 @@ const highlight = L.layerGroup();
 
 const geometries = () => (transectIndex ??= api.transects().then((fc) => new Map(fc.features.map((f) => [f.id, f.geometry]))));
 
-/** Click bản đồ → WMS GetFeatureInfo trên lớp transect → nạp chi tiết từ API Laravel. */
+/**
+ * Chọn transect → nạp chi tiết từ API Laravel. Có GeoServer: click bản đồ → WMS GetFeatureInfo;
+ * không có: bấm thẳng vào đường GeoJSON của lớp transect.
+ */
 export function initTransectPanel(map, link = null) {
     permalink = link;
     mapRef = map;
     highlight.addTo(map);
     document.getElementById('inspector-close')?.addEventListener('click', closeInspector);
     document.addEventListener('keydown', (e) => e.key === 'Escape' && closeInspector());
+    if (!USE_WMS) {
+        handlers.onTransectClick = async (f, latlng) => {
+            const props = { ...f.properties, id: f.id };
+            L.popup().setLatLng(latlng).setContent(`<strong>${props.transect_code}</strong><br>${CLASS_LABEL[props.change_class] ?? ''}`).openOn(map);
+            try {
+                await showTransect(props.id);
+            } catch {
+                setStatus(`Thông tin transect: ${UPDATING.toLowerCase()}.`);
+            }
+        };
+        return;
+    }
     map.on('click', async (e) => {
         if (!map.hasLayer(layers.transects)) return;
         try {
