@@ -18,6 +18,7 @@ class PagesTest extends TestCase
 
     public function test_about_page_renders_methodology(): void
     {
+        config(['services.geoserver.url' => 'http://gs.test/geoserver']);
         $this->get('/gioi-thieu')->assertOk()
             ->assertSee('Tiêu chí phân loại mức biến động')
             ->assertSee('|LRR| &gt; t × SE(LRR)', false)
