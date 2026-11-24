@@ -4,6 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WebGIS giám sát bờ sông Hậu — xã Bình Mỹ</title>
+    <link rel="preload" href="/data/aoi.json" as="fetch" crossorigin="anonymous">
+    @if (! empty($geoserver['url']))
+        <link rel="preconnect" href="{{ $geoserver['url'] }}" crossorigin>
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>window.WEBGIS = @json(['geoserver' => $geoserver, 'years' => $years, 'vietmapKey' => $vietmapKey]);</script>
 </head>
