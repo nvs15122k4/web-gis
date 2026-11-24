@@ -16,5 +16,3 @@ Route::post('/dang-xuat', [SessionController::class, 'destroy'])->middleware('au
 // Báo cáo nội bộ: khách -> chuyển tới /dang-nhap; không phải admin -> 403.
 Route::get('/bao-cao', [MapController::class, 'report'])->middleware(['auth', 'admin']);
 
-// 404 chạy qua nhóm middleware web để thanh điều hướng nhận đúng phiên đăng nhập.
-Route::fallback(fn () => abort(404));
