@@ -42,13 +42,22 @@ describe('initBasemaps', () => {
         expect(layer._url).toContain('layer=songhau:nen_ban_do');
     });
 
-    it('không đặt GeoServer thì dùng OpenStreetMap, không có nền nen_ban_do', async () => {
+    it('không đặt GeoServer thì mặc định dùng nền vector Việt Nam (có Hoàng Sa, Trường Sa), không có nen_ban_do', async () => {
         window.WEBGIS = { geoserver: { url: null, workspace: 'songhau' } };
+        globalThis.fetch = vi.fn(() => Promise.resolve({ json: () => Promise.resolve({ type: 'FeatureCollection', features: [] }) }));
         const { initBasemaps } = await load();
         const { map } = makeMap();
         await initBasemaps(map);
-        expect(map.addedLayers[0]._url).toContain('tile.openstreetmap.org');
-        expect(map.addedLayers.some((l) => l._url.includes('nen_ban_do'))).toBe(false);
+        expect(globalThis.fetch).toHaveBeenCalledWith('/data/basemap_vn.geojson');
+        expect(map.addedLayers.some((l) => l._url?.includes('nen_ban_do'))).toBe(false);
+    });
+
+    it('luôn có lớp nhãn Hoàng Sa, Trường Sa trên mọi nền', async () => {
+        const { initBasemaps } = await load();
+        const { map } = makeMap();
+        await initBasemaps(map);
+        expect(document.body.innerHTML).toContain('Quần đảo Hoàng Sa');
+        expect(document.body.innerHTML).toContain('Quần đảo Trường Sa');
     });
 
     it('không đặt GeoServer nhưng có khoá VIETMAP thì VIETMAP là nền mặc định', async () => {
