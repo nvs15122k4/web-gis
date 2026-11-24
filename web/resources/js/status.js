@@ -17,20 +17,21 @@ const LAYER_LABEL = {
 
 /**
  * Hỏi /api/status rồi hiện banner liệt kê phần dữ liệu còn "đang cập nhật"
- * (chưa kết nối CSDL, bảng rỗng, hoặc GeoServer chưa chạy).
+ * (chưa kết nối CSDL, bảng rỗng, hoặc GeoServer đã cấu hình nhưng chưa chạy).
  */
 export async function loadDataStatus() {
     let status;
     try {
         status = await get('/status');
     } catch {
-        status = { mysql: false, postgis: false, geoserver: false, data: {} };
+        status = { mysql: false, postgis: false, geoserver: null, data: {} };
     }
 
     const pending = Object.entries(LAYER_LABEL).filter(([key]) => !status.data?.[key]).map(([, label]) => label);
     const notes = [];
     if (pending.length) notes.push(`Dữ liệu ${pending.join(', ')}: ${UPDATING.toLowerCase()}.`);
-    if (!status.geoserver) notes.push(`Lớp bản đồ GeoServer: ${UPDATING.toLowerCase()}.`);
+    // geoserver === null: không cấu hình GeoServer (chế độ GeoJSON), không phải lỗi.
+    if (status.geoserver === false) notes.push(`Lớp bản đồ GeoServer: ${UPDATING.toLowerCase()}.`);
 
     const banner = document.getElementById('data-banner');
     if (banner) {
