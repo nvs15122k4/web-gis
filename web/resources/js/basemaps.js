@@ -26,6 +26,15 @@ function selfHosted() {
 
 const SELF_HOSTED = { 'Bản đồ nền (GeoServer)': selfHosted };
 
+/** Nền công khai dự phòng khi không có GeoServer và không có khoá VIETMAP. */
+const OSM = {
+    'OpenStreetMap': () => L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>',
+        maxZoom: 19,
+        pane: BASEMAP_PANE,
+    }),
+};
+
 const esri = (service, attribution) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`, {
     attribution: `Tiles &copy; Esri &mdash; ${attribution}`,
     maxNativeZoom: 19,
@@ -40,17 +49,23 @@ const esri = (service, attribution) => L.tileLayer(`https://server.arcgisonline.
  */
 const ESRI_IMAGERY = { 'Ảnh vệ tinh (Esri)': () => esri('World_Imagery', 'Esri, Maxar, Earthstar Geographics') };
 
-/** Mặc định là nền tự phục vụ; có API key thì thêm nền VIETMAP (tải thư viện GL theo nhu cầu), lỗi tải thì chỉ dùng nền tự phục vụ + ảnh vệ tinh. */
+/**
+ * Có GeoServer thì nền tự phục vụ đứng đầu (mặc định); không có thì VIETMAP (nếu có API key) rồi OpenStreetMap + ảnh vệ tinh.
+ * VIETMAP tải thư viện GL theo nhu cầu; lỗi tải thì rơi về nền còn lại.
+ */
 async function basemapDefs(vietmapKey) {
+    const hasGeoServer = Boolean(window.WEBGIS?.geoserver?.url);
+    const base = hasGeoServer ? SELF_HOSTED : {};
+    const fallback = hasGeoServer ? {} : OSM;
     if (vietmapKey) {
         try {
             const { vietmapBasemaps } = await import('./vietmap');
-            return { ...SELF_HOSTED, ...vietmapBasemaps(vietmapKey), ...ESRI_IMAGERY };
+            return { ...base, ...vietmapBasemaps(vietmapKey), ...fallback, ...ESRI_IMAGERY };
         } catch (e) {
-            console.warn('Không tải được nền VIETMAP, chỉ dùng nền GeoServer và ảnh vệ tinh.', e);
+            console.warn('Không tải được nền VIETMAP, dùng nền dự phòng và ảnh vệ tinh.', e);
         }
     }
-    return { ...SELF_HOSTED, ...ESRI_IMAGERY };
+    return { ...base, ...fallback, ...ESRI_IMAGERY };
 }
 
 function remembered() {
