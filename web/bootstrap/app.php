@@ -31,6 +31,22 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
+        // Trang 404 của giao diện chạy qua nhóm middleware web (phiên, cookie) để thanh điều hướng đúng trạng thái
+        // đăng nhập; làm ở đây thay vì Route::fallback để URL sai phương thức vẫn trả 405 như thông lệ.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return null;
+            }
+
+            return (new \Illuminate\Pipeline\Pipeline(app()))
+                ->send($request)
+                ->through(array_values(array_filter(
+                    app('router')->getMiddlewareGroups()['web'],
+                    fn ($m) => $m !== \Illuminate\Routing\Middleware\SubstituteBindings::class, // cần route đã khớp
+                )))
+                ->then(fn () => response(view('errors.404', ['exception' => $e])->render(), 404, ['Content-Type' => 'text/html; charset=UTF-8']));
+        });
+
         // Chưa có CSDL (hoặc CSDL chưa migrate): API trả 503 "đang cập nhật" thay vì lỗi 500,
         // để giao diện vẫn chạy và hiển thị trạng thái rỗng.
         $exceptions->render(function (QueryException|\PDOException $e, Request $request) {
