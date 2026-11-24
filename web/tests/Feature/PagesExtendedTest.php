@@ -54,6 +54,12 @@ class PagesExtendedTest extends TestCase
         $this->get('/')->assertSee('gs.test\\/geoserver', false)->assertSee('wsx', false);
     }
 
+    public function test_map_page_khong_dat_geoserver_thi_url_null(): void
+    {
+        config(['services.geoserver.url' => null]);
+        $this->get('/')->assertOk()->assertSee('"url":null', false);
+    }
+
     public function test_map_page_renders_even_when_postgis_unavailable(): void
     {
         $pg = \DB::connection('pgsql');
