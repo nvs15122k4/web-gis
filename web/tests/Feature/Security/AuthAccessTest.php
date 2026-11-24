@@ -136,7 +136,10 @@ class AuthAccessTest extends TestCase
 
     public function test_email_lookup_is_case_insensitive_due_to_mysql_collation(): void
     {
-        $this->postJson('/api/auth/login', ['email' => 'ADMIN@WEBGIS.TEST', 'password' => 'password'])->assertOk();
+        $response = $this->postJson('/api/auth/login', ['email' => 'ADMIN@WEBGIS.TEST', 'password' => 'password']);
+
+        // MySQL không phân biệt hoa/thường nên khớp; Postgres (chế độ một CSDL) phân biệt nên từ chối.
+        config('database.default') === 'pgsql' ? $response->assertUnauthorized() : $response->assertOk();
     }
 
     public function test_password_is_case_sensitive(): void
