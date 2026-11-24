@@ -2,7 +2,6 @@ import { readableTextOn } from './contrast.js';
 import L from 'leaflet';
 import colors from './colors.json';
 import { api } from './api';
-import { renderHistoryChart } from './chart';
 import { setStatus, UPDATING } from './status';
 import { WMS_URL, TRANSECT_LAYER, USE_WMS, handlers, layers } from './layers';
 
@@ -157,5 +156,7 @@ export async function showTransect(id) {
     openInspector();
     permalink?.setTransect(id);
     highlightTransect(id);
+    // Chart.js (~200 kB) chỉ tải khi người dùng mở transect đầu tiên, không nằm trong bundle khởi động.
+    const { renderHistoryChart } = await import('./chart');
     renderHistoryChart(document.getElementById('history-chart'), history);
 }
