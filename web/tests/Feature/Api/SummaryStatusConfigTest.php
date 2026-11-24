@@ -35,20 +35,31 @@ class SummaryStatusConfigTest extends TestCase
         $this->assertSame(2, $s['reference_events']);
     }
 
+    public function test_status_khong_cau_hinh_geoserver_thi_null_va_khong_goi_mang(): void
+    {
+        config(['services.geoserver.url' => null]);
+        Http::fake();
+        $this->getJson('/api/status')->assertOk()->assertJsonPath('geoserver', null);
+        Http::assertNothingSent();
+    }
+
     public function test_status_geoserver_up_and_down(): void
     {
+        config(['services.geoserver.url' => 'http://gs.test/geoserver']);
         Http::fake(['*' => Http::response('<ok/>', 200)]);
         $this->getJson('/api/status')->assertJsonPath('geoserver', true);
     }
 
     public function test_status_geoserver_http_500_is_false(): void
     {
+        config(['services.geoserver.url' => 'http://gs.test/geoserver']);
         Http::fake(['*' => Http::response('', 500)]);
         $this->getJson('/api/status')->assertJsonPath('geoserver', false);
     }
 
     public function test_status_geoserver_connection_failure_is_false(): void
     {
+        config(['services.geoserver.url' => 'http://gs.test/geoserver']);
         Http::fake(fn () => throw new \Illuminate\Http\Client\ConnectionException('down'));
         $this->getJson('/api/status')->assertOk()->assertJsonPath('geoserver', false);
     }
