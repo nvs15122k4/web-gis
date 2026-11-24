@@ -47,13 +47,20 @@ describe('loadDataStatus', () => {
         expect(banner().querySelectorAll('div')).toHaveLength(1);
     });
 
+    it('không cấu hình GeoServer (geoserver=null) thì không báo lỗi GeoServer', async () => {
+        globalThis.fetch = respond({ geoserver: null, data: { shorelines: 1, transects: 1, hotspots: 1, reference_events: 1 } });
+        await loadDataStatus();
+        expect(banner().hidden).toBe(true);
+        expect(banner().textContent).not.toContain('GeoServer');
+    });
+
     it('API lỗi thì coi mọi lớp là đang cập nhật và vẫn trả về status mặc định', async () => {
         globalThis.fetch = respond({}, false);
         const status = await loadDataStatus();
-        expect(status).toEqual({ mysql: false, postgis: false, geoserver: false, data: {} });
+        expect(status).toEqual({ mysql: false, postgis: false, geoserver: null, data: {} });
         expect(banner().hidden).toBe(false);
         expect(banner().textContent).toContain('đường bờ, transect, hotspot, sạt lở tham chiếu');
-        expect(banner().textContent).toContain('GeoServer');
+        expect(banner().textContent).not.toContain('GeoServer');
     });
 
     it('thiếu trường data trong phản hồi không gây lỗi', async () => {
