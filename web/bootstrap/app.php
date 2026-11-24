@@ -12,6 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        // /healthz nằm ngoài nhóm middleware web (không phiên/cookie/CSRF) để UptimeRobot gọi nhẹ nhất.
+        then: function (): void {
+            \Illuminate\Support\Facades\Route::get('/healthz', \App\Http\Controllers\HealthController::class);
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Khách chưa đăng nhập vào trang cần quyền thì chuyển tới form đăng nhập (API vẫn trả 401 JSON).
