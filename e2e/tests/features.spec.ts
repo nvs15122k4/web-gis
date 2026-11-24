@@ -129,24 +129,46 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
         expect(z[0]).toBeLessThan(z[1]);
     });
 
-    test('21 khung nhìn neo vào đoạn sông Hậu – xã Bình Mỹ, vẫn thu phóng được', { tag: ['@happy', '@regression'] }, async ({ page }) => {
-        await page.goto('/#map=8/13.50000/111.00000');
-        await page.waitForFunction(() => (window as any).__webgis?.map);
+    test('21 khung nhìn ban đầu neo vào đoạn sông Hậu – xã Bình Mỹ, vẫn thu phóng được tới Biển Đông', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         const inArea = (c: { lat: number; lng: number }) => c.lat >= 10.40 && c.lat <= 10.62 && c.lng >= 105.12 && c.lng <= 105.42;
-        // Liên kết trỏ ra Biển Đông vẫn bị kéo về khu vực nghiên cứu.
-        expect(inArea(await page.evaluate(() => (window as any).__webgis.map.getCenter()))).toBe(true);
+        const center = () => page.evaluate(() => (window as any).__webgis.map.getCenter());
+        // Không có liên kết chia sẻ: khung nhìn ban đầu căn vào khu nghiên cứu.
+        await page.goto('/');
+        await page.waitForFunction(() => (window as any).__webgis?.map);
+        await expect.poll(async () => inArea(await center())).toBe(true);
         const view = await page.evaluate(() => {
             const m = (window as any).__webgis.map;
             m.setZoom(3, { animate: false });
             const out = m.getZoom();
             m.setZoom(17, { animate: false });
-            m.panBy([20000, -20000], { animate: false });
-            return { out, min: m.getMinZoom(), zoom: m.getZoom(), center: m.getCenter() };
+            return { out, min: m.getMinZoom(), zoom: m.getZoom() };
         });
         expect(view.out).toBe(view.min);
         expect(view.min).toBeLessThanOrEqual(6);
         expect(view.zoom).toBe(17);
-        expect(inArea(view.center)).toBe(true);
+        // Nút "Về khu vực nghiên cứu" đưa khung nhìn trở lại sau khi đã kéo đi nơi khác.
+        await page.evaluate(() => (window as any).__webgis.map.setView([16.5, 112.0], 6, { animate: false }));
+        expect(inArea(await center())).toBe(false);
+        await page.locator('.home-control').click();
+        await expect.poll(async () => inArea(await center())).toBe(true);
+    });
+
+    test('21b khung nhìn cho phép tới Hoàng Sa, Trường Sa nhưng không ra khỏi Biển Đông', { tag: ['@edge', '@regression'] }, async ({ page }) => {
+        // Liên kết trỏ ra Biển Đông (gần Trường Sa) được giữ nguyên, không bị kéo về khu nghiên cứu.
+        await page.goto('/#map=8/9.00000/113.00000');
+        await page.waitForFunction(() => (window as any).__webgis?.map);
+        const c = await page.evaluate(() => (window as any).__webgis.map.getCenter());
+        expect(c.lat).toBeCloseTo(9.0, 1);
+        expect(c.lng).toBeCloseTo(113.0, 1);
+        // Kéo thật xa thì bị chặn ở biên Biển Đông (4.5–24.5 N, 100–119.5 E).
+        const edge = await page.evaluate(() => {
+            const m = (window as any).__webgis.map;
+            m.setZoom(8, { animate: false });
+            m.panBy([200000, -200000], { animate: false });
+            return m.getBounds().getNorthEast();
+        });
+        expect(edge.lat).toBeLessThanOrEqual(24.5 + 0.05);
+        expect(edge.lng).toBeLessThanOrEqual(119.5 + 0.05);
     });
 
     test('19 trang giới thiệu & tải dữ liệu', { tag: ['@happy'] }, async ({ page }) => {
