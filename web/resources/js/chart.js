@@ -21,7 +21,7 @@ export function renderHistoryChart(canvas, history) {
     }
     if (!history.length) return null;
     const muted = cssVar('--muted', '#5a6876');
-    const line = cssVar('--chart-line', '#0f6e8c');
+    const line = cssVar('--chart-line', '#0f766e');
     const grid = cssVar('--border', '#e2e7ec');
     Chart.defaults.color = muted;
     return new Chart(canvas, {
