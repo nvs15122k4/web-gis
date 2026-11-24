@@ -27,28 +27,28 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ### Bản đồ
 
-![Bản đồ tổng quan](docs/minh_chung/giao_dien/01_ban_do_tong_quan.png)
+![Bản đồ tổng quan](docs/minh_chung/giao_dien_moi/01_ban_do_tong_quan.png)
 
 *Thẻ **Tổng quan**: 267 transect tô màu theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), thống kê, hotspot, sạt lở tham chiếu,
 ranh giới khu vực nghiên cứu. Nền bản đồ tự phục vụ trên GeoServer.*
 
 | | |
 |---|---|
-| ![Thẻ Lớp dữ liệu](docs/minh_chung/giao_dien/02_tab_lop.png) | ![Thẻ Hotspot](docs/minh_chung/giao_dien/03_tab_diem_nong.png) |
+| ![Thẻ Lớp dữ liệu](docs/minh_chung/giao_dien_moi/02_tab_lop.png) | ![Thẻ Hotspot](docs/minh_chung/giao_dien_moi/03_tab_diem_nong.png) |
 | **Lớp dữ liệu**: bật/tắt transect, hotspot, sạt lở tham chiếu; đường bờ từng năm 2018–2026; so sánh hai năm | **Hotspot**: lọc đoạn lùi bờ theo tốc độ tối thiểu (m/năm), bấm một đoạn để phóng tới |
-| ![Chi tiết transect](docs/minh_chung/giao_dien/05_chi_tiet_transect.png) | ![So sánh hai năm](docs/minh_chung/giao_dien/06_so_sanh_nam.png) |
+| ![Chi tiết transect](docs/minh_chung/giao_dien_moi/05_chi_tiet_transect.png) | ![So sánh hai năm](docs/minh_chung/giao_dien_moi/06_so_sanh_nam.png) |
 | **Chi tiết transect T0094**: NSM, EPR, LRR, R², khoảng tin cậy 95%, độ bất định, biểu đồ lịch sử vị trí đường bờ | **So sánh hai năm**: chồng hai đường bờ để xem dịch chuyển |
 
 - **Chia sẻ & xuất dữ liệu** — liên kết chia sẻ lưu khung nhìn, lớp, năm trong URL (`#map=…`); tải từng lớp dạng GeoJSON/CSV tại `/api/export/{lớp}.{geojson|csv}`.
-- **Giao diện di động** — bố cục thu gọn, xem [ảnh](docs/minh_chung/giao_dien/13_di_dong.png).
+- **Giao diện di động** — bố cục thu gọn, xem [ảnh](docs/minh_chung/giao_dien_moi/13_di_dong.png).
 
 ### Các trang còn lại
 
 | | |
 |---|---|
-| ![Phương pháp](docs/minh_chung/giao_dien/07_gioi_thieu.png) | ![Hướng dẫn](docs/minh_chung/giao_dien/08_huong_dan.png) |
+| ![Phương pháp](docs/minh_chung/giao_dien_moi/07_gioi_thieu.png) | ![Hướng dẫn](docs/minh_chung/giao_dien_moi/08_huong_dan.png) |
 | `/gioi-thieu` — phương pháp và hạn chế | `/huong-dan` — hướng dẫn sử dụng |
-| ![Quản trị ngưỡng](docs/minh_chung/giao_dien/12_quan_tri_nguong.png) | ![Báo cáo](docs/minh_chung/giao_dien/11_bao_cao.png) |
+| ![Quản trị ngưỡng](docs/minh_chung/giao_dien_moi/12_quan_tri_nguong.png) | ![Báo cáo](docs/minh_chung/giao_dien_moi/11_bao_cao.png) |
 | `/admin` — chỉnh ngưỡng hiển thị (cần quyền `admin`) | `/bao-cao` — báo cáo nội bộ (cần quyền `admin`) |
 
 ### REST API
