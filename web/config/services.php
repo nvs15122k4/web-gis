@@ -35,8 +35,9 @@ return [
         ],
     ],
 
+    // GeoServer là tuỳ chọn: không đặt GEOSERVER_URL thì web vẽ lớp bản đồ bằng GeoJSON từ /api/* (Leaflet).
     'geoserver' => [
-        'url' => env('GEOSERVER_URL', 'http://localhost:8080/geoserver'),
+        'url' => rtrim((string) env('GEOSERVER_URL', ''), '/') ?: null,
         'workspace' => env('GEOSERVER_WORKSPACE', 'songhau'),
     ],
 
