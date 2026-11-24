@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Khách chưa đăng nhập vào trang cần quyền thì chuyển tới form đăng nhập (API vẫn trả 401 JSON).
+        // Sau proxy/CDN của Vercel: chỉ tin X-Forwarded-Proto (không tin X-Forwarded-For để IP không bị giả).
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_PROTO);
         $middleware->redirectGuestsTo('/dang-nhap');
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
