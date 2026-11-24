@@ -15,6 +15,11 @@
 @include('partials.nav', ['withSidebarToggle' => true])
 <div class="app">
     <aside class="sidebar" id="sidebar" aria-label="Bảng điều khiển">
+        <header class="sidebar-head">
+            <p class="eyebrow">Khu vực nghiên cứu</p>
+            <h1 class="sidebar-title">Xã Bình Mỹ, An Giang</h1>
+            <p class="sidebar-meta"><span class="chip">Sông Hậu</span>@if (! empty($years['all']))<span class="chip">{{ $years['all'][0] }}–{{ end($years['all']) }}</span>@endif<span class="chip">Sentinel-2</span></p>
+        </header>
         <div class="sidebar-alerts">
             <div id="data-banner" class="banner" role="status" hidden></div>
             <p id="status" class="status" role="status"></p>
