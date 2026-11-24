@@ -42,6 +42,27 @@ describe('initBasemaps', () => {
         expect(layer._url).toContain('layer=songhau:nen_ban_do');
     });
 
+    it('không đặt GeoServer thì dùng OpenStreetMap, không có nền nen_ban_do', async () => {
+        window.WEBGIS = { geoserver: { url: null, workspace: 'songhau' } };
+        const { initBasemaps } = await load();
+        const { map } = makeMap();
+        await initBasemaps(map);
+        expect(map.addedLayers[0]._url).toContain('tile.openstreetmap.org');
+        expect(map.addedLayers.some((l) => l._url.includes('nen_ban_do'))).toBe(false);
+    });
+
+    it('không đặt GeoServer nhưng có khoá VIETMAP thì VIETMAP là nền mặc định', async () => {
+        window.WEBGIS = { geoserver: { url: null, workspace: 'songhau' } };
+        vi.doMock('../../resources/js/vietmap', () => ({
+            vietmapBasemaps: () => ({ 'Nền Vietmap giả': () => L.tileLayer('https://vm.test/{z}/{x}/{y}.png') }),
+        }));
+        const { initBasemaps } = await load();
+        const { map } = makeMap();
+        await initBasemaps(map, 'KEY');
+        expect(map.addedLayers[0]._url).toBe('https://vm.test/{z}/{x}/{y}.png');
+        vi.doUnmock('../../resources/js/vietmap');
+    });
+
     it('khôi phục nền đã chọn từ localStorage', async () => {
         localStorage.setItem('webgis_basemap', 'Ảnh vệ tinh (Esri)');
         const { initBasemaps } = await load();
