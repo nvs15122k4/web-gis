@@ -128,6 +128,7 @@
     <section id="tai-du-lieu">
         <h2>Tải dữ liệu</h2>
         @include('partials.downloads')
+        @if (config('services.geoserver.url'))
         @php
             $gs = config('services.geoserver');
             $ows = rtrim($gs['url'], '/').'/'.$gs['workspace'];
@@ -144,6 +145,7 @@
             <li><span>Hotspot lùi bờ qua WFS</span><span class="download-links">
                 <a class="pill" href="{{ $wfsGet }}&amp;typeName={{ $gs['workspace'] }}:erosion_hotspots" rel="noopener">GeoJSON</a></span></li>
         </ul>
+        @endif
     </section>
 
     <section id="tham-khao">
