@@ -18,6 +18,14 @@ class ExportPostgisFailureTest extends TestCase
         $pg->statement('SET LOCAL search_path TO tmp_empty_schema_r2');
     }
 
+    /** Ba ca dưới đây cần threshold_configs/token nằm ở CSDL khác PostGIS; ở chế độ một CSDL chúng cùng một schema nên không tách được. */
+    private function requireSeparateDatabases(): void
+    {
+        if (config('database.default') === 'pgsql') {
+            $this->markTestSkipped('Chế độ một CSDL: bảng ứng dụng và PostGIS chung schema, không mô phỏng được việc PostGIS hỏng riêng.');
+        }
+    }
+
     public static function exports(): array
     {
         $out = [];
@@ -76,18 +84,21 @@ class ExportPostgisFailureTest extends TestCase
 
     public function test_status_endpoint_survives_postgis_failure(): void
     {
+        $this->requireSeparateDatabases();
         $this->breakPostgis();
         $this->getJson('/api/status')->assertOk()->assertJsonPath('postgis', false)->assertJsonPath('mysql', true);
     }
 
     public function test_threshold_config_is_independent_of_postgis(): void
     {
+        $this->requireSeparateDatabases();
         $this->breakPostgis();
         $this->getJson('/api/config/thresholds')->assertOk()->assertJsonFragment(['key' => 'min_erosion_rate']);
     }
 
     public function test_admin_threshold_update_works_while_postgis_is_down(): void
     {
+        $this->requireSeparateDatabases();
         $token = $this->postJson('/api/auth/login', ['email' => 'admin@webgis.test', 'password' => 'password'])->json('token');
         $this->breakPostgis();
         $this->withToken($token)->putJson('/api/admin/config/thresholds/min_erosion_rate', ['value' => 2])
