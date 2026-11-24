@@ -318,5 +318,10 @@ function bindReference(map) {
             statusEl.textContent = '';
         }
     });
-    map.on('moveend', refresh);
+    // Kéo/zoom liên tiếp chỉ gọi API một lần sau khi dừng 250 ms.
+    let timer = null;
+    map.on('moveend', () => {
+        clearTimeout(timer);
+        timer = setTimeout(refresh, 250);
+    });
 }
