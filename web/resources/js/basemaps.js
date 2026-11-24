@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { initSovereignty, addVietnamButton } from './sovereignty';
+import { initSovereignty, addVietnamButton, ARCHIPELAGOS } from './sovereignty';
 
 const STORAGE_KEY = 'webgis_basemap';
 /**
@@ -40,8 +40,41 @@ const OSM = {
  * Nền vector offline (không cần GeoServer, không cần khoá): Natural Earth 1:10m bản quan điểm Việt Nam, đã cắt khu vực
  * Đông Nam Á (public/data/basemap_vn.geojson). Hoàng Sa, Trường Sa là lãnh thổ Việt Nam, không có "đường lưỡi bò".
  */
+const DETAIL_MIN_ZOOM = 8;
+/** Pane tile chi tiết nằm trên pane vector (SVG cùng pane sẽ che ảnh tile). */
+const DETAIL_PANE = 'basemap-detail';
+
+/**
+ * Nền lai: vector Việt Nam luôn nằm dưới; từ zoom 8 trở lên, khi khung nhìn không chạm vùng Hoàng Sa, Trường Sa,
+ * chồng thêm tile OpenStreetMap để có sông, đường, địa danh. Khung nhìn có hai quần đảo thì chỉ dùng nền vector + nhãn chủ quyền.
+ */
+const hybridClass = () => L.LayerGroup.extend({
+    onAdd(map) {
+        L.LayerGroup.prototype.onAdd.call(this, map);
+        this._sync = () => this.syncDetail();
+        map.on('moveend zoomend', this._sync);
+        this.syncDetail();
+    },
+    onRemove(map) {
+        map.off('moveend zoomend', this._sync);
+        L.LayerGroup.prototype.onRemove.call(this, map);
+    },
+    syncDetail() {
+        const map = this._map;
+        if (!map) return;
+        const nearIslands = ARCHIPELAGOS.some((a) => map.getBounds().intersects(a.bounds));
+        const want = map.getZoom() >= DETAIL_MIN_ZOOM && !nearIslands;
+        const has = this.hasLayer(this.detail);
+        if (want && !has) this.addLayer(this.detail);
+        if (!want && has) this.removeLayer(this.detail);
+    },
+});
+
 function vectorVietnam() {
-    const group = L.layerGroup();
+    const group = new (hybridClass())();
+    group.options = { attribution: 'Nền: <a href="https://www.naturalearthdata.com" rel="noopener">Natural Earth</a> (quan điểm Việt Nam), '
+        + '&copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>' };
+    group.detail = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, pane: DETAIL_PANE });
     fetch('/data/basemap_vn.geojson')
         .then((r) => r.json())
         .then((data) => {
@@ -54,7 +87,6 @@ function vectorVietnam() {
             }).addTo(group);
         })
         .catch((e) => console.warn('Không tải được nền vector Việt Nam.', e));
-    group.options = { attribution: 'Nền: <a href="https://www.naturalearthdata.com" rel="noopener">Natural Earth</a> (quan điểm Việt Nam)' };
     return group;
 }
 
@@ -103,6 +135,7 @@ function remembered() {
 
 export async function initBasemaps(map, vietmapKey = null) {
     map.createPane(BASEMAP_PANE).style.zIndex = 150;
+    map.createPane(DETAIL_PANE).style.zIndex = 152;
     L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
     map.getContainer().classList.add('has-sea-bg');
     initCoordinates(map);
