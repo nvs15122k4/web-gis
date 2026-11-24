@@ -571,11 +571,11 @@ main:focus { outline: none; }
 @media (max-width: 640px) {
     .topnav { min-width: 0; overflow-x: auto; scrollbar-width: none; }
     .topnav a, .nav-logout button { flex: none; padding: 0 .55rem; font-size: .78rem; }
-    .brand-text { display: none; }
 }
 .doc .steps { padding-left: 0; list-style: none; counter-reset: step; }
 .doc .steps li { position: relative; margin: .6rem 0; padding: .1rem 0 .1rem 2.6rem; counter-increment: step; }
 .doc .steps li::before { content: counter(step); position: absolute; left: 0; top: .1rem; display: grid; place-items: center; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--primary); color: #fff; font-size: .8rem; font-weight: 700; }
+@media (prefers-color-scheme: dark) { .doc .steps li::before { color: #06203d; } }
 .doc kbd { padding: .1rem .45rem; border: 1px solid var(--border-strong); border-bottom-width: 3px; border-radius: 6px; background: var(--surface-2); font: .82em var(--mono); }
 .doc .badge { display: inline-block; padding: .1rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
 .doc .badge-done { color: var(--ok); background: var(--ok-bg); border: 1px solid var(--ok); }
