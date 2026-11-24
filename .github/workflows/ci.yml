@@ -46,6 +46,7 @@ jobs:
       DB_PGSQL_DATABASE: webgis_spatial_test
       DB_PGSQL_USERNAME: postgres
       DB_PGSQL_PASSWORD: postgres
+      DB_PGSQL_SSLMODE: prefer   # postgres service của CI không có SSL; .env.example mặc định require (Supabase)
     steps:
       - uses: actions/checkout@v5
 
