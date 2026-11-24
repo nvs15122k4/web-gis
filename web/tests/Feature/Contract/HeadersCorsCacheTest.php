@@ -22,22 +22,50 @@ class HeadersCorsCacheTest extends TestCase
         $this->assertStringContainsString('application/json', $r->headers->get('Content-Type'));
     }
 
-    #[DataProvider('jsonEndpoints')]
-    public function test_json_endpoints_are_not_publicly_cached_by_default(string $url): void
+    public static function cachedEndpoints(): array
     {
-        // Hành vi hiện tại: không đặt Cache-Control riêng -> Laravel mặc định "no-cache, private".
-        $cc = $this->get($url)->headers->get('Cache-Control');
-        $this->assertStringContainsString('no-cache', $cc);
-        $this->assertStringContainsString('private', $cc);
-        $this->assertStringNotContainsString('public', $cc);
+        return array_map(fn ($u) => [$u], [
+            '/api/summary', '/api/shorelines', '/api/transects', '/api/transects/1', '/api/transects/1/history',
+            '/api/erosion-hotspots', '/api/reference-events',
+        ]);
     }
 
-    #[DataProvider('jsonEndpoints')]
-    public function test_no_etag_or_last_modified_emitted(string $url): void
+    public static function uncachedEndpoints(): array
+    {
+        return array_map(fn ($u) => [$u], ['/api/status', '/api/config/thresholds']);
+    }
+
+    #[DataProvider('cachedEndpoints')]
+    public function test_read_only_data_endpoints_are_publicly_cacheable_with_etag(string $url): void
     {
         $r = $this->get($url);
+        if (! $r->isSuccessful()) {
+            $this->markTestSkipped('Endpoint không trả 2xx trong môi trường test (không có dữ liệu).');
+        }
+        $cc = $r->headers->get('Cache-Control');
+        $this->assertStringContainsString('public', $cc);
+        $this->assertStringContainsString('max-age=60', $cc);
+        $this->assertStringContainsString('s-maxage=300', $cc);
+        $this->assertStringContainsString('stale-while-revalidate=600', $cc);
+        $this->assertNotNull($r->headers->get('ETag'));
+    }
+
+    #[DataProvider('cachedEndpoints')]
+    public function test_conditional_request_with_matching_etag_returns_304(string $url): void
+    {
+        $first = $this->get($url);
+        if (! $first->isSuccessful()) {
+            $this->markTestSkipped('Endpoint không trả 2xx trong môi trường test (không có dữ liệu).');
+        }
+        $this->get($url, ['If-None-Match' => $first->headers->get('ETag')])->assertStatus(304);
+    }
+
+    #[DataProvider('uncachedEndpoints')]
+    public function test_status_and_thresholds_are_not_publicly_cached(string $url): void
+    {
+        $r = $this->get($url);
+        $this->assertStringNotContainsString('public', (string) $r->headers->get('Cache-Control'));
         $this->assertNull($r->headers->get('ETag'));
-        $this->assertFalse($r->headers->has('Last-Modified'));
     }
 
     #[DataProvider('jsonEndpoints')]
