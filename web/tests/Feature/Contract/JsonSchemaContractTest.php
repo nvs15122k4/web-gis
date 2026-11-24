@@ -36,7 +36,7 @@ class JsonSchemaContractTest extends TestCase
         $this->assertSame(['data', 'geoserver', 'mysql', 'postgis'], $this->keys($j));
         $this->assertIsBool($j['mysql']);
         $this->assertIsBool($j['postgis']);
-        $this->assertIsBool($j['geoserver']);
+        $this->assertNull($j['geoserver'], 'không cấu hình GEOSERVER_URL thì null (không phải lỗi)');
         $this->assertSame(['hotspots', 'reference_events', 'shorelines', 'transects'], $this->keys($j['data']));
         foreach ($j['data'] as $n) {
             $this->assertIsInt($n);
@@ -82,7 +82,7 @@ class JsonSchemaContractTest extends TestCase
         $this->assertFeatureCollection($fc);
         foreach ($fc['features'] as $f) {
             $this->assertSame('LineString', $f['geometry']['type']);
-            $this->assertSame(['baseline_id', 'change_class', 'epr_m_per_year', 'id', 'lrr_m_per_year', 'transect_code'], $this->keys($f['properties']));
+            $this->assertSame(['baseline_id', 'change_class', 'epr_m_per_year', 'id', 'is_significant', 'lrr_m_per_year', 'transect_code'], $this->keys($f['properties']));
             $this->assertIsString($f['properties']['change_class']);
         }
     }
