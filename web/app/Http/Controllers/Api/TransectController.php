@@ -16,7 +16,7 @@ class TransectController extends Controller
 
         $transects = Transect::withGeoJson()
             ->join('shoreline_change_stats as s', 's.transect_id', '=', 'transects.id')
-            ->addSelect('s.change_class', 's.epr_m_per_year', 's.lrr_m_per_year')
+            ->addSelect('s.change_class', 's.epr_m_per_year', 's.lrr_m_per_year', 's.is_significant')
             ->when($request->filled('change_class'), fn ($q) => $q->where('s.change_class', $request->query('change_class')))
             ->when($bbox && count($bbox) === 4, fn ($q) => $q->whereRaw(
                 'transects.geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)', $bbox
