@@ -73,8 +73,17 @@ class RoutesAndConfigTest extends BaseUnitTest
 
     public function test_hai_ket_noi_db_duoc_khai_bao(): void
     {
-        $this->assertSame('mysql', config('database.default'));
         $this->assertSame('pgsql', config('database.connections.pgsql.driver'));
+        $this->assertSame('mysql', config('database.connections.mysql.driver'));
+
+        if (config('database.default') === 'pgsql') {
+            // Chế độ một CSDL (Supabase/Postgres cục bộ): chỉ kết nối pgsql được dùng, chứa cả bảng ứng dụng.
+            $this->assertNotSame('', (string) config('database.connections.pgsql.database'));
+
+            return;
+        }
+
+        $this->assertSame('mysql', config('database.default'));
         $this->assertSame('webgis_app_test', config('database.connections.mysql.database'));
         $this->assertSame('webgis_spatial_test', config('database.connections.pgsql.database'));
     }
