@@ -8,8 +8,9 @@
 </head>
 <body class="page">
 @include('partials.nav')
-<main class="admin" id="main-content" tabindex="-1">
+<main class="admin state-page" id="main-content" tabindex="-1">
     <div class="admin-card">
+        <p class="state-code" aria-hidden="true">403</p>
         <h1>Không có quyền truy cập</h1>
         <p class="lead">Trang này chỉ dành cho tài khoản quản trị (admin). Tài khoản hiện tại không có quyền xem.</p>
         <a class="btn btn-primary btn-block" href="/">Về bản đồ</a>

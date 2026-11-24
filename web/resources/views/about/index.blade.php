@@ -8,6 +8,17 @@
 </head>
 <body class="page">
 @include('partials.nav')
+<main id="main-content" tabindex="-1">
+<div class="page-hero">
+    <div class="page-hero-inner">
+        <p class="eyebrow">Phương pháp & dữ liệu</p>
+        <h1>Giới thiệu &amp; phương pháp</h1>
+        <p class="lead">WebGIS giám sát biến động bờ sông Hậu tại xã Bình Mỹ, tỉnh An Giang, giai đoạn
+        {{ $years[0] }}–{{ end($years) }}. Kết quả được tính sẵn bằng pipeline Python từ ảnh vệ tinh; web chỉ đọc và hiển thị,
+        không tính lại các chỉ số.</p>
+        <p class="hero-meta"><span class="chip">Sentinel-2 L2A · DSAS · Bình Mỹ, An Giang</span></p>
+    </div>
+</div>
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
     <p>Mục lục</p>
@@ -21,11 +32,7 @@
     <a href="#tai-du-lieu">Tải dữ liệu</a>
     <a href="#tham-khao">Tham khảo</a>
 </nav>
-<main class="doc" id="main-content" tabindex="-1">
-    <h1>Giới thiệu &amp; phương pháp</h1>
-    <p class="lead">WebGIS giám sát biến động bờ sông Hậu tại xã Bình Mỹ, tỉnh An Giang, giai đoạn
-        {{ $years[0] }}–{{ end($years) }}. Kết quả được tính sẵn bằng pipeline Python từ ảnh vệ tinh; web chỉ đọc và hiển thị,
-        không tính lại các chỉ số.</p>
+<article class="doc">
 
 
     <section id="muc-tieu">
@@ -162,8 +169,9 @@
             <li>Clerc và cs., đánh giá định vị Sentinel-2 (CE95 &lt; 12,5 m); ESA, đặc tả sản phẩm Sentinel-2 L1C (định vị tuyệt đối &lt; 12 m ở 95,5%).</li>
         </ul>
     </section>
-</main>
+</article>
 </div>
+</main>
 <script type="module">
     // Điền trạng thái từng lớp từ /api/status.
     const cells = document.querySelectorAll('[data-layer]');
