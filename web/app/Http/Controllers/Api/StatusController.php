@@ -44,9 +44,13 @@ class StatusController extends Controller
         }
     }
 
-    private function geoserverUp(): bool
+    /** null = không cấu hình GeoServer (chế độ GeoJSON), không phải lỗi. */
+    private function geoserverUp(): ?bool
     {
         $gs = config('services.geoserver');
+        if (empty($gs['url'])) {
+            return null;
+        }
         try {
             return Http::timeout(2)->get("{$gs['url']}/{$gs['workspace']}/wms", [
                 'service' => 'WMS', 'request' => 'GetCapabilities',
