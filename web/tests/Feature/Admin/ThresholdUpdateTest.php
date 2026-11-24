@@ -81,10 +81,12 @@ class ThresholdUpdateTest extends TestCase
         $this->assertSame(0, ActivityLog::count());
     }
 
-    /** Ghi nhận hành vi hiện tại: collation MySQL không phân biệt hoa/thường nên khoá viết hoa vẫn khớp (xem báo cáo). */
+    /** Ghi nhận hành vi hiện tại: collation MySQL không phân biệt hoa/thường nên khoá viết hoa vẫn khớp; Postgres phân biệt nên trả 404. */
     public function test_key_lookup_is_case_insensitive_due_to_mysql_collation(): void
     {
-        $this->putThreshold('MIN_EROSION_RATE', ['value' => 2])->assertOk();
+        $response = $this->putThreshold('MIN_EROSION_RATE', ['value' => 2]);
+
+        config('database.default') === 'pgsql' ? $response->assertNotFound() : $response->assertOk();
     }
 
     public function test_multiple_updates_create_one_log_each_in_order(): void
