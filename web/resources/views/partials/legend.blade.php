@@ -1,4 +1,4 @@
-<details class="map-legend" id="legend" open>
+<details class="map-legend legend" id="legend" open>
     <summary>Chú giải</summary>
     <div class="legend-body">
         <h3>Mức biến động transect</h3>
