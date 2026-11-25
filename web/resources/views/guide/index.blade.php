@@ -9,18 +9,18 @@
 <body class="page">
 @include('partials.nav')
 <main id="main-content" tabindex="-1">
-<div class="page-hero">
-    <div class="page-hero-inner">
+<header class="page-head">
+    <div class="page-head-inner">
         <p class="eyebrow">Hướng dẫn sử dụng</p>
         <h1>Hướng dẫn sử dụng</h1>
         <p class="lead">Cách xem và đọc kết quả giám sát biến động bờ sông Hậu tại xã Bình Mỹ, An Giang. Bạn không cần đăng nhập
         để dùng các chức năng dưới đây.</p>
-        <p class="hero-meta"><span class="chip">Không cần đăng nhập</span></p>
+        <p class="page-meta"><span class="chip">Không cần đăng nhập</span></p>
     </div>
-</div>
+</header>
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
-    <p>Mục lục</p>
+    <p class="doc-toc-title">Mục lục</p>
     <a href="#bat-dau">Bắt đầu</a>
     <a href="#tong-quan">Tổng quan</a>
     <a href="#lop-du-lieu">Lớp dữ liệu</a>
@@ -127,5 +127,19 @@
 </article>
 </div>
 </main>
+<script>
+    // Đánh dấu mục đang đọc trong mục lục.
+    (() => {
+        const links = [...document.querySelectorAll('.doc-toc a')];
+        if (!links.length || !('IntersectionObserver' in window)) return;
+        const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+        const io = new IntersectionObserver((es) => es.forEach((e) => {
+            if (!e.isIntersecting) return;
+            links.forEach((a) => a.classList.remove('is-current'));
+            byId.get(e.target.id)?.classList.add('is-current');
+        }), { rootMargin: '0px 0px -70% 0px' });
+        byId.forEach((_, id) => document.getElementById(id) && io.observe(document.getElementById(id)));
+    })();
+</script>
 </body>
 </html>
