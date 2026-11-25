@@ -10,7 +10,6 @@
 @include('partials.nav')
 <div class="auth-split">
     <aside class="auth-aside" aria-hidden="true">
-        <svg class="auth-waves" viewBox="0 0 400 200" preserveAspectRatio="none"><path d="M0 120c60-30 100-30 160 0s100 30 240-10v90H0z" opacity=".25"/><path d="M0 150c60-30 100-30 160 0s100 30 240-10v60H0z" opacity=".35"/></svg>
         <p class="eyebrow">WebGIS Sông Hậu</p>
         <p class="auth-claim">Theo dõi từng đoạn bờ, từng năm.</p>
         <p class="auth-sub">Khu vực quản trị dành cho người phụ trách số liệu và báo cáo công việc.</p>
