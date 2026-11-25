@@ -30,18 +30,18 @@
 <body class="page">
 @include('partials.nav')
 <main id="main-content" tabindex="-1">
-<div class="page-hero">
-    <div class="page-hero-inner">
+<header class="page-head">
+    <div class="page-head-inner">
         <p class="eyebrow">Trang nội bộ · chỉ quản trị viên</p>
         <h1>Báo cáo công việc đã làm</h1>
         <p class="lead">Tổng hợp từ lịch sử git và các tính năng đã hoàn thành của đề tài “WebGIS giám sát biến động bờ sông Hậu, xã Bình Mỹ, An Giang”,
         đối chiếu với đề cương. Trang nội bộ, chỉ tài khoản admin xem được. Số liệu chốt ngày 23/11/2026.</p>
-        <p class="hero-meta"><span class="chip">Dành cho tài khoản admin</span></p>
+        <p class="page-meta"><span class="chip">Dành cho tài khoản admin</span></p>
     </div>
-</div>
+</header>
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
-    <p>Mục lục</p>
+    <p class="doc-toc-title">Mục lục</p>
     <a href="#so-lieu">Số liệu chung</a>
     <a href="#tien-do">Tiến độ theo đề cương</a>
     <a href="#moc-thoi-gian">Mốc thời gian</a>
@@ -81,7 +81,7 @@
 
     <section id="moc-thoi-gian">
         <h2>Mốc thời gian</h2>
-        <ol class="timeline">
+        <ol class="history">
             <li><time datetime="2026-09-27">27/09/2026 — 65 commit</time>
                 Dựng khung Laravel, lược đồ MySQL/PostGIS, REST API, lệnh nhập dữ liệu và cấu hình GeoServer; giao diện bản đồ (Leaflet, WMS, biểu đồ transect, chia sẻ liên kết).
                 Dựng pipeline Sentinel-2 từ tải ảnh đến thống kê NSM/EPR/LRR, nạp dữ liệu demo lần 1; bộ số hoá ground truth.</li>
@@ -146,5 +146,19 @@
 </article>
 </div>
 </main>
+<script>
+    // Đánh dấu mục đang đọc trong mục lục.
+    (() => {
+        const links = [...document.querySelectorAll('.doc-toc a')];
+        if (!links.length || !('IntersectionObserver' in window)) return;
+        const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+        const io = new IntersectionObserver((es) => es.forEach((e) => {
+            if (!e.isIntersecting) return;
+            links.forEach((a) => a.classList.remove('is-current'));
+            byId.get(e.target.id)?.classList.add('is-current');
+        }), { rootMargin: '0px 0px -70% 0px' });
+        byId.forEach((_, id) => document.getElementById(id) && io.observe(document.getElementById(id)));
+    })();
+</script>
 </body>
 </html>
