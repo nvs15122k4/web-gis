@@ -150,7 +150,7 @@ main.admin { display: grid; justify-items: center; align-content: start; padding
     .page-head-inner { padding: 16px 16px 14px; }
     .auth-split { grid-template-columns: minmax(0, 1fr); min-height: 0; }
     .auth-aside { padding: 20px 16px; }
-    .auth-claim { font-size: var(--fs-xl); }
+    .auth-claim { font-size: var(--fs-xl); max-width: none; }
     .auth-sub { display: none; }
 }
 @media (max-width: 640px) {
