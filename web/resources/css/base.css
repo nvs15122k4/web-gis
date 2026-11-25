@@ -1,0 +1,133 @@
+/* Nền tảng: reset, chữ, nút, ô nhập, công tắc, nhãn, thông báo. Dùng chung mọi trang. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+    font: 400 var(--fs-md)/1.5 var(--font);
+    color: var(--ink);
+    background: var(--canvas);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv11', 'ss03';
+}
+h1, h2, h3, h4 { margin: 0; line-height: 1.25; font-weight: 600; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--accent-ink); text-underline-offset: 2px; }
+a:hover { color: var(--accent-hover); }
+code, kbd { font: 12px var(--mono); padding: 1px 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 2px; }
+/* chỉ áp cho icon giao diện, không đụng tới SVG vẽ lớp vector của Leaflet */
+:where(.appbar, .sidebar, .inspector, .legend, .timeline, .page-nav, .btn, .chip) svg {
+    width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75;
+    stroke-linecap: round; stroke-linejoin: round; flex: none;
+}
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.skip-link {
+    position: absolute; left: 8px; top: -64px; z-index: 3000; padding: 8px 12px;
+    background: var(--surface); color: var(--ink); border: 2px solid var(--focus); border-radius: var(--r);
+    font-weight: 600; text-decoration: none;
+}
+.skip-link:focus { top: 8px; }
+
+/* ---- văn bản phụ ---- */
+.eyebrow { font-size: var(--fs-xs); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.hint { margin: 6px 0; font-size: var(--fs-sm); color: var(--ink-3); }
+.hint:empty { display: none; }
+.updating { color: var(--warn-ink); font-style: italic; }
+p.updating, div.updating {
+    margin: 6px 0; padding: 8px 10px; font-style: normal; font-size: var(--fs-sm);
+    border: 1px dashed var(--warn-line); border-radius: var(--r); background: var(--warn-bg);
+}
+.note {
+    margin: 8px 0; padding: 8px 10px; font-size: var(--fs-sm);
+    border-left: 3px solid var(--warn-line); background: var(--warn-bg); color: var(--warn-ink);
+}
+.msg-ok { color: var(--ok); }
+.msg-error, .field-error { color: var(--error); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; flex: none; }
+.legend-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; flex: none; }
+.num { font-variant-numeric: tabular-nums; }
+
+.chip {
+    display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px;
+    border: 1px solid var(--line-strong); border-radius: 2px; background: var(--surface-2);
+    color: var(--ink-2); font-size: var(--fs-xs); font-weight: 500; white-space: nowrap;
+}
+
+/* ---- nút ---- */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 32px; padding: 0 12px; white-space: nowrap; text-decoration: none;
+    font: 500 var(--fs-md) var(--font);
+    border: 1px solid var(--line-strong); border-radius: var(--r);
+    background: var(--surface); color: var(--ink); cursor: pointer;
+    transition: background-color .12s var(--ease), border-color .12s var(--ease);
+}
+.btn:hover { background: var(--surface-3); border-color: var(--control-line); color: var(--ink); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--ink-2); }
+.btn-ghost:hover { background: var(--surface-3); border-color: transparent; }
+.btn-block { width: 100%; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.icon-btn {
+    display: inline-grid; place-items: center; width: 32px; height: 32px; padding: 0;
+    border: 0; border-radius: var(--r); background: transparent; color: inherit; cursor: pointer;
+}
+.icon-btn:hover { background: color-mix(in srgb, currentColor 14%, transparent); }
+
+/* ---- ô nhập ---- */
+input[type=number], input[type=email], input[type=password], input[type=text], select {
+    height: 32px; min-width: 0; padding: 0 8px;
+    font: var(--fs-md) var(--font); color: var(--ink);
+    border: 1px solid var(--control-line); border-radius: var(--r); background: var(--surface);
+}
+input:hover, select:hover { border-color: var(--ink-3); }
+input:focus, select:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: var(--focus); }
+input[type=checkbox] { accent-color: var(--accent); }
+.field { display: grid; gap: 4px; flex: 1; min-width: 0; }
+.field > span { display: flex; align-items: center; gap: 6px; font-size: var(--fs-sm); font-weight: 500; color: var(--ink-2); }
+.input-group { display: flex; gap: 6px; align-items: center; }
+.input-group input { flex: 1; }
+.input-suffix { color: var(--ink-3); font-size: var(--fs-sm); }
+
+/* công tắc bật/tắt: vẫn là checkbox thật để bàn phím và trình đọc màn hình dùng được */
+.switch {
+    appearance: none; -webkit-appearance: none; flex: none; margin: 0; position: relative;
+    width: 32px; height: 18px; border-radius: 9px; background: var(--control-line); cursor: pointer;
+    transition: background-color .12s var(--ease);
+}
+.switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; transition: transform .12s var(--ease);
+}
+.switch:checked { background: var(--accent); }
+.switch:checked::after { transform: translateX(14px); }
+.switch:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ---- thông báo, khung chờ ---- */
+.banner {
+    margin: 0; padding: 7px 12px; font-size: var(--fs-sm);
+    background: var(--warn-bg); color: var(--warn-ink); border-bottom: 1px solid var(--warn-line);
+}
+.status { margin: 0; padding: 0 12px; font-size: var(--fs-sm); color: var(--warn-ink); }
+.status:empty { display: none; }
+.skeleton {
+    height: 96px; border-radius: var(--r);
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%) 0 0 / 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ---- truy cập ---- */
+@media (pointer: coarse) {
+    .btn, .icon-btn, input[type=number], input[type=email], input[type=password], input[type=text], select { min-height: 44px; }
+    .icon-btn { min-width: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+@media (forced-colors: active) {
+    .switch { border: 1px solid ButtonText; }
+    .switch::after { background: ButtonText; }
+    .btn-primary { border: 2px solid ButtonText; }
+}
