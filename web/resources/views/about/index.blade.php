@@ -9,19 +9,19 @@
 <body class="page">
 @include('partials.nav')
 <main id="main-content" tabindex="-1">
-<div class="page-hero">
-    <div class="page-hero-inner">
+<header class="page-head">
+    <div class="page-head-inner">
         <p class="eyebrow">Phương pháp & dữ liệu</p>
         <h1>Giới thiệu &amp; phương pháp</h1>
         <p class="lead">WebGIS giám sát biến động bờ sông Hậu tại xã Bình Mỹ, tỉnh An Giang, giai đoạn
         {{ $years[0] }}–{{ end($years) }}. Kết quả được tính sẵn bằng pipeline Python từ ảnh vệ tinh; web chỉ đọc và hiển thị,
         không tính lại các chỉ số.</p>
-        <p class="hero-meta"><span class="chip">Sentinel-2 L2A · DSAS · Bình Mỹ, An Giang</span></p>
+        <p class="page-meta"><span class="chip">Sentinel-2 L2A · DSAS · Bình Mỹ, An Giang</span></p>
     </div>
-</div>
+</header>
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
-    <p>Mục lục</p>
+    <p class="doc-toc-title">Mục lục</p>
     <a href="#muc-tieu">Mục tiêu</a>
     <a href="#du-lieu">Dữ liệu</a>
     <a href="#phuong-phap">Phương pháp</a>
@@ -183,6 +183,20 @@
             td.textContent = n ? `${n} bản ghi` : 'Đang cập nhật';
             td.className = n ? '' : 'updating';
         }));
+</script>
+<script>
+    // Đánh dấu mục đang đọc trong mục lục.
+    (() => {
+        const links = [...document.querySelectorAll('.doc-toc a')];
+        if (!links.length || !('IntersectionObserver' in window)) return;
+        const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+        const io = new IntersectionObserver((es) => es.forEach((e) => {
+            if (!e.isIntersecting) return;
+            links.forEach((a) => a.classList.remove('is-current'));
+            byId.get(e.target.id)?.classList.add('is-current');
+        }), { rootMargin: '0px 0px -70% 0px' });
+        byId.forEach((_, id) => document.getElementById(id) && io.observe(document.getElementById(id)));
+    })();
 </script>
 </body>
 </html>

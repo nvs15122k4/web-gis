@@ -4,6 +4,7 @@ import { initLayers, layers } from './layers';
 import { initPermalink, readPermalink } from './permalink';
 import { loadSummary } from './summary';
 import { initTabs } from './tabs';
+import { initTimeline } from './timeline';
 import { initTransectPanel, showTransect, zoomToTransect } from './transect-panel';
 
 const DEFAULT_CENTER = [10.545, 105.29];
@@ -48,6 +49,7 @@ export function initMap() {
     initLayers(map);
     initTransectPanel(map, permalink);
     initTabs(document.getElementById('sidebar'));
+    initTimeline(map);
     const sidebar = initSidebarToggle(map);
 
     const select = (id) => {

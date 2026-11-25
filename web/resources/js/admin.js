@@ -34,7 +34,7 @@ async function renderThresholds() {
     }
     $('thresholds').innerHTML = list
         .map((c) => `<form class="threshold-form" data-key="${c.key}">
-            <label>${c.description ?? c.key} <input type="number" step="0.1" min="0" name="value" value="${c.value}"></label>
+            <label><span>${c.description ?? c.key}</span><input type="number" step="0.1" min="0" name="value" value="${c.value}"></label>
             <button type="submit" class="btn btn-primary">Lưu</button></form>`)
         .join('');
     document.querySelectorAll('.threshold-form').forEach((form) => {

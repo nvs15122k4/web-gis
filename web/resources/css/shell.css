@@ -1,0 +1,49 @@
+/* Khung ứng dụng: thanh tiêu đề, bố cục trang bản đồ (rail + bảng + bản đồ) và trang nội dung. */
+
+/* ================= Thanh tiêu đề ================= */
+.appbar {
+    position: relative; z-index: 1500; display: flex; align-items: stretch; gap: 4px;
+    height: var(--appbar-h); padding: 0 8px 0 4px;
+    background: var(--bar); color: var(--bar-ink); border-bottom: 1px solid #000;
+}
+.appbar .icon-btn { align-self: center; color: var(--bar-ink); }
+.appbar .icon-btn:hover { background: var(--bar-2); }
+.brand { display: flex; align-items: center; gap: 10px; padding: 0 14px 0 8px; color: inherit; text-decoration: none; }
+.brand:hover { color: #fff; }
+.brand-mark { display: grid; place-items: center; width: 26px; height: 26px; border: 1.5px solid var(--bar-ink); border-radius: 2px; }
+.brand-mark svg { width: 18px; height: 18px; stroke-width: 1.75; }
+.brand-text { display: grid; line-height: 1.15; }
+.brand-text strong { font-size: var(--fs-lg); font-weight: 650; letter-spacing: .005em; }
+.brand-text small { font-size: var(--fs-xs); color: var(--bar-ink-2); }
+.topnav { display: flex; align-items: stretch; margin-left: auto; }
+.topnav a, .topnav button {
+    position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px;
+    font: 500 var(--fs-md) var(--font); color: var(--bar-ink-2); text-decoration: none;
+    background: none; border: 0; cursor: pointer;
+}
+.topnav a:hover, .topnav button:hover { color: #fff; background: var(--bar-2); }
+.topnav a.active, .topnav a[aria-current=page] { color: #fff; }
+.topnav a.active::after, .topnav a[aria-current=page]::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #4fc3d9;
+}
+.nav-logout { display: flex; margin: 0; border-left: 1px solid var(--bar-line); }
+.appbar :focus-visible { outline-color: #8fd3e2; outline-offset: -2px; }
+
+/* ================= Trang bản đồ: rail + bảng + bản đồ ================= */
+body.map-page { display: grid; grid-template-rows: var(--appbar-h) minmax(0, 1fr); height: 100vh; height: 100dvh; overflow: hidden; }
+.app { display: flex; min-height: 0; min-width: 0; }
+
+.sidebar {
+    display: grid; grid-template-columns: var(--rail-w) var(--panel-w); flex: none; min-height: 0;
+    background: var(--surface); border-right: 1px solid var(--line-strong);
+    z-index: 1100;
+}
+/* thu gọn: giữ lại rail, ẩn bảng nội dung (trên điện thoại do responsive.css xử lý riêng) */
+.sidebar.collapsed { grid-template-columns: var(--rail-w) 0; }
+.sidebar-body { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+.panels { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.map-wrap { position: relative; flex: 1; min-width: 0; min-height: 0; background: var(--map-sea); }
+#map { position: absolute; inset: 0; background: var(--map-sea); outline-offset: -2px; }
+
+/* ================= Trang nội dung ================= */
+body.page { min-height: 100vh; }

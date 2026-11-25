@@ -221,7 +221,7 @@ export async function loadHotspots(minRate) {
     const list = document.getElementById('hotspot-list');
     list.innerHTML = fc.features
         .map((f, i) => `<li data-severity="${f.properties.severity}"><button type="button" data-index="${i}">
-            <span>${f.properties.notes ?? 'Hotspot'}</span><span class="rate">${f.properties.severity} m/năm</span></button></li>`)
+            <span>${f.properties.notes ?? 'Hotspot'}</span><span class="rate num">${f.properties.severity} m/năm</span></button></li>`)
         .join('');
     // Bấm một đoạn trong danh sách → phóng tới và mở popup trên bản đồ.
     list.querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => {

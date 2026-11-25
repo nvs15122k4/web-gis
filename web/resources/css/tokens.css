@@ -1,0 +1,114 @@
+/*
+ * Design tokens — WebGIS Sông Hậu.
+ * Ngôn ngữ thiết kế: công cụ bản đồ chuyên dụng (Global Nature Watch, Global Fishing Watch, ArcGIS Dashboards):
+ * thanh tiêu đề tối mỏng, bảng điều khiển phẳng nền sáng, viền 1px, góc vuông 2–4px, chữ Inter cỡ nhỏ,
+ * một màu nhấn xanh ngọc cho trạng thái đang chọn. Màu dữ liệu (--c-*) lấy từ colors.css, không dùng cho chrome.
+ */
+:root {
+    color-scheme: light;
+
+    --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+    /* cỡ chữ */
+    --fs-xs: 11px;
+    --fs-sm: 12px;
+    --fs-md: 13px;
+    --fs-lg: 15px;
+    --fs-xl: 18px;
+    --fs-2xl: 24px;
+    --fs-kpi: 28px;
+
+    /* bề mặt (sáng) */
+    --canvas: #e9edf0;           /* nền trang nội dung */
+    --surface: #ffffff;          /* bảng, thẻ */
+    --surface-2: #f4f6f8;        /* nền phụ, rail, hàng chẵn */
+    --surface-3: #e9edf1;        /* hover */
+    --line: #d9dfe5;             /* viền mảnh */
+    --line-strong: #b5bfc9;
+    --control-line: #7b8794;     /* viền ô nhập, công tắc: >= 3:1 (WCAG 1.4.11) */
+
+    /* chữ */
+    --ink: #14212b;
+    --ink-2: #3a4854;
+    --ink-3: #566472;            /* >= 4.5:1 trên --surface và --surface-2 */
+
+    /* thanh tiêu đề tối */
+    --bar: #0d2230;
+    --bar-2: #153245;
+    --bar-line: #25465c;
+    --bar-ink: #eaf1f5;
+    --bar-ink-2: #9fb6c4;
+
+    /* màu nhấn */
+    --accent: #0a6f86;           /* chữ trắng trên accent đạt ~5.9:1 */
+    --accent-hover: #08596c;
+    --accent-soft: #dcedf1;
+    --accent-ink: #07525f;       /* chữ accent trên nền sáng */
+    --focus: #1769c2;
+
+    /* trạng thái */
+    --warn-bg: #fdf3e1;
+    --warn-line: #e3b567;
+    --warn-ink: #6b3f06;
+    --ok: #1a6b3a;
+    --ok-bg: #e8f5ec;
+    --error: #b3261e;
+    --error-bg: #fdeceb;
+
+    /* nền bản đồ & bề mặt nổi trên bản đồ */
+    --map-sea: #bcd8e8;
+    --float: #ffffff;
+    --float-line: rgba(20, 33, 43, .22);
+    --float-shadow: 0 1px 2px rgba(10, 25, 35, .18), 0 2px 10px rgba(10, 25, 35, .14);
+
+    /* biểu đồ */
+    --chart-line: #0a6f86;
+    --chart-grid: #e1e6eb;
+
+    /* hình học */
+    --r: 3px;
+    --r-lg: 4px;
+    --appbar-h: 48px;
+    --rail-w: 60px;
+    --panel-w: 328px;
+    --inspector-w: 348px;
+    --timeline-h: 64px;
+    --ease: cubic-bezier(.2, .7, .3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+        color-scheme: dark;
+        --canvas: #0b141b;
+        --surface: #121e27;
+        --surface-2: #17252f;
+        --surface-3: #20323f;
+        --line: #26394a;
+        --line-strong: #3a5266;
+        --control-line: #7c92a4;
+        --ink: #e6edf2;
+        --ink-2: #bccad5;
+        --ink-3: #93a6b5;
+        --bar: #08141c;
+        --bar-2: #0f212d;
+        --bar-line: #1f3646;
+        --accent: #2aa4bf;
+        --accent-hover: #4bb8d0;
+        --accent-soft: #14323d;
+        --accent-ink: #6ccbe0;
+        --focus: #62a8f5;
+        --warn-bg: #2b2210;
+        --warn-line: #7a5a1c;
+        --warn-ink: #f0cd8c;
+        --ok: #6fd392;
+        --ok-bg: #112a1b;
+        --error: #ff9b92;
+        --error-bg: #301613;
+        --float: #121e27;
+        --float-line: rgba(0, 0, 0, .6);
+        --float-shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 2px 12px rgba(0, 0, 0, .45);
+        --chart-line: #4bb8d0;
+        --chart-grid: #26394a;
+    }
+}
