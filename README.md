@@ -29,18 +29,18 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ![Bản đồ tổng quan](docs/minh_chung/giao_dien_moi/01_ban_do_tong_quan.png)
 
-*Thẻ **Tổng quan**: 267 transect tô màu theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), thống kê, hotspot, sạt lở tham chiếu,
-ranh giới khu vực nghiên cứu. Nền bản đồ tự phục vụ trên GeoServer.*
+*Thẻ **Tổng quan** (cột biểu tượng bên trái): 267 transect tô màu theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), thống kê, hotspot, sạt lở tham chiếu,
+ranh giới khu vực nghiên cứu; chú giải nổi ở góc dưới trái, dải năm 2018–2026 ở đáy bản đồ (bấm một năm để bật/tắt đường bờ, nút **Phát** chạy lần lượt). Nền bản đồ tự phục vụ trên GeoServer.*
 
 | | |
 |---|---|
 | ![Thẻ Lớp dữ liệu](docs/minh_chung/giao_dien_moi/02_tab_lop.png) | ![Thẻ Hotspot](docs/minh_chung/giao_dien_moi/03_tab_diem_nong.png) |
 | **Lớp dữ liệu**: bật/tắt transect, hotspot, sạt lở tham chiếu; đường bờ từng năm 2018–2026; so sánh hai năm | **Hotspot**: lọc đoạn lùi bờ theo tốc độ tối thiểu (m/năm), bấm một đoạn để phóng tới |
 | ![Chi tiết transect](docs/minh_chung/giao_dien_moi/05_chi_tiet_transect.png) | ![So sánh hai năm](docs/minh_chung/giao_dien_moi/06_so_sanh_nam.png) |
-| **Chi tiết transect T0094**: NSM, EPR, LRR, R², khoảng tin cậy 95%, độ bất định, biểu đồ lịch sử vị trí đường bờ | **So sánh hai năm**: chồng hai đường bờ để xem dịch chuyển |
+| **Chi tiết transect T0094**: NSM, EPR, LRR, R², khoảng tin cậy 95%, độ bất định, biểu đồ lịch sử vị trí đường bờ | **So sánh hai năm** (2018 – 2026): chồng hai đường bờ để xem dịch chuyển |
 
 - **Chia sẻ & xuất dữ liệu** — liên kết chia sẻ lưu khung nhìn, lớp, năm trong URL (`#map=…`); tải từng lớp dạng GeoJSON/CSV tại `/api/export/{lớp}.{geojson|csv}`.
-- **Giao diện di động** — bố cục thu gọn, xem [ảnh](docs/minh_chung/giao_dien_moi/13_di_dong.png).
+- **Giao diện di động** — bảng điều khiển và chi tiết transect thành ngăn kéo phía dưới, thanh điều hướng chia đều một hàng, xem [ảnh](docs/minh_chung/giao_dien_moi/13_di_dong.png).
 
 ### Các trang còn lại
 
