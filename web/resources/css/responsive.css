@@ -18,3 +18,20 @@
 @media (max-width: 720px) {
     .brand-text strong { white-space: nowrap; }
 }
+/* Điện thoại hẹp: thanh điều hướng xuống hàng riêng, chia đều chiều ngang để không mục nào bị cắt. */
+@media (max-width: 480px) {
+    :root { --appbar-h: 84px; }
+    .appbar { flex-wrap: wrap; align-content: flex-start; row-gap: 0; padding: 0 4px; }
+    .brand { height: 42px; }
+    .brand-mark { display: grid; }
+    .topnav {
+        order: 3; flex: 1 0 100%; min-width: 0; height: 42px; margin-left: 0; overflow-x: auto;
+        border-top: 1px solid var(--bar-line);
+    }
+    .topnav a, .topnav button { flex: 1 0 auto; justify-content: center; padding: 0 5px; font-size: var(--fs-sm); }
+    .nav-logout { flex: 1 0 auto; border-left: 0; }
+    .nav-logout button { width: 100%; }
+}
+@media (max-width: 400px) {
+    .topnav a, .topnav button { padding: 0 3px; font-size: 12px; }
+}
