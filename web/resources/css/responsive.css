@@ -1,0 +1,20 @@
+/* Điều chỉnh khung chung cho màn hình nhỏ; quy tắc riêng từng vùng nằm trong sidebar.css, map.css, pages.css. */
+@media (max-width: 900px) {
+    .brand-text small { display: none; }
+    .topnav a, .topnav button { padding: 0 9px; }
+}
+@media (max-width: 720px) {
+    :root { --appbar-h: 44px; }
+    .brand { padding: 0 8px 0 4px; }
+    .brand-prefix { display: none; }
+    .brand-text strong { font-size: var(--fs-md); }
+    .topnav { overflow-x: auto; scrollbar-width: none; }
+    .topnav::-webkit-scrollbar { display: none; }
+    .topnav a, .topnav button { padding: 0 8px; font-size: var(--fs-sm); white-space: nowrap; }
+}
+@media (max-width: 420px) {
+    .brand-mark { display: none; }
+}
+@media (max-width: 720px) {
+    .brand-text strong { white-space: nowrap; }
+}
