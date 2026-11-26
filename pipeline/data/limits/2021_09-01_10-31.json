@@ -1,0 +1,38 @@
+[
+ {
+  "date": "2021-09-02",
+  "masked_fraction": 0.342,
+  "used": false,
+  "processing_baseline": "03.00"
+ },
+ {
+  "date": "2021-09-07",
+  "masked_fraction": 0.54,
+  "used": false,
+  "processing_baseline": "03.00"
+ },
+ {
+  "date": "2021-09-17",
+  "masked_fraction": 0.2,
+  "used": true,
+  "processing_baseline": "03.00"
+ },
+ {
+  "date": "2021-09-22",
+  "masked_fraction": 0.943,
+  "used": false,
+  "processing_baseline": "03.00"
+ },
+ {
+  "date": "2021-09-27",
+  "masked_fraction": 0.44,
+  "used": false,
+  "processing_baseline": "03.00"
+ },
+ {
+  "date": "2021-10-12",
+  "masked_fraction": 0.77,
+  "used": false,
+  "processing_baseline": "03.00"
+ }
+]
