@@ -30,7 +30,7 @@ const hex = (c) => c.replace('#', '');
 function shorelineLayer(year, color) {
     if (USE_WMS) return wms('shorelines', { cql_filter: `year=${year}`, env: `color:${hex(color)}` });
     // Chế độ GeoJSON: tải đường bờ của đúng năm khi lớp được tạo, vẽ vào lớp rỗng đã trả về.
-    const layer = L.geoJSON(null, { style: { color, weight: 3, opacity: 0.9 }, interactive: false });
+    const layer = L.geoJSON(null, { style: { color, weight: 3, opacity: 0.9, className: 'shoreline-path' }, interactive: false });
     api.shorelines(year).then((fc) => layer.addData(fc)).catch(() => {
         setStatus(`Dữ liệu đường bờ năm ${year}: ${UPDATING.toLowerCase()}.`);
     });
