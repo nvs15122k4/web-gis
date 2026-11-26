@@ -214,6 +214,13 @@ class ImportPipelineOutput extends Command
         foreach (array_keys(Shoreline::ALT_SOURCES) as $source) {
             $files = glob("{$alt}/{$source}/shoreline/*_".self::ALT_INDEX.'.json') ?: [];
             sort($files);
+            // Ưu tiên đường bờ do QGIS giải đoán (qgis_shoreline/<năm>.json) nếu có: cùng phương pháp với bản chính nên so sánh
+            // chỉ còn khác nguồn ảnh. Năm nào chưa có file QGIS thì dùng bản Python như trước.
+            $files = array_map(function (string $f) use ($alt, $source): string {
+                $q = "{$alt}/{$source}/qgis_shoreline/".strstr(basename($f), '_', true).'.json';
+
+                return is_file($q) ? $q : $f;
+            }, $files);
             foreach ($files as $file) {
                 $json = $this->readJson($file);
                 $features = $json['features'] ?? [];
@@ -221,7 +228,7 @@ class ImportPipelineOutput extends Command
                     throw new \RuntimeException(basename($file).': cần đúng 1 feature đường bờ, có '.count($features));
                 }
                 $p = $features[0]['properties'] ?? [];
-                if (! isset($p['year']) || ($p['source'] ?? $source) !== $source) {
+                if (! isset($p['year']) || ! in_array($p['source'] ?? $source, [$source, "qgis_{$source}"], true)) {
                     throw new \RuntimeException(basename($file).": thiếu năm hoặc source không khớp '{$source}'");
                 }
                 $pg->statement(
