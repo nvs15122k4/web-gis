@@ -8,6 +8,7 @@ import { applyLayerSettings } from './layer-settings';
 import { initPermalink, readPermalink } from './permalink';
 import { initPrint } from './print';
 import { initSearch } from './search';
+import { smoothGeoJSON } from './smooth';
 import { initSwipe } from './swipe';
 import { loadSummary } from './summary';
 import { initTabs } from './tabs';
@@ -40,14 +41,15 @@ export function initMap() {
     fetch('/data/aoi.json')
         .then((r) => r.json())
         .then((aoi) => {
-            const layer = L.geoJSON(aoi, {
+            // Chỉ làm mượt phần vẽ (Chaikin 2 vòng, nét tròn đầu); khung nhìn vẫn tính từ dữ liệu gốc.
+            const layer = L.geoJSON(smoothGeoJSON(aoi, 2), {
                 style: (f) => (f.properties.role === 'commune'
-                    ? { color: '#555', weight: 1.5, dashArray: '2 5', fill: false }
-                    : { color: '#333', weight: 2, dashArray: '6 4', fill: false }),
+                    ? { color: '#555', weight: 1.5, dashArray: '2 5', fill: false, lineCap: 'round', lineJoin: 'round' }
+                    : { color: '#333', weight: 2, dashArray: '6 4', fill: false, lineCap: 'round', lineJoin: 'round' }),
                 interactive: false,
             }).addTo(map);
             const study = aoi.features.filter((f) => f.properties.role !== 'commune');
-            const bounds = (study.length ? L.geoJSON({ type: 'FeatureCollection', features: study }) : layer).getBounds();
+            const bounds = L.geoJSON(study.length ? { type: 'FeatureCollection', features: study } : aoi).getBounds();
             // Không animate: hiệu ứng zoom dở dang sẽ ghi đè khung nhìn nếu người dùng di chuyển ngay sau đó.
             if (!moved) map.fitBounds(bounds, { animate: false });
             addHomeControl(map, bounds);
