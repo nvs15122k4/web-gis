@@ -1,6 +1,7 @@
 import L from 'leaflet';
 import { createAttrTable } from './attr-table';
 import { initBasemaps } from './basemaps';
+import { initGraticule } from './graticule';
 import { initLayers, layers } from './layers';
 import { initLayerTree } from './layer-tree';
 import { initPermalink, readPermalink } from './permalink';
@@ -57,6 +58,7 @@ export function initMap() {
     initTabs(document.getElementById('sidebar'));
     initTimeline(map);
     initToolbar(map);
+    initGraticule(map);
     initLayerTree(map);
     initPrint();
     initSwipe(map, window.WEBGIS.years);
