@@ -62,10 +62,10 @@ test.describe('Hướng dẫn và Báo cáo', () => {
         expect(overflow).toBe(false);
     });
 
-    test('GR07 giao diện tối: trang báo cáo dùng nền tối', { tag: ['@regression', '@responsive'] }, async ({ page }) => {
+    test('GR07 chỉ còn giao diện sáng: hệ điều hành chọn tối vẫn giữ nền sáng', { tag: ['@regression', '@responsive'] }, async ({ page }) => {
         await page.emulateMedia({ colorScheme: 'dark' });
         await sessionLogin(page);
         const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-        expect(bg).not.toBe('rgb(255, 255, 255)');
+        expect(bg).toBe('rgb(232, 233, 231)');
     });
 });

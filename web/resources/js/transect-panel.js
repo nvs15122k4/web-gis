@@ -3,6 +3,7 @@ import L from 'leaflet';
 import colors from './colors.json';
 import { api } from './api';
 import { setStatus, UPDATING } from './status';
+import { fadeIn } from './motion';
 import { WMS_URL, TRANSECT_LAYER, USE_WMS, handlers, layers } from './layers';
 
 const CLASS_LABEL = {
@@ -93,7 +94,29 @@ async function highlightTransect(id) {
     const geometry = (await geometries().catch(() => new Map())).get(id);
     if (!geometry) return;
     L.geoJSON(geometry, { style: { color: '#fff', weight: 9, opacity: 0.9 }, interactive: false }).addTo(highlight);
-    L.geoJSON(geometry, { style: { color: '#0c2d3f', weight: 4 }, interactive: false }).addTo(highlight);
+    const core = L.geoJSON(geometry, { style: { color: '#0c2d3f', weight: 4 }, interactive: false }).addTo(highlight);
+    // Vòng Vermilion lan ra từ giữa đoạn được chọn (CSS thuần, tắt khi giảm chuyển động).
+    L.marker(core.getBounds().getCenter(), {
+        icon: L.divIcon({ className: 'select-ring', html: '<i></i><i></i><i></i><b></b>', iconSize: [0, 0] }),
+        interactive: false, keyboard: false, zIndexOffset: 500,
+    }).addTo(highlight);
+}
+
+const ICON_ALERT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v5M12 17.5v.01"/></svg>';
+
+/** Trạng thái đang tải trong thẻ chi tiết (chỉ khi thẻ đã mở sẵn, tránh nháy thẻ rỗng). */
+function showDetailLoading() {
+    const panel = document.getElementById('inspector');
+    if (!panel || panel.hidden) return;
+    panel.querySelector('.inspector-body')?.setAttribute('aria-busy', 'true');
+    document.getElementById('transect-detail').innerHTML = '<div class="detail-skeleton" aria-hidden="true"><i></i><i></i><i></i><i></i></div>';
+}
+
+function showDetailError() {
+    const panel = document.getElementById('inspector');
+    if (!panel || panel.hidden) return;
+    panel.querySelector('.inspector-body')?.removeAttribute('aria-busy');
+    document.getElementById('transect-detail').innerHTML = `<div class="state-block is-error" role="alert">${ICON_ALERT}<div><strong>Không tải được chi tiết transect</strong>${UPDATING}. Thử chọn lại đoạn này sau ít giây.</div></div>`;
 }
 
 async function featureAt(map, latlng) {
@@ -123,7 +146,15 @@ export async function zoomToTransect(map, id) {
 }
 
 export async function showTransect(id) {
-    const [detail, history] = await Promise.all([api.transect(id), api.transectHistory(id)]);
+    showDetailLoading();
+    let detail;
+    let history;
+    try {
+        [detail, history] = await Promise.all([api.transect(id), api.transectHistory(id)]);
+    } catch (e) {
+        showDetailError();
+        throw e;
+    }
     const s = detail.stats ?? {};
     const cls = s.change_class;
     const years = history.map((h) => h.year);
@@ -153,7 +184,9 @@ export async function showTransect(id) {
             ${row('Số năm quan trắc', 'stat-obs', years.length ? `${years.length} năm (${years[0]}–${years[years.length - 1]})` : val(null))}
         </dl>
         ${weakFit ? '<p class="note" id="stat-note">Xu hướng tuyến tính chưa rõ ràng (R² &lt; 0,3), cần diễn giải thận trọng.</p>' : ''}`;
+    document.querySelector('#inspector .inspector-body')?.removeAttribute('aria-busy');
     openInspector();
+    fadeIn(document.getElementById('transect-detail'), { duration: 260, from: 6 });
     permalink?.setTransect(id);
     highlightTransect(id);
     // Chart.js (~200 kB) chỉ tải khi người dùng mở transect đầu tiên, không nằm trong bundle khởi động.

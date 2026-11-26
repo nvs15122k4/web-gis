@@ -6,7 +6,7 @@
         ['2.3', 'Pipeline xử lý ảnh và trích xuất đường bờ', 'done', 'Composite trung vị, NDWI/MNDWI/AWEI + Otsu, vector hoá dưới pixel, baseline và transect vuông góc (pipeline/s1–s4).'],
         ['2.4', 'Đánh giá độ chính xác và kiểm chứng', 'done', 'Ground truth số hoá 5 ô mẫu (2018, 2022, 2026), RMSE đường bờ 15,1–20,0 m đưa vào U_classify; đối chiếu chéo ESA WorldCover và Impact Observatory LULC.'],
         ['2.5', 'Tiêu chí phân loại và độ bất định', 'done', 'NSM/EPR/LRR/R², kiểm định |LRR| > 1,96 × SE, bốn mức biến động, U_georef chốt 12 m.'],
-        ['2.6', 'Kiến trúc, cơ sở dữ liệu và giao diện WebGIS', 'done', 'MySQL (người dùng, cấu hình) + PostGIS (không gian), GeoServer WMS (tuỳ chọn), Leaflet + Chart.js; giao diện sáng/tối, hỗ trợ bàn phím và cảm ứng.'],
+        ['2.6', 'Kiến trúc, cơ sở dữ liệu và giao diện WebGIS', 'done', 'MySQL (người dùng, cấu hình) + PostGIS (không gian), GeoServer WMS (tuỳ chọn), Leaflet + Chart.js; giao diện sáng thiết kế theo hệ Transect, hỗ trợ bàn phím và cảm ứng.'],
         ['3.5', 'Đối chiếu với sạt lở tham chiếu 2019–2020', 'part', 'Nguồn công khai chỉ có lý trình Km, chưa có toạ độ nên dùng vùng cảnh báo ~3,3 km; kết quả hiện không phát hiện đoạn lùi bờ trong vùng này (đã ghi rõ ở trang Phương pháp).'],
         ['3.6.2', 'REST API và bảo mật', 'done', 'Sanctum, khoá đăng nhập sau 5 lần sai theo email + IP, token hết hạn sau 480 phút, kiểm tra đầu vào, ghi nhật ký thay đổi ngưỡng.'],
         ['3.6.3', 'Giao diện người dùng', 'done', 'Bản đồ, biểu đồ transect, hotspot, so sánh hai năm, chia sẻ liên kết, tải GeoJSON/CSV, trang Phương pháp, Quản trị, Hướng dẫn và Báo cáo.'],
@@ -37,6 +37,11 @@
         <p class="lead">Tổng hợp từ lịch sử git và các tính năng đã hoàn thành của đề tài “WebGIS giám sát biến động bờ sông Hậu, xã Bình Mỹ, An Giang”,
         đối chiếu với đề cương. Trang nội bộ, chỉ tài khoản admin xem được. Số liệu chốt ngày 23/11/2026.</p>
         <p class="page-meta"><span class="chip">Dành cho tài khoản admin</span></p>
+        <dl class="page-stamp" aria-label="Thông tin tài liệu">
+            <div><dt>Phạm vi</dt><dd>Nội bộ · admin</dd></div>
+            <div><dt>Số liệu</dt><dd>23/11/2026</dd></div>
+            <div><dt>Hạng mục</dt><dd>{{ $done }}/{{ $total }} hoàn thành</dd></div>
+        </dl>
     </div>
 </header>
 <div class="doc-layout">
@@ -61,7 +66,8 @@
             <div><b>9</b><span>năm đường bờ (2018–2026)</span></div>
             <div><b>{{ $done }}/{{ $total }}</b><span>hạng mục đề cương hoàn thành</span></div>
         </div>
-        <div class="progress" role="progressbar" aria-label="Tiến độ theo đề cương" aria-valuemin="0" aria-valuemax="{{ $total }}" aria-valuenow="{{ $done }}"><i style="width: {{ round($done / $total * 100) }}%"></i></div>
+        <div class="progress" style="--n: {{ $total }}" role="progressbar" aria-label="Tiến độ theo đề cương" aria-valuemin="0" aria-valuemax="{{ $total }}" aria-valuenow="{{ $done }}"><i style="width: {{ round($done / $total * 100) }}%"></i></div>
+        <p class="progress-caption"><span>0</span><span>{{ $done }} / {{ $total }} hạng mục ({{ round($done / $total * 100) }}%)</span><span>{{ $total }}</span></p>
     </section>
 
     <section id="tien-do">
@@ -70,7 +76,7 @@
             <tr><th>Mục</th><th>Nội dung</th><th>Trạng thái</th><th>Kết quả / bằng chứng</th></tr>
             @foreach ($progress as [$no, $name, $state, $note])
                 <tr>
-                    <td>{{ $no }}</td>
+                    <td class="code">{{ $no }}</td>
                     <td>{{ $name }}</td>
                     <td><span class="badge badge-{{ $state }}">{{ $labels[$state] }}</span></td>
                     <td>{{ $note }}</td>
@@ -94,7 +100,7 @@
                 Vector hoá đường bờ dưới pixel và chạy lại kết quả; đưa RMSE ground truth vào độ bất định; bổ sung mạnh kiểm thử;
                 sửa lỗi API (bbox dạng mảng, id quá lớn, ngưỡng âm/quá dài); khoá đăng nhập sai và token hết hạn.</li>
             <li><time datetime="2026-11-23">23/11/2026 — 35 commit</time>
-                Truy cập: liên kết bỏ qua điều hướng, focus, vùng chạm 44 px, giảm chuyển động, tương phản; giao diện tối theo hệ điều hành;
+                Truy cập: liên kết bỏ qua điều hướng, focus, vùng chạm 44 px, giảm chuyển động, tương phản; giao diện sáng thống nhất theo hệ Transect (bỏ chế độ tối);
                 kiểm thử JavaScript; thêm trang Hướng dẫn sử dụng và Báo cáo công việc (trang này).</li>
         </ol>
     </section>
@@ -113,7 +119,7 @@
             <li>REST API tra cứu đường bờ, transect, hotspot, sự kiện tham chiếu, thống kê; xuất GeoJSON/CSV.</li>
             <li>Bản đồ tương tác: lớp bản đồ (GeoJSON từ API, hoặc WMS khi có GeoServer), tô màu theo mức biến động, so sánh hai năm, lọc hotspot, chia sẻ liên kết.</li>
             <li>Trang Phương pháp, Quản trị ngưỡng (có nhật ký), Hướng dẫn sử dụng và Báo cáo công việc (chỉ admin, chặn phía máy chủ).</li>
-            <li>Giao diện sáng/tối, hỗ trợ bàn phím, trình đọc màn hình và màn hình cảm ứng.</li>
+            <li>Giao diện sáng theo hệ thiết kế Transect (lưới 1 px, Cobalt/Vermilion), hỗ trợ bàn phím, trình đọc màn hình, màn hình cảm ứng và bố cục điện thoại dạng bottom sheet.</li>
         </ul>
         <h3>Hạ tầng</h3>
         <ul>

@@ -3,7 +3,7 @@ import Chart from 'chart.js/auto';
 Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
 Chart.defaults.font.size = 11;
 
-/** Lấy màu theo giao diện hiện tại (sáng/tối) từ biến CSS; dự phòng khi chưa có biến. */
+/** Lấy màu theo giao diện hiện tại từ biến CSS; dự phòng khi chưa có biến. */
 const cssVar = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
 /**

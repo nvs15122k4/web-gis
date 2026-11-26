@@ -430,11 +430,13 @@ test.describe('Responsive & giao diện', () => {
         await expect(page.locator('#sidebar')).toBeVisible();
     });
 
-    test('R05 dark mode: trang tải được và chữ/nền tương phản', { tag: ['@responsive'] }, async ({ page }) => {
+    test('R05 không có dark mode: hệ điều hành chọn tối vẫn dùng bảng màu sáng', { tag: ['@responsive'] }, async ({ page }) => {
         await page.emulateMedia({ colorScheme: 'dark' });
         await page.goto('/gioi-thieu');
-        const c = await page.evaluate(() => { const s = getComputedStyle(document.body); return { fg: s.color, bg: s.backgroundColor }; });
-        expect(c.fg).not.toBe(c.bg);
+        const c = await page.evaluate(() => { const s = getComputedStyle(document.body); return { fg: s.color, bg: s.backgroundColor, scheme: getComputedStyle(document.documentElement).colorScheme }; });
+        expect(c.bg).toBe('rgb(232, 233, 231)');
+        expect(c.fg).toBe('rgb(23, 25, 27)');
+        expect(c.scheme).toBe('light');
     });
 
     test('R06 bàn phím: Tab đến được liên kết đầu tiên của menu và Enter điều hướng', { tag: ['@responsive'] }, async ({ page }) => {

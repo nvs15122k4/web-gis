@@ -111,7 +111,7 @@
         <ul>
             <li>Bấm <kbd>Tab</kbd> ngay khi mở trang để hiện liên kết <em>Bỏ qua điều hướng, đến nội dung chính</em>.</li>
             <li>Các thẻ trong bảng điều khiển chuyển bằng phím mũi tên trái/phải.</li>
-            <li>Giao diện tự chuyển sáng hoặc tối theo cài đặt của hệ điều hành; nền bản đồ luôn sáng để màu phân loại dễ đọc.</li>
+            <li>Giao diện dùng một bảng màu sáng cố định, nền bản đồ sáng để màu phân loại dễ đọc; trên điện thoại, bảng điều khiển và thẻ chi tiết transect hiện dạng bottom sheet.</li>
         </ul>
     </section>
 

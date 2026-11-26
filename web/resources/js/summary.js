@@ -1,6 +1,7 @@
 import colors from './colors.json';
 import { api } from './api';
 import { UPDATING } from './status';
+import { countUp } from './motion';
 
 const CLASS_LABEL = { accretion: 'Bồi', stable: 'Ổn định', mild_erosion: 'Lùi nhẹ', severe_erosion: 'Lùi mạnh' };
 const num = (v, d = 2) => (v === null || v === undefined ? UPDATING : Number(v).toFixed(d));
@@ -56,6 +57,12 @@ export async function loadSummary(onSelectTransect) {
             ${fact('Hotspot', s.hotspots.count ? `${s.hotspots.count} đoạn · ${hotLen}` : UPDATING)}
             ${fact('Sạt lở tham chiếu', s.reference_events.count ? `${s.reference_events.count} sự kiện` : UPDATING)}
         </dl>`;
+
+    // Số liệu đếm lên khi bảng tổng quan hiện ra (đặt lại về giá trị cuối nếu giảm chuyển động).
+    countUp(body.querySelector('#kpi-transects'), t.total);
+    countUp(body.querySelector('#kpi-erosion'), pct(erosion, t.total), { suffix: '%', delay: 80 });
+    if (s.shorelines.count) countUp(body.querySelector('#kpi-years'), s.shorelines.count, { delay: 160 });
+    body.querySelectorAll('.class-counts b[data-class]').forEach((b, i) => countUp(b, Number(b.textContent), { delay: 200 + i * 60 }));
 
     body.querySelectorAll('[data-transect]').forEach((a) => a.addEventListener('click', (e) => {
         e.preventDefault();

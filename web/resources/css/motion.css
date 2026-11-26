@@ -1,0 +1,65 @@
+/*
+ * Chuyển động: chỉ CSS (và WAAPI/rAF trong motion.js), không thư viện.
+ * Mọi hoạt ảnh nằm trong no-preference; base.css đã ép thời lượng ~0 khi người dùng chọn giảm chuyển động.
+ */
+@keyframes rise-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes slide-in-left { from { opacity: 0; transform: translateX(-10px); } }
+@keyframes bar-grow { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes ring-expand {
+    0% { transform: translate(-50%, -50%) scale(.25); opacity: .95; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+@keyframes ring-settle { from { opacity: 1; transform: translate(-50%, -50%) scale(1.25); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes path-in { from { opacity: 0; } }
+@keyframes skeleton-sweep { to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: no-preference) {
+    /* bảng nội dung trượt nhẹ khi đổi tab, danh sách hiện lần lượt */
+    .panel:not([hidden]) > section { animation: rise-in var(--dur-3) var(--ease-out) both; }
+    .panel:not([hidden]) > section:nth-child(2) { animation-delay: 50ms; }
+    .panel:not([hidden]) > section:nth-child(3) { animation-delay: 100ms; }
+    .panel:not([hidden]) > section:nth-child(4) { animation-delay: 150ms; }
+
+    .class-counts li, .facts > div, .item-list li, .year-grid .year-chip {
+        animation: slide-in-left var(--dur-3) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 32ms + 80ms);
+    }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(1) { --i: 0; }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(2) { --i: 1; }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(3) { --i: 2; }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(4) { --i: 3; }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(5) { --i: 4; }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(6) { --i: 5; }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(7) { --i: 6; }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(8) { --i: 7; }
+    :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(n + 9) { --i: 8; }
+    .class-bar { animation: bar-grow 700ms var(--ease-out) 120ms both; }
+    .kpis { animation: fade-in var(--dur-3) var(--ease-out) both; }
+
+    /* thanh bên thu gọn/mở mượt */
+    .sidebar { transition: grid-template-columns var(--dur-2) var(--ease-out); }
+    .sidebar-body { transition: opacity var(--dur-2) var(--ease-out); }
+    .sidebar.collapsed .sidebar-body { opacity: 0; }
+
+    /* chọn transect: vòng Vermilion lan ra rồi chốt lại */
+    .select-ring { pointer-events: none; }
+    .select-ring i { position: absolute; left: 0; top: 0; width: 56px; height: 56px; border: 2px solid var(--mark); border-radius: 50%; opacity: 0; animation: ring-expand 1.3s var(--ease-out) both; }
+    .select-ring i:nth-child(2) { animation-delay: .22s; }
+    .select-ring i:nth-child(3) { animation-delay: .44s; }
+    .select-ring b { animation: ring-settle .5s var(--ease-out) both; }
+
+    /* đường bờ của năm mới hiện dần, không nhảy */
+    .leaflet-overlay-pane path.shoreline-path { animation: path-in .55s var(--ease-out) both; }
+
+    /* thanh thời gian: mốc đổi màu mượt, vạch Vermilion trượt theo năm đang phát */
+    .tick, .tick-mark { transition: background-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), transform var(--dur-2) var(--ease-out); }
+    .timeline-playhead { transition: transform .5s var(--ease-out), width .3s var(--ease-out), opacity .2s var(--ease); }
+
+    /* hiện trạng thái tải/lỗi */
+    .state-block { animation: fade-in var(--dur-2) var(--ease-out) both; }
+}
+
+@media (prefers-reduced-motion: no-preference) and (max-width: 720px) {
+    @keyframes sheet-up { from { transform: translateY(28px); opacity: 0; } }
+    .sidebar:not(.collapsed) { animation: sheet-up var(--dur-3) var(--ease-out); }
+}
