@@ -16,9 +16,10 @@ return new class extends Migration
     public function up(): void
     {
         $db = DB::connection('pgsql');
-        $db->statement("ALTER TABLE shorelines ADD COLUMN source VARCHAR(20) NOT NULL DEFAULT 'main'");
-        $db->statement('ALTER TABLE shorelines DROP CONSTRAINT shorelines_year_water_index_key');
-        $db->statement('ALTER TABLE shorelines ADD CONSTRAINT shorelines_year_water_index_source_key UNIQUE (year, water_index, source)');
+        $db->statement("ALTER TABLE shorelines ADD COLUMN IF NOT EXISTS source VARCHAR(20) NOT NULL DEFAULT 'main'");
+        $db->statement('ALTER TABLE shorelines DROP CONSTRAINT IF EXISTS shorelines_year_water_index_key');
+        // Chỉ mục duy nhất (không phải CONSTRAINT) để chạy lại an toàn, kể cả khi migration đồng bộ đã tạo sẵn.
+        $db->statement('CREATE UNIQUE INDEX IF NOT EXISTS shorelines_year_water_index_source_key ON shorelines (year, water_index, source)');
     }
 
     public function down(): void
@@ -26,8 +27,9 @@ return new class extends Migration
         $db = DB::connection('pgsql');
         // Khoá cũ không chứa source: phải bỏ dòng đối chứng trước, nếu không sẽ trùng (year, water_index) với bản chính.
         $db->statement("DELETE FROM shorelines WHERE source <> 'main'");
-        $db->statement('ALTER TABLE shorelines DROP CONSTRAINT shorelines_year_water_index_source_key');
+        $db->statement('ALTER TABLE shorelines DROP CONSTRAINT IF EXISTS shorelines_year_water_index_source_key');
+        $db->statement('DROP INDEX IF EXISTS shorelines_year_water_index_source_key');
         $db->statement('ALTER TABLE shorelines ADD CONSTRAINT shorelines_year_water_index_key UNIQUE (year, water_index)');
-        $db->statement('ALTER TABLE shorelines DROP COLUMN source');
+        $db->statement('ALTER TABLE shorelines DROP COLUMN IF EXISTS source');
     }
 };
