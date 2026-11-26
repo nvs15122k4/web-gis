@@ -62,6 +62,7 @@
 
     <main class="map-wrap" id="main-content" tabindex="-1" aria-label="Bản đồ">
         <div id="map"></div>
+        <p id="measure-readout" class="measure-readout" role="status" hidden></p>
         @include('partials.transect-panel')
         @include('partials.legend')
         @include('partials.timeline')
