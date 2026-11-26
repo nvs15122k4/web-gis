@@ -82,3 +82,24 @@ export function dismissPanel(el, done) {
     el.addEventListener('animationend', onEnd);
     timer = setTimeout(() => finish(true), 400); // phòng khi animationend không bắn (tab ẩn, hoạt ảnh bị tắt)
 }
+
+/**
+ * Gợi ý nhấn kiểu "ripple": một vòng tròn lan ra từ điểm chạm trên nút.
+ * Ủy quyền một lần trên `root`; bỏ qua nút bị vô hiệu hoá, và không làm gì khi giảm chuyển động.
+ */
+export function initRipple(root = document, selector = '.btn, .tool-btn, .icon-btn') {
+    root.addEventListener('pointerdown', (e) => {
+        const btn = e.target instanceof Element ? e.target.closest(selector) : null;
+        if (!btn || btn.disabled || btn.getAttribute('aria-disabled') === 'true' || reducedMotion()) return;
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height) * 2;
+        const dot = document.createElement('span');
+        dot.className = 'ripple';
+        dot.setAttribute('aria-hidden', 'true');
+        dot.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px`;
+        btn.append(dot);
+        const drop = () => dot.remove();
+        dot.addEventListener('animationend', drop, { once: true });
+        setTimeout(drop, 700);
+    });
+}
