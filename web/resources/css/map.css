@@ -1,49 +1,52 @@
-/* Lớp bản đồ: điều khiển Leaflet, popup, thẻ chi tiết transect, chú giải, thanh thời gian. */
+/* Lớp bản đồ: điều khiển Leaflet, popup, thẻ chi tiết transect, chú giải, thước thời gian, lưới toạ độ, mũi tên bắc. */
 
-/* #map chừa chỗ dưới cho thanh thời gian: điều khiển, thang tỉ lệ, toạ độ tự nằm trên thanh */
-/* overflow chặn trình duyệt cuộn khung bản đồ khi focus vào phần tử nổi */
+/* #map chừa chỗ dưới cho thước thời gian: điều khiển, thang tỉ lệ, toạ độ tự nằm trên thước */
 .map-wrap { overflow: hidden; }
 #map { bottom: var(--timeline-h); font-family: var(--font); font-size: var(--fs-sm); }
 .map-wrap:has(#timeline[hidden]) #map { bottom: 0; }
 .has-sea-bg { background: var(--map-sea); }
+:root { --grat-l: 58px; --grat-b: 18px; }
 
-/* ================= Điều khiển Leaflet ================= */
+/* ================= Điều khiển Leaflet: phẳng, viền mảnh, góc vuông ================= */
 .leaflet-bar, .leaflet-control-layers {
-    border: 1px solid var(--float-line) !important; border-radius: var(--r) !important;
+    border: 1px solid var(--float-line) !important; border-radius: 0 !important;
     box-shadow: var(--float-shadow) !important; background: var(--float);
 }
 .leaflet-bar a, .leaflet-bar a:hover {
-    width: 30px; height: 30px; line-height: 30px; background-color: var(--float); color: var(--ink);
-    border-bottom: 1px solid var(--line); font: 500 18px/30px var(--font);
+    width: 32px; height: 32px; line-height: 32px; background-color: var(--float); color: var(--ink);
+    border-bottom: 1px solid var(--line-strong); font: 400 18px/32px var(--font);
 }
 .leaflet-bar a:hover { background-color: var(--surface-3); }
-.leaflet-bar a:last-child { border-bottom: 0; }
+.leaflet-bar a:last-child { border-bottom: 0; border-radius: 0; }
+.leaflet-bar a:first-child { border-radius: 0; }
 .leaflet-bar a.leaflet-disabled { background: var(--surface-2); color: var(--ink-3); opacity: .6; }
-.leaflet-touch .leaflet-bar a { width: 30px; height: 30px; line-height: 30px; }
+.leaflet-touch .leaflet-bar a { width: 32px; height: 32px; line-height: 32px; }
 .home-control { display: grid !important; place-items: center; color: var(--ink) !important; }
-.home-control svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.leaflet-control.vn-fit { display: block; width: 30px; height: 30px; line-height: 30px; text-align: center; font: 600 11px/30px var(--font); letter-spacing: .02em; background: var(--float); color: var(--ink); }
-.leaflet-top .leaflet-control, .leaflet-bottom .leaflet-control { margin-top: 8px; margin-left: 8px; margin-right: 8px; }
+.home-control svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.leaflet-control.vn-fit { display: block; width: 32px; height: 32px; line-height: 32px; text-align: center; font: 600 11px/32px var(--font); letter-spacing: .02em; background: var(--float); color: var(--ink); }
+.leaflet-top .leaflet-control, .leaflet-bottom .leaflet-control { margin-top: 10px; margin-left: 10px; margin-right: 10px; }
+.leaflet-left .leaflet-control { margin-left: calc(var(--grat-l) + 10px); }
 .leaflet-bottom .leaflet-control { margin-bottom: 0; }
+.leaflet-bottom { margin-bottom: var(--grat-b); }
 .leaflet-top.leaflet-right { transition: right .18s var(--ease); }
 
 /* nền bản đồ: bảng chọn gọn */
 .leaflet-control-layers { color: var(--ink); font: var(--fs-sm) var(--font); }
-.leaflet-control-layers-toggle { width: 30px; height: 30px; background-size: 18px 18px; }
+.leaflet-control-layers-toggle { width: 32px; height: 32px; background-size: 18px 18px; }
 .leaflet-control-layers-expanded { padding: 8px 12px; min-width: 190px; }
 .leaflet-control-layers label { display: flex; align-items: center; gap: 6px; margin: 3px 0; font-size: var(--fs-sm); }
 .leaflet-control-layers-list input { accent-color: var(--accent); margin: 0; }
 .leaflet-control-layers-separator { border-top-color: var(--line); }
 
-/* thang tỉ lệ & toạ độ: dải mảnh sát đáy */
-.leaflet-control-scale { margin-left: 8px; }
+/* thang tỉ lệ & toạ độ */
+.leaflet-control-scale { margin-left: calc(var(--grat-l) + 10px); }
 .leaflet-control-scale-line {
-    border-color: var(--ink-2); background: color-mix(in srgb, var(--float) 85%, transparent); color: var(--ink);
-    font: 500 10px/1.4 var(--font); padding: 1px 6px 0;
+    border: 1px solid var(--ink); border-top: 0; background: color-mix(in srgb, var(--float) 88%, transparent); color: var(--ink);
+    font: 500 11px/1.4 var(--font); padding: 1px 6px 0; box-shadow: none;
 }
 .leaflet-control-attribution {
-    margin: 0 !important; padding: 1px 6px; font: 10px/1.6 var(--font); color: var(--ink-2);
-    background: color-mix(in srgb, var(--float) 85%, transparent) !important;
+    margin: 0 !important; padding: 1px 6px; font: 10.5px/1.6 var(--font); color: var(--ink-2);
+    background: color-mix(in srgb, var(--float) 88%, transparent) !important;
 }
 .leaflet-control-attribution a { color: var(--accent-ink); }
 .leaflet-control.coords {
@@ -53,13 +56,37 @@
 }
 .leaflet-control.coords:empty::before { content: '—'; color: var(--ink-3); }
 
+/* ================= Lưới toạ độ ở rìa bản đồ ================= */
+.graticule { position: absolute; inset: 0; z-index: 640; pointer-events: none; font: 500 10.5px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.graticule .g-left, .graticule .g-bottom { position: absolute; background: color-mix(in srgb, var(--float) 92%, transparent); }
+.graticule .g-left { left: 0; top: 0; bottom: var(--grat-b); width: var(--grat-l); border-right: 1px solid var(--float-line); overflow: hidden; }
+.graticule .g-bottom { left: var(--grat-l); right: 0; bottom: 0; height: var(--grat-b); border-top: 1px solid var(--float-line); overflow: hidden; }
+.graticule .g-corner { position: absolute; left: 0; bottom: 0; width: var(--grat-l); height: var(--grat-b); background: var(--float); border-top: 1px solid var(--float-line); border-right: 1px solid var(--float-line); }
+.g-lat, .g-lng { position: absolute; white-space: nowrap; }
+.g-lat { right: 0; padding-right: 5px; transform: translateY(-50%); }
+.g-lat::after { content: ''; position: absolute; right: 0; top: 50%; width: 4px; height: 1px; background: var(--ink); }
+.g-lat span { display: block; line-height: 1.05; text-align: right; }
+.g-lng { top: 0; padding-top: 5px; transform: translateX(-50%); }
+.g-lng::before { content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 4px; background: var(--ink); }
+
+/* ================= Mũi tên bắc ================= */
+.north {
+    position: absolute; z-index: 700; right: 14px; bottom: calc(var(--timeline-h) + var(--grat-b) + 34px); width: 34px; pointer-events: none;
+    display: grid; justify-items: center; font: 600 15px/1 var(--serif); color: var(--ink);
+}
+.north svg { width: 24px; height: 40px; fill: var(--ink); stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; filter: drop-shadow(0 0 2px var(--float)); }
+.north svg .n-half { fill: var(--float); }
+.north span { margin-bottom: 1px; text-shadow: 0 0 3px var(--float), 0 0 3px var(--float); }
+.map-wrap:has(#timeline[hidden]) .north { bottom: calc(var(--grat-b) + 34px); }
+.map-wrap.inspecting .north { right: calc(var(--inspector-w) + 14px); }
+
 /* ================= Popup ================= */
 .leaflet-popup-content-wrapper {
-    padding: 0; border-radius: var(--r-lg); background: var(--float); color: var(--ink);
-    border: 1px solid var(--float-line); box-shadow: var(--float-shadow);
+    padding: 0; border-radius: 0; background: var(--float); color: var(--ink);
+    border: 1px solid var(--float-line); box-shadow: 3px 3px 0 rgba(31, 28, 23, .12);
 }
 .leaflet-popup-content { margin: 10px 28px 10px 12px; font: var(--fs-sm)/1.5 var(--font); }
-.leaflet-popup-content strong { font-weight: 600; font-size: var(--fs-md); }
+.leaflet-popup-content strong { font: 600 var(--fs-lg) var(--mono); }
 .leaflet-popup-content p { margin: 6px 0 0; }
 .leaflet-popup-content small { color: var(--ink-3); }
 .leaflet-popup-tip { background: var(--float); border: 1px solid var(--float-line); box-shadow: none; }
@@ -68,134 +95,139 @@
 .popup-table { margin-top: 4px; border-collapse: collapse; }
 .popup-table th { text-align: left; color: var(--ink-3); font-weight: 400; padding: 1px 12px 1px 0; vertical-align: top; }
 .popup-table td { padding: 1px 0; font-variant-numeric: tabular-nums; }
-.leaflet-tooltip { font: var(--fs-sm)/1.4 var(--font); color: var(--ink); background: var(--float); border: 1px solid var(--float-line); border-radius: var(--r); box-shadow: var(--float-shadow); }
+.leaflet-tooltip { font: var(--fs-sm)/1.4 var(--font); color: var(--ink); background: var(--float); border: 1px solid var(--float-line); border-radius: 0; box-shadow: none; }
 
 /* nhãn chủ quyền, địa danh vẽ trên bản đồ (luôn chữ tối trên nền sáng của bản đồ) */
 .sovereignty-label span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; text-align: center; font: 700 12px/1.2 var(--font); color: #7a0f14; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 5px #fff; pointer-events: none; }
 .sovereignty-label small { display: block; font-weight: 500; font-size: 10px; }
-.sovereignty-sea span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font: 600 italic 13px/1 var(--font); letter-spacing: .3em; color: #2b5d7c; text-shadow: 0 0 3px #fff; pointer-events: none; }
+.sovereignty-sea span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font: 600 italic 13px/1 var(--serif); letter-spacing: .3em; color: #2b5d7c; text-shadow: 0 0 3px #fff; pointer-events: none; }
 .vn-label span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; pointer-events: none; text-shadow: 0 0 3px #fff, 0 0 3px #fff; }
 .vn-label-province span { font: 600 11px/1 var(--font); color: #6b5a2e; }
-.vn-label-water span { font: italic 500 11px/1 var(--font); color: #1f5a80; }
+.vn-label-water span { font: italic 500 11.5px/1 var(--serif); color: #1f5a80; }
 
 /* ================= Thẻ chi tiết transect (dock bên phải) ================= */
 .inspector {
     position: absolute; z-index: 900; top: 0; right: 0; bottom: var(--timeline-h);
     width: var(--inspector-w); display: flex; flex-direction: column; overflow: hidden;
-    background: var(--surface); color: var(--ink); border-left: 1px solid var(--line-strong);
+    background: var(--surface); color: var(--ink); border-left: 1px solid var(--ink);
     animation: inspector-in .16s var(--ease);
 }
 .map-wrap:has(#timeline[hidden]) .inspector { bottom: 0; }
-@keyframes inspector-in { from { transform: translateX(16px); opacity: 0; } }
-.inspector-head { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 12px 8px 12px 14px; border-bottom: 1px solid var(--line-strong); background: var(--surface-2); }
-.inspector-head::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 48px; height: 2px; background: var(--mark); }
-.inspector-title { font-family: var(--mono); letter-spacing: -.01em; }
-.inspector-title { display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: var(--fs-xl); font-weight: 650; font-variant-numeric: tabular-nums; }
+@keyframes inspector-in { from { opacity: 0; } }
+.inspector-head { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 14px 8px 12px 20px; border-bottom: 1px solid var(--ink); }
+.inspector-head::after { content: ''; position: absolute; left: 20px; bottom: -1px; width: 40px; height: 2px; background: var(--mark); }
+.inspector-title { display: flex; align-items: center; gap: 10px; margin-top: 2px; font: 600 24px/1.1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .inspector-head .icon-btn { color: var(--ink-2); }
-.inspector-body { flex: 1; overflow-y: auto; padding: 12px 14px 16px; }
-.class-badge { display: inline-block; padding: 1px 8px; border-radius: 2px; font-size: var(--fs-xs); font-weight: 600; line-height: 1.6; }
+.inspector-body { flex: 1; overflow-y: auto; padding: 14px 20px 18px; }
+.class-badge { display: inline-block; padding: 0 7px; font: 600 var(--fs-xs)/1.7 var(--font); letter-spacing: 0; }
 .class-badge:empty { display: none; }
-.subhead { display: flex; align-items: center; gap: 10px; margin: 18px 0 8px; font-size: var(--fs-xs); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
-.subhead::after { content: ''; flex: 1; height: 1px; background: var(--line); }
-.stat-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-bottom: 10px; border: 1px solid var(--line); background: var(--line); }
-.stat-tile { padding: 8px 10px; background: var(--surface); }
-.stat-tile span { display: block; font-size: var(--fs-xs); font-weight: 600; letter-spacing: .08em; color: var(--ink-3); }
-.stat-tile b { letter-spacing: -.01em; }
-.stat-tile b { display: block; margin-top: 2px; font-size: var(--fs-lg); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.stat-tile b .updating { font-size: var(--fs-xs); font-weight: 400; }
+.subhead { margin: 20px 0 8px; font: 600 var(--fs-lg)/1.2 var(--serif); color: var(--ink); }
+.stat-tiles { display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 12px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.stat-tile { padding: 8px 10px 8px 0; }
+.stat-tile + .stat-tile { padding-left: 10px; border-left: 1px solid var(--line); }
+.stat-tile span { display: block; font-size: var(--fs-xs); color: var(--ink-3); }
+.stat-tile b { display: block; margin-top: 2px; font: 600 var(--fs-lg)/1.25 var(--serif); white-space: nowrap; font-variant-numeric: lining-nums tabular-nums; }
+.stat-tile b .updating { font: 400 var(--fs-xs) var(--font); }
 .stat-list { margin: 0; }
 .stat-list div { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: var(--fs-sm); }
 .stat-list div:last-child { border-bottom: 0; }
 .stat-list dt { color: var(--ink-3); }
 .stat-list dd { margin: 0; text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
-.chart-box { position: relative; height: 200px; }
-.chart-note { font-size: var(--fs-xs); }
+.chart-box { position: relative; height: 200px; border: 1px solid var(--line-strong); background: var(--surface); padding: 6px 4px 2px 2px; }
+.chart-note { font: italic var(--fs-sm) var(--serif); }
 .inspector-body[aria-busy=true] #transect-detail { pointer-events: none; }
 .inspector-body[aria-busy=true] .chart-box { opacity: .5; }
-.chart-box { border: 1px solid var(--line); background: var(--surface); padding: 6px 4px 2px 2px; }
-.empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; padding: 12px; text-align: center; font-size: var(--fs-sm); color: var(--warn-ink); border: 1px dashed var(--line-strong); background: var(--surface-2); }
+.empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; padding: 12px; text-align: center; font: italic var(--fs-md) var(--serif); color: var(--warn-ink); border: 1px dashed var(--line-strong); background: var(--surface-2); }
 
 /* thẻ mở: các nút bên phải bản đồ lùi sang trái */
 .map-wrap.inspecting .leaflet-top.leaflet-right,
 .map-wrap.inspecting .leaflet-bottom.leaflet-right { right: var(--inspector-w); }
 
-/* ================= Chú giải ================= */
+/* ================= Chú giải: khung kép mảnh như bản đồ in ================= */
 .map-legend {
-    position: absolute; z-index: 800; left: 10px; bottom: calc(var(--timeline-h) + 28px);
-    width: 216px; background: var(--float); color: var(--ink);
-    border: 1px solid var(--float-line); border-radius: var(--r-lg); box-shadow: var(--float-shadow);
+    position: absolute; z-index: 800; right: 12px; bottom: calc(var(--timeline-h) + var(--grat-b) + 100px);
+    width: 224px; background: var(--float); color: var(--ink);
+    border: 1px solid var(--ink); box-shadow: inset 0 0 0 3px var(--float), inset 0 0 0 4px var(--ink);
     font-size: var(--fs-sm);
 }
+.map-legend summary { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; font: italic 600 var(--fs-lg) var(--serif); color: var(--ink); cursor: pointer; list-style: none; }
 .map-legend summary:hover { background: var(--surface-2); }
-.map-legend summary { display: flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px; font-size: var(--fs-xs); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); cursor: pointer; list-style: none; }
 .map-legend summary::-webkit-details-marker { display: none; }
 .map-legend summary::after { content: ''; width: 6px; height: 6px; margin-left: auto; border: solid var(--ink-3); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); transition: transform .12s var(--ease); }
 .map-legend[open] summary::after { transform: rotate(-135deg); }
-.map-legend summary:focus-visible { outline-offset: -2px; }
-.legend-body { padding: 0 10px 8px; border-top: 1px solid var(--line); }
-.legend-body h3 { margin: 8px 0 4px; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-3); }
+.map-legend summary:focus-visible { outline-offset: -5px; }
+.legend-body { margin: 0 4px; padding: 0 10px 12px; border-top: 1px solid var(--line-strong); }
+.legend-body h3 { margin: 10px 0 4px; font: italic 400 var(--fs-sm) var(--serif); color: var(--ink-3); }
 .legend-item { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
-.legend-body .legend-swatch { width: 22px; height: 4px; border-radius: 0; }
+.legend-body .legend-swatch { width: 22px; height: 4px; }
 .legend-body .dot { margin: 0 8px 0 5px; }
 .aoi-key { width: 22px; height: 0; border-top: 2px dashed var(--ink-2); flex: none; }
 
-/* ================= Thanh thời gian ================= */
+/* ================= Thước thời gian: thang chia năm, nền giấy ================= */
 .timeline {
     position: absolute; z-index: 850; left: 0; right: 0; bottom: 0; height: var(--timeline-h);
     display: flex; align-items: stretch; gap: 0;
-    background: var(--bar); color: var(--bar-ink); border-top: 1px solid #000;
+    background: var(--surface); color: var(--ink); border-top: 1px solid var(--ink);
 }
-.timeline-head { display: flex; flex-direction: column; justify-content: center; gap: 4px; flex: none; width: 176px; padding: 0 12px; border-right: 1px solid var(--bar-line); }
-.timeline-title { white-space: nowrap; font-size: var(--fs-xs); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--bar-ink-2); }
+.timeline-head { display: flex; flex-direction: column; justify-content: center; gap: 5px; flex: none; width: 184px; padding: 0 16px; border-right: 1px solid var(--line-strong); }
+.timeline-title { white-space: nowrap; font: italic 600 var(--fs-md) var(--serif); color: var(--ink); }
 .timeline-play {
-    display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; height: 24px; padding: 0 8px;
-    font: 500 var(--fs-sm) var(--font); color: var(--bar-ink); background: var(--bar-2); border: 1px solid var(--bar-line); border-radius: var(--r); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; height: 24px; padding: 0 9px;
+    font: 500 var(--fs-sm) var(--font); color: var(--ink); background: var(--surface); border: 1px solid var(--control-line); cursor: pointer;
 }
-.timeline-play:hover:not(:disabled) { border-color: var(--bar-mark); }
-.timeline-play:disabled { opacity: .45; cursor: default; }
-.timeline-play svg { width: 12px; height: 12px; fill: currentColor; stroke: none; }
+.timeline-play:hover:not(:disabled) { background: var(--surface-3); }
+.timeline-play:disabled { opacity: .5; cursor: default; }
+.timeline-play svg { width: 11px; height: 11px; fill: currentColor; stroke: none; }
 .timeline-play .ico-stop, .timeline-play[aria-pressed=true] .ico-play { display: none; }
 .timeline-play[aria-pressed=true] .ico-stop { display: block; }
-.timeline-ticks { flex: 1; display: flex; margin: 0; padding: 0; list-style: none; min-width: 0; overflow-x: auto; scrollbar-width: thin; }
+.timeline-ticks { position: relative; flex: 1; display: flex; margin: 0; padding: 0; list-style: none; min-width: 0; overflow-x: auto; scrollbar-width: thin; }
 .timeline-ticks li { flex: 1 0 56px; display: flex; }
 .tick {
     position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-    padding: 0; font: 500 var(--fs-sm) var(--font); font-variant-numeric: tabular-nums; color: var(--bar-ink);
-    background: none; border: 0; border-left: 1px solid var(--bar-line); cursor: pointer;
+    padding: 0; font: 500 var(--fs-md) var(--font); font-variant-numeric: tabular-nums; color: var(--ink);
+    background: none; border: 0; border-left: 1px solid var(--line-strong); cursor: pointer;
 }
-.tick:hover { background: var(--bar-2); }
-.tick-mark { display: block; width: 70%; max-width: 44px; height: 4px; background: var(--tick-color, transparent); box-shadow: inset 0 0 0 1px var(--bar-line); }
+/* vạch chia nhỏ giữa hai mốc, như thang tỉ lệ */
+.tick::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 25%); opacity: .8; }
+.tick:hover { background: var(--surface-2); }
+.tick-mark { display: block; width: 70%; max-width: 44px; height: 4px; background: var(--tick-color, transparent); box-shadow: inset 0 0 0 1px var(--line-strong); }
 .tick.is-on .tick-mark { box-shadow: none; }
-.tick.is-on { background: var(--bar-2); font-weight: 650; }
-.tick.is-empty { color: #6f8798; cursor: default; }
-.tick.is-empty .tick-mark { background: repeating-linear-gradient(90deg, var(--bar-line) 0 3px, transparent 3px 6px); box-shadow: none; }
-.tick.is-on::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--bar-ink); }
-.timeline-ticks { position: relative; }
-.timeline-playhead { position: absolute; left: 0; bottom: 0; z-index: 1; height: 3px; width: 56px; background: var(--bar-mark); pointer-events: none; opacity: 0; }
+.tick.is-on { background: var(--surface-2); font-weight: 600; }
+.tick.is-empty { color: var(--ink-3); cursor: default; font-style: italic; }
+.tick.is-empty .tick-mark { background: repeating-linear-gradient(90deg, var(--line-strong) 0 3px, transparent 3px 6px); box-shadow: none; }
+.tick.is-on::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--ink); }
+.timeline-playhead { position: absolute; left: 0; bottom: 0; z-index: 1; height: 3px; width: 56px; background: var(--mark); pointer-events: none; opacity: 0; }
 .timeline-playhead.is-active { opacity: 1; }
-.tick:focus-visible, .timeline-play:focus-visible { outline: 2px solid #f5f5f1; outline-offset: -2px; }
+.tick:focus-visible, .timeline-play:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 
 /* ================= Điện thoại ================= */
+@media (max-width: 720px) {
+    :root { --grat-l: 0px; --grat-b: 0px; }
+    .graticule, .north { display: none; }
+}
 @media (max-width: 640px) {
     :root { --timeline-h: 56px; }
-    .timeline-head { width: auto; flex-direction: row; align-items: center; padding: 0 8px; }
+    .timeline-head { width: auto; flex-direction: row; align-items: center; padding: 0 10px; }
     .timeline-title { display: none; }
     .timeline-play { height: 32px; }
     .timeline-ticks li { flex-basis: 52px; }
-    /* thẻ chi tiết thành bottom sheet nằm trên thanh thời gian và đè lên bảng điều khiển */
+    /* thẻ chi tiết thành bottom sheet nằm trên thước thời gian và đè lên bảng điều khiển */
     .inspector {
         left: 0; right: 0; top: auto; bottom: var(--timeline-h); width: auto; max-height: 46dvh;
-        z-index: 1250; border-left: 0; border-top: 1px solid var(--line-strong); box-shadow: 0 -4px 14px rgba(0, 0, 0, .25);
+        z-index: 1250; border-left: 0; border-top: 1px solid var(--ink); box-shadow: 0 -4px 14px rgba(31, 28, 23, .22);
         animation: sheet-in .18s var(--ease);
     }
     .map-wrap:has(#timeline[hidden]) .inspector { bottom: 0; }
     @keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }
-    .inspector::before { content: ''; position: absolute; z-index: 1; left: 50%; top: 5px; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--line-strong); }
-    .inspector-head { padding-top: 16px; }
+    .inspector::before { content: ''; position: absolute; z-index: 1; left: 50%; top: 5px; width: 36px; height: 3px; margin-left: -18px; background: var(--line-strong); }
+    .inspector-head { padding-top: 16px; padding-left: 16px; }
+    .inspector-head::after { left: 16px; }
+    .inspector-body { padding: 12px 16px 16px; }
     .map-wrap.inspecting .leaflet-top.leaflet-right,
     .map-wrap.inspecting .leaflet-bottom.leaflet-right { right: 0; }
-    .map-legend { left: 8px; bottom: calc(var(--timeline-h) + 26px); width: 200px; }
+    .map-legend { left: 8px; right: auto; bottom: calc(var(--timeline-h) + 26px); width: 204px; }
     .map-wrap.inspecting .map-legend { display: none; }
+    .leaflet-left .leaflet-control, .leaflet-control-scale { margin-left: 8px; }
     .leaflet-control.coords { display: none; }
     .leaflet-control-attribution { max-width: 60vw; }
 }
@@ -212,21 +244,21 @@
 }
 
 /* ================= Thanh công cụ nổi ================= */
-.float-toolbar { display: grid; gap: 6px; }
-.tool-group { display: grid; background: var(--float); border: 1px solid var(--float-line); border-radius: var(--r); box-shadow: var(--float-shadow); }
+.float-toolbar { display: grid; gap: 8px; }
+.tool-group { display: grid; background: var(--float); border: 1px solid var(--float-line); box-shadow: var(--float-shadow); }
 .tool-btn {
     display: grid; place-items: center; width: 32px; height: 32px; padding: 0; color: var(--ink);
-    background: none; border: 0; border-bottom: 1px solid var(--line); cursor: pointer;
+    background: none; border: 0; border-bottom: 1px solid var(--line-strong); cursor: pointer;
 }
 .tool-btn:last-child { border-bottom: 0; }
 .tool-btn:hover { background: var(--surface-3); }
-.tool-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.tool-btn[aria-pressed=true] { color: #fff; background: var(--accent); box-shadow: inset 3px 0 0 var(--mark); }
+.tool-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tool-btn[aria-pressed=true] { color: var(--float); background: var(--ink); box-shadow: inset 0 -2px 0 var(--mark); }
 .tool-btn:focus-visible { outline-offset: -2px; }
 .measure-readout {
     position: absolute; z-index: 820; left: 50%; top: 10px; transform: translateX(-50%); max-width: calc(100% - 120px);
     padding: 5px 12px; font: 500 var(--fs-sm) var(--mono); font-variant-numeric: tabular-nums; color: var(--ink);
-    background: var(--float); border: 1px solid var(--float-line); border-left: 3px solid var(--mark); border-radius: var(--r); box-shadow: var(--float-shadow);
+    background: var(--float); border: 1px solid var(--float-line); border-left: 3px solid var(--mark); box-shadow: var(--float-shadow);
 }
 /* khi đo: lớp vector không bắt chuột để nhấp không mở thẻ transect */
 .map-wrap.measuring .leaflet-interactive { pointer-events: none !important; }
@@ -241,7 +273,7 @@
 .select-ring { width: 0 !important; height: 0 !important; margin: 0 !important; background: none; border: 0; }
 .select-ring b {
     position: absolute; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid var(--mark); border-radius: 50%;
-    background: rgba(233, 75, 53, .1); transform: translate(-50%, -50%); box-sizing: border-box;
+    background: rgba(224, 74, 51, .1); transform: translate(-50%, -50%); box-sizing: border-box;
 }
 .select-ring i { display: none; }
 @media (prefers-reduced-motion: no-preference) { .select-ring i { display: block; } }
@@ -249,7 +281,7 @@
 /* ================= Trạng thái tải, rỗng, lỗi trong thẻ chi tiết ================= */
 .state-block {
     display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; margin: 0 0 10px; padding: 12px;
-    border: 1px solid var(--line); background: var(--surface-2); font-size: var(--fs-sm); color: var(--ink-2);
+    border: 1px solid var(--line-strong); background: var(--surface-2); font-size: var(--fs-sm); color: var(--ink-2);
 }
 .state-block svg { width: 18px; height: 18px; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .state-block strong { display: block; color: var(--ink); font-weight: 600; }
@@ -257,17 +289,16 @@
 .state-block.is-error strong { color: var(--error); }
 .state-block .btn { margin-top: 8px; }
 .detail-skeleton { display: grid; gap: 10px; }
-.detail-skeleton i { display: block; height: 52px; border-radius: var(--r); background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%) 0 0 / 200% 100%; animation: skeleton-sweep 1.4s linear infinite; }
+.detail-skeleton i { display: block; height: 52px; background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%) 0 0 / 200% 100%; animation: skeleton-sweep 1.4s linear infinite; }
 .detail-skeleton i:nth-child(n + 2) { height: 14px; }
 .detail-skeleton i:nth-child(3) { width: 72%; }
 .detail-skeleton i:nth-child(4) { width: 86%; }
 
 /* ================= Máy tính bảng ================= */
 @media (max-width: 1024px) and (min-width: 721px) {
-    :root { --panel-w: 296px; --inspector-w: 316px; }
-    .map-legend { width: 196px; }
-    .timeline-head { width: 150px; }
-    .map-wrap.inspecting .map-legend { display: none; }
-    .stat-tile { padding: 8px 8px; }
-    .stat-tile b { font-size: var(--fs-md); }
+    :root { --panel-w: 304px; --inspector-w: 324px; }
+    .map-legend { width: 204px; }
+    .timeline-head { width: 150px; padding: 0 12px; }
+    .map-wrap.inspecting .map-legend, .map-wrap.inspecting .north { display: none; }
+    .stat-tile b { font-size: var(--fs-lg); }
 }
