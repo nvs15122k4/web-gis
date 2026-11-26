@@ -46,7 +46,11 @@ class MapController extends Controller
 
     public function admin(): View
     {
-        return view('admin.index');
+        return view('admin.index', [
+            'geoserver' => config('services.geoserver'),
+            'vietmapKey' => config('services.vietmap.key'),
+            'years' => ['all' => [], 'available' => []],
+        ]);
     }
 
     /** Hướng dẫn sử dụng: mọi người dùng xem được. */
