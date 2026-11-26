@@ -80,6 +80,7 @@ async function loadYearly(body) {
     let stats;
     try {
         stats = await api.yearlyStats();
+        if (!Array.isArray(stats)) throw new TypeError('yearly-stats không phải mảng');
     } catch {
         body.querySelector('#yearly-table').innerHTML = `<p class="updating">Thống kê theo năm: ${UPDATING.toLowerCase()}.</p>`;
         return;
