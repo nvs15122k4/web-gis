@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Shoreline;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -19,15 +18,10 @@ use Illuminate\Support\Facades\DB;
  *   reference.json  properties: event_date, description, source, danger_level?, length_m?, location?
  *                      (danger_level: dac_biet_nguy_hiem | nguy_hiem | binh_thuong — theo QĐ 01/2011/QĐ-TTg)
  * File nào không có thì bỏ qua.
- *
- * Với --alt=<thư mục> còn nạp thêm hai bản dữ liệu đối chứng độc lập (không đụng bản chính), cũng bằng UPSERT:
- *   <alt>/{s2c1,landsat}/shoreline/<năm>_mndwi.json   đường bờ (thường ở EPSG:32648, đổi sang 4326 khi nạp)
- *   <dir>/alt_transects.json   properties: transect_code, {s2c1,landsat}_{lrr,class,diff}
- *   <dir>/alt_compare.json     {s2c1,landsat}: scenes_used{năm: số cảnh}, low_confidence_years[]
  */
 class ImportPipelineOutput extends Command
 {
-    protected $signature = 'webgis:import {dir : Thư mục chứa output GeoJSON của pipeline} {--dry-run : Chỉ kiểm tra, không ghi} {--alt= : Thư mục dữ liệu đối chứng (chứa s2c1/shoreline và landsat/shoreline), nạp kèm bản đối chứng} {--prune : Xoá transect không còn trong output mới (mặc định giữ lại)}';
+    protected $signature = 'webgis:import {dir : Thư mục chứa output GeoJSON của pipeline} {--dry-run : Chỉ kiểm tra, không ghi} {--prune : Xoá transect không còn trong output mới (mặc định giữ lại)}';
 
     protected $description = 'Nạp output pipeline (GeoJSON) vào PostGIS bằng UPSERT';
 
@@ -36,13 +30,6 @@ class ImportPipelineOutput extends Command
         $dir = rtrim($this->argument('dir'), '/');
         if (! is_dir($dir)) {
             $this->error("Không tìm thấy thư mục: {$dir}");
-
-            return self::FAILURE;
-        }
-
-        $alt = $this->option('alt');
-        if ($alt !== null && ! is_dir($alt)) {
-            $this->error("Không tìm thấy thư mục dữ liệu đối chứng: {$alt}");
 
             return self::FAILURE;
         }
@@ -60,11 +47,6 @@ class ImportPipelineOutput extends Command
             ];
             if ($this->option('prune')) {
                 $counts['pruned'] = $this->pruneTransects($pg, $dir);
-            }
-            if ($alt !== null) {
-                $counts['alt_shorelines'] = $this->altShorelines($pg, rtrim($alt, '/'));
-                $counts['alt_lrr'] = $this->altLrr($pg, $dir);
-                $counts['alt_years'] = $this->altYears($pg, $dir);
             }
             $this->option('dry-run') ? $pg->rollBack() : $pg->commit();
         } catch (\Throwable $e) {
@@ -125,11 +107,11 @@ class ImportPipelineOutput extends Command
         foreach ($this->features($dir, 'shorelines') as $f) {
             $p = $f['properties'];
             $pg->statement(
-                'INSERT INTO shorelines (year, water_index, source, source_image_date, geom)
-                 VALUES (?, ?, ?, ?, ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)))
-                 ON CONFLICT (year, water_index, source) DO UPDATE
+                'INSERT INTO shorelines (year, water_index, source_image_date, geom)
+                 VALUES (?, ?, ?, ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)))
+                 ON CONFLICT (year, water_index) DO UPDATE
                  SET source_image_date = EXCLUDED.source_image_date, geom = EXCLUDED.geom',
-                [$p['year'], $p['water_index'], Shoreline::MAIN, $p['source_image_date'] ?? null, json_encode($f['geometry'])]
+                [$p['year'], $p['water_index'], $p['source_image_date'] ?? null, json_encode($f['geometry'])]
             );
             $n++;
         }
@@ -139,7 +121,7 @@ class ImportPipelineOutput extends Command
 
     /**
      * --prune: xoá transect có trong DB mà output mới không còn (vd. pipeline dựng lại transect từ đường bờ mới và bỏ bớt
-     * một transect). Khoá ngoại ON DELETE CASCADE nên khoảng cách, thống kê và LRR đối chứng của nó đi theo.
+     * một transect). Khoá ngoại ON DELETE CASCADE nên khoảng cách và thống kê của nó đi theo.
      * Không bao giờ xoá khi output không có transect nào: file thiếu/rỗng không được coi là "xoá hết".
      */
     private function pruneTransects($pg, string $dir): int
@@ -193,100 +175,6 @@ class ImportPipelineOutput extends Command
                 );
             }
             $n++;
-        }
-
-        return $n;
-    }
-
-    /** Chỉ số nước của bản đối chứng được nạp: cùng chỉ số với bản chính đang hiển thị (MNDWI). */
-    private const ALT_INDEX = 'mndwi';
-
-    /** EPSG của GeoJSON (đọc từ khối crs, mặc định 4326 theo RFC 7946). */
-    private function epsg(array $json): int
-    {
-        return preg_match('/EPSG:+(\d+)/', $json['crs']['properties']['name'] ?? '', $m) ? (int) $m[1] : 4326;
-    }
-
-    /** Đường bờ đối chứng: mỗi file <năm>_mndwi.json một feature, đổi hệ toạ độ về 4326, ghi vào shorelines với source tương ứng. */
-    private function altShorelines($pg, string $alt): int
-    {
-        $n = 0;
-        foreach (array_keys(Shoreline::ALT_SOURCES) as $source) {
-            $files = glob("{$alt}/{$source}/shoreline/*_".self::ALT_INDEX.'.json') ?: [];
-            sort($files);
-            // Ưu tiên đường bờ do QGIS giải đoán (qgis_shoreline/<năm>.json) nếu có: cùng phương pháp với bản chính nên so sánh
-            // chỉ còn khác nguồn ảnh. Năm nào chưa có file QGIS thì dùng bản Python như trước.
-            $files = array_map(function (string $f) use ($alt, $source): string {
-                $q = "{$alt}/{$source}/qgis_shoreline/".strstr(basename($f), '_', true).'.json';
-
-                return is_file($q) ? $q : $f;
-            }, $files);
-            foreach ($files as $file) {
-                $json = $this->readJson($file);
-                $features = $json['features'] ?? [];
-                if (count($features) !== 1) {
-                    throw new \RuntimeException(basename($file).': cần đúng 1 feature đường bờ, có '.count($features));
-                }
-                $p = $features[0]['properties'] ?? [];
-                if (! isset($p['year']) || ! in_array($p['source'] ?? $source, [$source, "qgis_{$source}"], true)) {
-                    throw new \RuntimeException(basename($file).": thiếu năm hoặc source không khớp '{$source}'");
-                }
-                $pg->statement(
-                    'INSERT INTO shorelines (year, water_index, source, source_image_date, geom)
-                     VALUES (?, ?, ?, NULL, ST_Multi(ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), ?), 4326)))
-                     ON CONFLICT (year, water_index, source) DO UPDATE SET geom = EXCLUDED.geom',
-                    [(int) $p['year'], strtoupper(self::ALT_INDEX), $source, json_encode($features[0]['geometry']), $this->epsg($json)]
-                );
-                $n++;
-            }
-        }
-
-        return $n;
-    }
-
-    /** LRR đối chứng theo transect (khớp theo transect_code); transect chưa có trong CSDL thì bỏ qua, không tạo mới. */
-    private function altLrr($pg, string $dir): int
-    {
-        $ids = $pg->table('transects')->pluck('id', 'transect_code');
-        $n = 0;
-        foreach ($this->features($dir, 'alt_transects') as $f) {
-            $p = $f['properties'];
-            $tid = $ids[$p['transect_code'] ?? null] ?? null;
-            if ($tid === null) {
-                continue;
-            }
-            foreach (array_keys(Shoreline::ALT_SOURCES) as $source) {
-                $pg->statement(
-                    'INSERT INTO transect_alt_lrr (transect_id, source, lrr_m_per_year, change_class, diff_vs_main) VALUES (?, ?, ?, ?, ?)
-                     ON CONFLICT (transect_id, source) DO UPDATE
-                     SET lrr_m_per_year = EXCLUDED.lrr_m_per_year, change_class = EXCLUDED.change_class, diff_vs_main = EXCLUDED.diff_vs_main',
-                    [$tid, $source, $p["{$source}_lrr"] ?? null, $p["{$source}_class"] ?? null, $p["{$source}_diff"] ?? null]
-                );
-                $n++;
-            }
-        }
-
-        return $n;
-    }
-
-    /** Số cảnh ảnh dùng được và cờ độ tin cậy thấp theo năm của từng nguồn đối chứng. */
-    private function altYears($pg, string $dir): int
-    {
-        $compare = $this->readJson("{$dir}/alt_compare.json");
-        $n = 0;
-        foreach (array_keys(Shoreline::ALT_SOURCES) as $source) {
-            $scenes = $compare[$source]['scenes_used'] ?? [];
-            $low = array_map('intval', $compare[$source]['low_confidence_years'] ?? []);
-            $years = array_unique([...array_map('intval', array_keys($scenes)), ...$low]);
-            sort($years);
-            foreach ($years as $year) {
-                $pg->statement(
-                    'INSERT INTO alt_source_years (source, year, scenes_used, low_confidence) VALUES (?, ?, ?, ?)
-                     ON CONFLICT (source, year) DO UPDATE SET scenes_used = EXCLUDED.scenes_used, low_confidence = EXCLUDED.low_confidence',
-                    [$source, $year, $scenes[(string) $year] ?? null, in_array($year, $low, true) ? 'true' : 'false']
-                );
-                $n++;
-            }
         }
 
         return $n;
