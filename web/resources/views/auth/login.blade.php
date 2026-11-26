@@ -13,6 +13,11 @@
         <p class="eyebrow">WebGIS Sông Hậu</p>
         <p class="auth-claim">Theo dõi từng đoạn bờ, từng năm.</p>
         <p class="auth-sub">Khu vực quản trị dành cho người phụ trách số liệu và báo cáo công việc.</p>
+        <dl class="auth-facts">
+            <div><dt>Sông</dt><dd>Hậu</dd></div>
+            <div><dt>Ảnh</dt><dd>S-2</dd></div>
+            <div><dt>Giai đoạn</dt><dd>2018–2026</dd></div>
+        </dl>
     </aside>
     <main class="admin" id="main-content" tabindex="-1">
         <div class="admin-card">
