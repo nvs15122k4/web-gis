@@ -10,7 +10,7 @@ import s5_stats as S  # noqa: E402
 
 # Giá trị chốt từ tính tay: sqrt(5² + 6² + U_classify²)
 @pytest.mark.parametrize("year,expected", [
-    (2018, 18.845),   # sqrt(25+36+17.15²)
+    (2018, 18.46),   # sqrt(25+36+16.73²)
     (2019, 23.063),   # năm không có ground truth: U_CLASSIFY_DEFAULT = 21.7
     (2020, 23.063),
     (2021, 23.063),
