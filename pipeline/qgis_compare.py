@@ -104,7 +104,9 @@ def main():
     shore, short, width = {}, {"main": "Bờ 2026 — bản chính (S2 PC)", "s2c1": "Bờ 2026 — Sentinel-2 C1", "landsat": "Bờ 2026 — Landsat 8/9"}, \
         {"main": 0.4, "s2c1": 1.0, "landsat": 1.8}   # nét mảnh nằm trên nét dày để thấy cả ba khi chúng trùng nhau
     for k, (lab, col) in SRC.items():
-        f = (Q.DATA / "shoreline" / "2026.json") if k == "main" else (Q.DATA / "alt" / k / "shoreline" / "2026_mndwi.json")
+        # bản đối chứng: ưu tiên đường bờ QGIS (cùng phương pháp với bản chính, qgis_interpret_alt.py), không có thì dùng bản Python
+        qf = Q.DATA / "alt" / k / "qgis_shoreline" / "2026.json"
+        f = (Q.DATA / "shoreline" / "2026.json") if k == "main" else (qf if qf.exists() else Q.DATA / "alt" / k / "shoreline" / "2026_mndwi.json")
         lyr = Q.vector(f, short[k]); lyr.renderer().setSymbol(Q.line(col, width[k])); shore[k] = lyr
     layers = [img, xa, *lrr.values(), *diff.values(), *shore.values()]
     for l in layers:
@@ -116,7 +118,7 @@ def main():
     tr_ext = lrr["main"].extent(); tr_ext.grow(300)
     maps = [
         three_panel(project, "so_sanh_lrr_3_nguon", "So sánh tốc độ biến động bờ (LRR) giữa ba nguồn dữ liệu, 2018–2026",
-                    "Cùng bộ 266 transect, cùng thủ tục khử đột biến/hồi quy (bước 5); khác nguồn ảnh, bản xử lý và cảm biến",
+                    "Cùng bộ 266 transect, cùng đường bờ giải đoán bằng QGIS, cùng thủ tục khử đột biến/hồi quy (bước 5); khác nguồn ảnh, bản xử lý và cảm biến",
                     [("Bản chính — Sentinel-2 L2A (PC), 9 năm", [lrr["main"], xa, img]),
                      ("Đối chứng 1 — Sentinel-2 C1 (AWS), 6 năm tin cậy", [lrr["s2c1"], xa, img]),
                      ("Đối chứng 2 — Landsat 8/9 (30 m), 9 năm", [lrr["landsat"], xa, img])],
