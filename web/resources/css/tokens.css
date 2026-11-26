@@ -1,8 +1,8 @@
 /*
  * Design tokens — WebGIS Sông Hậu.
- * Ngôn ngữ thiết kế: công cụ bản đồ chuyên dụng (Global Nature Watch, Global Fishing Watch, ArcGIS Dashboards):
- * thanh tiêu đề tối mỏng, bảng điều khiển phẳng nền sáng, viền 1px, góc vuông 2–4px, chữ Inter cỡ nhỏ,
- * một màu nhấn xanh ngọc cho trạng thái đang chọn. Màu dữ liệu (--c-*) lấy từ colors.css, không dùng cho chrome.
+ * Design System "Transect": Cool Grey / Paper / Ink, nhấn Cobalt, điểm nhấn Vermilion (chỉ dùng tiết chế).
+ * Ngôn ngữ Point–Line–Plane: mặt phẳng phẳng, đường phân cách mảnh 1px, góc gần như vuông, không đổ bóng nặng.
+ * Màu dữ liệu (--c-*) theo quy ước bản đồ trong colors.css, không áp màu thương hiệu lên lớp dữ liệu.
  */
 :root {
     color-scheme: light;
@@ -20,32 +20,34 @@
     --fs-kpi: 28px;
 
     /* bề mặt (sáng) */
-    --canvas: #e9edf0;           /* nền trang nội dung */
-    --surface: #ffffff;          /* bảng, thẻ */
-    --surface-2: #f4f6f8;        /* nền phụ, rail, hàng chẵn */
-    --surface-3: #e9edf1;        /* hover */
-    --line: #d9dfe5;             /* viền mảnh */
-    --line-strong: #b5bfc9;
-    --control-line: #7b8794;     /* viền ô nhập, công tắc: >= 3:1 (WCAG 1.4.11) */
+    --canvas: #e8e9e7;           /* nền trang nội dung */
+    --surface: #f5f5f1;          /* bảng, thẻ */
+    --surface-2: #ecece8;        /* nền phụ, rail, hàng chẵn */
+    --surface-3: #e2e3df;        /* hover */
+    --line: #d2d3cf;             /* viền mảnh */
+    --line-strong: #a9aba6;
+    --control-line: #77797a;     /* viền ô nhập, công tắc: >= 3:1 (WCAG 1.4.11) */
 
     /* chữ */
-    --ink: #14212b;
-    --ink-2: #3a4854;
-    --ink-3: #566472;            /* >= 4.5:1 trên --surface và --surface-2 */
+    --ink: #17191b;
+    --ink-2: #3b3e41;
+    --ink-3: #585b5d;            /* >= 4.5:1 trên --surface và --surface-2 */
 
     /* thanh tiêu đề tối */
-    --bar: #0d2230;
-    --bar-2: #153245;
-    --bar-line: #25465c;
-    --bar-ink: #eaf1f5;
-    --bar-ink-2: #9fb6c4;
+    --bar: #17191b;
+    --bar-2: #26292c;
+    --bar-line: #3a3e42;
+    --bar-ink: #f5f5f1;
+    --bar-ink-2: #aeb1b3;
 
     /* màu nhấn */
-    --accent: #0a6f86;           /* chữ trắng trên accent đạt ~5.9:1 */
-    --accent-hover: #08596c;
-    --accent-soft: #dcedf1;
-    --accent-ink: #07525f;       /* chữ accent trên nền sáng */
-    --focus: #1769c2;
+    --accent: #2855b8;           /* Cobalt: chữ trắng trên accent đạt ~6.7:1 */
+    --mark: #e94b35;             /* Vermilion: điểm nhấn (gạch chân mục đang chọn, đo đạc), không dùng làm chữ nhỏ */
+    --bar-mark: #e94b35;
+    --accent-hover: #1f4496;
+    --accent-soft: #dde4f4;
+    --accent-ink: #1f4496;       /* chữ accent trên nền sáng */
+    --focus: #2855b8;
 
     /* trạng thái */
     --warn-bg: #fdf3e1;
@@ -57,18 +59,18 @@
     --error-bg: #fdeceb;
 
     /* nền bản đồ & bề mặt nổi trên bản đồ */
-    --map-sea: #bcd8e8;
+    --map-sea: #c9d9e3;
     --float: #ffffff;
-    --float-line: rgba(20, 33, 43, .22);
-    --float-shadow: 0 1px 2px rgba(10, 25, 35, .18), 0 2px 10px rgba(10, 25, 35, .14);
+    --float-line: rgba(23, 25, 27, .28);
+    --float-shadow: 0 1px 0 rgba(23, 25, 27, .12), 0 1px 6px rgba(23, 25, 27, .12);
 
     /* biểu đồ */
-    --chart-line: #0a6f86;
-    --chart-grid: #e1e6eb;
+    --chart-line: #2855b8;
+    --chart-grid: #dcdcd8;
 
     /* hình học */
-    --r: 3px;
-    --r-lg: 4px;
+    --r: 2px;
+    --r-lg: 2px;
     --appbar-h: 48px;
     --rail-w: 60px;
     --panel-w: 328px;
@@ -80,24 +82,24 @@
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme='light']) {
         color-scheme: dark;
-        --canvas: #0b141b;
-        --surface: #121e27;
-        --surface-2: #17252f;
-        --surface-3: #20323f;
-        --line: #26394a;
-        --line-strong: #3a5266;
-        --control-line: #7c92a4;
-        --ink: #e6edf2;
-        --ink-2: #bccad5;
-        --ink-3: #93a6b5;
-        --bar: #08141c;
-        --bar-2: #0f212d;
-        --bar-line: #1f3646;
-        --accent: #2aa4bf;
-        --accent-hover: #4bb8d0;
-        --accent-soft: #14323d;
-        --accent-ink: #6ccbe0;
-        --focus: #62a8f5;
+        --canvas: #121314;
+        --surface: #1b1d1f;
+        --surface-2: #222527;
+        --surface-3: #2c3033;
+        --line: #34383b;
+        --line-strong: #50565a;
+        --control-line: #8b9094;
+        --ink: #ecece8;
+        --ink-2: #c4c6c4;
+        --ink-3: #9ea2a4;
+        --bar: #0c0d0e;
+        --bar-2: #1b1d1f;
+        --bar-line: #303437;
+        --accent: #6f93e6;
+        --accent-hover: #93adee;
+        --accent-soft: #1f2a47;
+        --accent-ink: #a9bff2;
+        --focus: #93adee;
         --warn-bg: #2b2210;
         --warn-line: #7a5a1c;
         --warn-ink: #f0cd8c;
@@ -105,10 +107,10 @@
         --ok-bg: #112a1b;
         --error: #ff9b92;
         --error-bg: #301613;
-        --float: #121e27;
+        --float: #1b1d1f;
         --float-line: rgba(0, 0, 0, .6);
         --float-shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 2px 12px rgba(0, 0, 0, .45);
-        --chart-line: #4bb8d0;
-        --chart-grid: #26394a;
+        --chart-line: #93adee;
+        --chart-grid: #34383b;
     }
 }
