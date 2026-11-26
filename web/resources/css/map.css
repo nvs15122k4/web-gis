@@ -100,10 +100,10 @@
 /* nhãn chủ quyền, địa danh vẽ trên bản đồ (luôn chữ tối trên nền sáng của bản đồ) */
 .sovereignty-label span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; text-align: center; font: 700 12px/1.2 var(--font); color: #7a0f14; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 5px #fff; pointer-events: none; }
 .sovereignty-label small { display: block; font-weight: 500; font-size: 10px; }
-.sovereignty-sea span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font: 600 italic 13px/1 var(--serif); letter-spacing: .3em; color: #2b5d7c; text-shadow: 0 0 3px #fff; pointer-events: none; }
+.sovereignty-sea span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font: 600 13px/1 var(--serif); letter-spacing: .3em; color: #2b5d7c; text-shadow: 0 0 3px #fff; pointer-events: none; }
 .vn-label span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; pointer-events: none; text-shadow: 0 0 3px #fff, 0 0 3px #fff; }
 .vn-label-province span { font: 600 11px/1 var(--font); color: #6b5a2e; }
-.vn-label-water span { font: italic 500 11.5px/1 var(--serif); color: #1f5a80; }
+.vn-label-water span { font: 500 11.5px/1 var(--serif); color: #1f5a80; }
 
 /* ================= Thẻ chi tiết transect (dock bên phải) ================= */
 .inspector {
@@ -132,10 +132,10 @@
 .stat-list dt { color: var(--ink-3); }
 .stat-list dd { margin: 0; text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
 .chart-box { position: relative; height: 200px; border: 1px solid var(--line-strong); background: var(--surface); padding: 6px 4px 2px 2px; }
-.chart-note { font: italic var(--fs-sm) var(--serif); }
+.chart-note { font: var(--fs-sm) var(--serif); }
 .inspector-body[aria-busy=true] #transect-detail { pointer-events: none; }
 .inspector-body[aria-busy=true] .chart-box { opacity: .5; }
-.empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; padding: 12px; text-align: center; font: italic var(--fs-md) var(--serif); color: var(--warn-ink); border: 1px dashed var(--line-strong); background: var(--surface-2); }
+.empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; padding: 12px; text-align: center; font: var(--fs-md) var(--serif); color: var(--warn-ink); border: 1px dashed var(--line-strong); background: var(--surface-2); }
 
 /* thẻ mở: các nút bên phải bản đồ lùi sang trái */
 .map-wrap.inspecting .leaflet-top.leaflet-right,
@@ -148,14 +148,14 @@
     border: 1px solid var(--ink); box-shadow: inset 0 0 0 3px var(--float), inset 0 0 0 4px var(--ink);
     font-size: var(--fs-sm);
 }
-.map-legend summary { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; font: italic 600 var(--fs-lg) var(--serif); color: var(--ink); cursor: pointer; list-style: none; }
+.map-legend summary { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; font: 600 var(--fs-lg) var(--serif); color: var(--ink); cursor: pointer; list-style: none; }
 .map-legend summary:hover { background: var(--surface-2); }
 .map-legend summary::-webkit-details-marker { display: none; }
 .map-legend summary::after { content: ''; width: 6px; height: 6px; margin-left: auto; border: solid var(--ink-3); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); transition: transform .12s var(--ease); }
 .map-legend[open] summary::after { transform: rotate(-135deg); }
 .map-legend summary:focus-visible { outline-offset: -5px; }
 .legend-body { margin: 0 4px; padding: 0 10px 12px; border-top: 1px solid var(--line-strong); }
-.legend-body h3 { margin: 10px 0 4px; font: italic 400 var(--fs-sm) var(--serif); color: var(--ink-3); }
+.legend-body h3 { margin: 10px 0 4px; font: 400 var(--fs-sm) var(--serif); color: var(--ink-3); }
 .legend-item { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
 .legend-body .legend-swatch { width: 22px; height: 4px; }
 .legend-body .dot { margin: 0 8px 0 5px; }
@@ -168,7 +168,7 @@
     background: var(--surface); color: var(--ink); border-top: 1px solid var(--ink);
 }
 .timeline-head { display: flex; flex-direction: column; justify-content: center; gap: 5px; flex: none; width: 184px; padding: 0 16px; border-right: 1px solid var(--line-strong); }
-.timeline-title { white-space: nowrap; font: italic 600 var(--fs-md) var(--serif); color: var(--ink); }
+.timeline-title { white-space: nowrap; font: 600 var(--fs-md) var(--serif); color: var(--ink); }
 .timeline-play {
     display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; height: 24px; padding: 0 9px;
     font: 500 var(--fs-sm) var(--font); color: var(--ink); background: var(--surface); border: 1px solid var(--control-line); cursor: pointer;
