@@ -6,5 +6,6 @@
             <span id="timeline-play-label">Phát</span>
         </button>
     </div>
+    <label class="timeline-slider"><span>Năm <b id="timeline-slider-year">—</b></span><input type="range" id="timeline-slider" min="0" max="0" step="1" value="0" aria-label="Chọn năm đường bờ"></label>
     <ol class="timeline-ticks" id="timeline-ticks"></ol>
 </div>
