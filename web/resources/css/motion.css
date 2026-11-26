@@ -20,6 +20,11 @@
 @keyframes panel-in-up { from { opacity: 0; transform: translateY(20px); } }
 @keyframes panel-out-down { to { opacity: 0; transform: translateY(20px); } }
 @keyframes drop-out { to { opacity: 0; transform: translateY(-4px); } }
+@keyframes ripple { from { transform: scale(0); opacity: .35; } to { transform: scale(1); opacity: 0; } }
+@keyframes toast-in { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+@keyframes toast-out { to { opacity: 0; transform: translateY(8px); } }
+@keyframes banner-in { from { opacity: 0; transform: translateY(-6px); } }
+@keyframes focus-pulse { from { outline-offset: 6px; outline-color: transparent; } }
 
 @media (prefers-reduced-motion: no-preference) {
     /* bảng nội dung trượt nhẹ khi đổi tab, danh sách hiện lần lượt */
@@ -85,6 +90,32 @@
     .btn:active:not(:disabled) { transform: translateY(1px); }
     .icon-btn, .topnav a, .topnav button, .search-results button, .attr-grid tbody tr, .tree-group > summary, .map-legend summary { transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
     .icon-btn:active { transform: scale(.94); }
+
+    /* ripple: vòng tròn lan từ điểm chạm (motion.js/initRipple gắn .ripple); nút phải cắt phần tràn */
+    .btn, .tool-btn, .icon-btn { position: relative; overflow: hidden; }
+    .ripple { position: absolute; border-radius: 50%; background: currentColor; pointer-events: none; transform: scale(0); animation: ripple 600ms var(--ease-out) forwards; }
+    .btn-primary { transition: background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease); }
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); }
+    .tool-btn { transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), transform var(--dur-1) var(--ease); }
+    .tool-btn:active { transform: scale(.92); }
+    .tool-btn svg, .icon-btn svg { transition: transform var(--dur-2) var(--ease-out); }
+    .tool-btn:hover svg, .icon-btn:hover svg { transform: scale(1.12); }
+
+    /* công tắc: nút trượt có độ nảy nhẹ khi nhấn */
+    .switch::after { transition: transform var(--dur-2) var(--ease-out), width var(--dur-1) var(--ease); }
+    .switch:active::after { width: 16px; }
+    .switch:checked:active::after { transform: translateX(10px); }
+
+    /* ô nhập và phím tab: vòng focus nở ra thay vì bật ngay */
+    :focus-visible { animation: focus-pulse var(--dur-2) var(--ease-out); }
+    input:focus, select:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 22%, transparent); }
+
+    /* thông báo: banner trạng thái trượt xuống, toast nổi lên rồi lùi xuống */
+    .banner:not([hidden]) { animation: banner-in var(--dur-3) var(--ease-out) both; }
+    .status:not(:empty) { animation: fade-in var(--dur-2) var(--ease-out) both; }
+    .toast { animation: toast-in var(--dur-2) var(--ease-out) both; }
+    .toast.is-closing { animation: toast-out var(--dur-2) var(--ease) forwards; }
+    .share-message:not(:empty) { animation: fade-in var(--dur-2) var(--ease-out) both; }
     .topnav a.active::after, .topnav a[aria-current=page]::after { animation: bar-grow var(--dur-3) var(--ease-out) both; }
 }
 
