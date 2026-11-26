@@ -9,3 +9,4 @@ data/crosscheck/*.tif
 data/alt/*/composite/
 data/alt/*/water/
 data/alt/jrc/*.tif
+data/alt/*/qgis/
