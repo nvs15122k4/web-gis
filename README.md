@@ -221,13 +221,13 @@ Hai CSDL, theo các migration trong `web/database/migrations/`.
 
 Trích từ `pipeline/output/*.json` (bản demo, sinh bởi pipeline).
 
-**Tổng quan** (`summary.json`): 266 transect, chỉ số nước đang dùng `mndwi`, 12 quan sát bị khử đột biến, 3 hotspot. Đường bờ chính do QGIS tự giải đoán từ ảnh (`config.SHORELINE_ENGINE = "qgis"`, `qgis_interpret.py`); bản Python cũ (contour dưới pixel) giữ ở `data/shoreline_python/` làm mốc đối chiếu.
+**Tổng quan** (`summary.json`): 266 transect, chỉ số nước đang dùng `mndwi`, 9 quan sát bị khử đột biến, 3 hotspot. Đường bờ chính do QGIS tự giải đoán từ ảnh (`config.SHORELINE_ENGINE = "qgis"`, `qgis_interpret.py`); bản Python cũ (contour dưới pixel) giữ ở `data/shoreline_python/` làm mốc đối chiếu.
 
 | Lớp biến động | Số transect |
 |---|---|
-| Bồi (`accretion`) | 72 |
-| Ổn định (`stable`) | 179 |
-| Lùi nhẹ (`mild_erosion`) | 11 |
+| Bồi (`accretion`) | 71 |
+| Ổn định (`stable`) | 181 |
+| Lùi nhẹ (`mild_erosion`) | 10 |
 | Lùi mạnh (`severe_erosion`) | 4 |
 
 Tiêu chí chốt trước khi chạy lại (không chỉnh theo kết quả): có ý nghĩa thống kê khi |LRR| > t(0,975; n − 2)·SE (n = 9 năm thì t = 2,365);
@@ -235,7 +235,7 @@ lùi mạnh khi có ý nghĩa, LRR ≤ −2 m/năm và khoảng cách giảm li�
 Trước đó dùng z = 1,96 và ngưỡng M − S = −1,804 m/năm (tính trên chính kết quả, hậu nghiệm): 124 transect có ý nghĩa, 3 lùi mạnh, 2 hotspot.
 Hotspot (`hotspots.json`, giai đoạn 2018–2026): 3 đoạn — T0020 (1 transect, LRR −2,68 m/năm), T0094 (1 transect, −2,67 m/năm), T0200–T0201 (2 transect, ~100 m, −3,09 m/năm).
 So với bản Python cũ (267 transect, 1 lùi mạnh, 1 hotspot T0094), số lùi mạnh tăng do đường bờ QGIS đi theo cạnh pixel 10 m còn Python nội suy dưới pixel, nên các transect sát ngưỡng −2 m/năm đổi nhóm; LRR hai bản tương quan r = 0,95 (`output/qgis_interpret.json`). Đây là sai khác phương pháp cỡ một pixel, không phải thay đổi thực địa.
-Độ bất định đường bờ `u_shoreline` (1σ, U_georef quy từ 12 m ở 95,5% về 6 m) theo năm: 17,00 m (2018), 19,98 m (2022), 21,47 m (các năm còn lại).
+Độ bất định đường bờ `u_shoreline` (1σ, U_georef quy từ 12 m ở 95,5% về 6 m) theo năm: 18,46 m (2018), 19,46 m (2022), 23,06 m (các năm còn lại; 2026: 23,05 m).
 
 **Đánh giá so với ground truth số hoá** (`evaluation.json`, 5 ô mẫu mỗi năm, 18.000 pixel/chỉ số). Giá trị F1 / IoU:
 
