@@ -31,23 +31,38 @@
    },
    "shoreline_error": {
     "ndwi": {
-     "n_transects": 58,
-     "mean_m": -4.22,
-     "mean_abs_m": 12.21,
-     "rmse_m": 25.54
+     "n_transects": 59,
+     "mean_m": -3.11,
+     "mean_abs_m": 11.44,
+     "rmse_m": 23.63
     },
     "mndwi": {
-     "n_transects": 58,
-     "mean_m": 1.58,
-     "mean_abs_m": 9.23,
-     "rmse_m": 15.1
+     "n_transects": 59,
+     "mean_m": 1.27,
+     "mean_abs_m": 9.72,
+     "rmse_m": 15.91
     },
     "awei": {
-     "n_transects": 58,
-     "mean_m": -60.26,
-     "mean_abs_m": 63.09,
-     "rmse_m": 123.05
+     "n_transects": 59,
+     "mean_m": -55.38,
+     "mean_abs_m": 58.65,
+     "rmse_m": 115.29
     }
+   },
+   "main_shoreline_error": {
+    "all": {
+     "n_transects": 59,
+     "mean_m": 3.69,
+     "mean_abs_m": 11.0,
+     "rmse_m": 16.73
+    },
+    "kept": {
+     "n_transects": 59,
+     "mean_m": 3.69,
+     "mean_abs_m": 11.0,
+     "rmse_m": 16.73
+    },
+    "n_excluded_by_despike": 0
    }
   },
   "2022": {
@@ -81,23 +96,38 @@
    },
    "shoreline_error": {
     "ndwi": {
-     "n_transects": 58,
-     "mean_m": -9.37,
-     "mean_abs_m": 14.28,
-     "rmse_m": 33.36
+     "n_transects": 59,
+     "mean_m": -10.32,
+     "mean_abs_m": 15.89,
+     "rmse_m": 35.51
     },
     "mndwi": {
-     "n_transects": 58,
-     "mean_m": 0.8,
-     "mean_abs_m": 11.38,
-     "rmse_m": 18.39
+     "n_transects": 59,
+     "mean_m": 0.74,
+     "mean_abs_m": 11.52,
+     "rmse_m": 18.15
     },
     "awei": {
-     "n_transects": 58,
-     "mean_m": -12.69,
-     "mean_abs_m": 15.6,
-     "rmse_m": 35.05
+     "n_transects": 59,
+     "mean_m": -13.13,
+     "mean_abs_m": 16.87,
+     "rmse_m": 37.28
     }
+   },
+   "main_shoreline_error": {
+    "all": {
+     "n_transects": 59,
+     "mean_m": 3.76,
+     "mean_abs_m": 12.41,
+     "rmse_m": 17.82
+    },
+    "kept": {
+     "n_transects": 59,
+     "mean_m": 3.76,
+     "mean_abs_m": 12.41,
+     "rmse_m": 17.82
+    },
+    "n_excluded_by_despike": 0
    }
   },
   "2026": {
@@ -132,22 +162,37 @@
    "shoreline_error": {
     "ndwi": {
      "n_transects": 59,
-     "mean_m": -4.12,
-     "mean_abs_m": 12.6,
-     "rmse_m": 25.43
+     "mean_m": -3.9,
+     "mean_abs_m": 12.61,
+     "rmse_m": 24.35
     },
     "mndwi": {
      "n_transects": 59,
-     "mean_m": 4.01,
-     "mean_abs_m": 13.45,
-     "rmse_m": 19.99
+     "mean_m": 3.85,
+     "mean_abs_m": 14.51,
+     "rmse_m": 21.3
     },
     "awei": {
      "n_transects": 59,
-     "mean_m": -8.25,
-     "mean_abs_m": 14.35,
-     "rmse_m": 29.53
+     "mean_m": -7.04,
+     "mean_abs_m": 13.66,
+     "rmse_m": 27.45
     }
+   },
+   "main_shoreline_error": {
+    "all": {
+     "n_transects": 59,
+     "mean_m": 5.99,
+     "mean_abs_m": 15.61,
+     "rmse_m": 21.69
+    },
+    "kept": {
+     "n_transects": 59,
+     "mean_m": 5.99,
+     "mean_abs_m": 15.61,
+     "rmse_m": 21.69
+    },
+    "n_excluded_by_despike": 0
    }
   }
  },
@@ -157,17 +202,18 @@
   "awei": 0.9457
  },
  "mean_rmse_m": {
-  "ndwi": 28.11,
-  "mndwi": 17.83,
-  "awei": 62.54
+  "ndwi": 27.83,
+  "mndwi": 18.45,
+  "awei": 60.01
  },
  "selected_index": "mndwi",
- "selection_reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (17.83 m)",
+ "selection_reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.45 m)",
  "best_index_by_mean_f1": "awei",
  "u_classify_suggestion": {
-  "2018": 15.1,
-  "2022": 18.39,
-  "2026": 19.99
+  "2018": 16.73,
+  "2022": 17.82,
+  "2026": 21.69
  },
- "note": "Chỉ số được chọn: mndwi (hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (17.83 m)). Cần config.DEFAULT_INDEX = 'mndwi' và config.U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}."
+ "u_classify_basis": "đường bờ chính (qgis), các quan sát còn lại sau despike",
+ "note": "Chỉ số được chọn: mndwi (hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.45 m)). Cần config.DEFAULT_INDEX = 'mndwi' và config.U_CLASSIFY = {2018: 16.73, 2022: 17.82, 2026: 21.69} (cơ sở: đường bờ chính (qgis), các quan sát còn lại sau despike). RMSE từng chỉ số (mean_rmse_m) dùng cách trích xuất Python thống nhất để so sánh chỉ số; sai số sản phẩm chính nằm ở by_year[năm].main_shoreline_error."
 }

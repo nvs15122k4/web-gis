@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AltSourceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ErosionHotspotController;
 use App\Http\Controllers\Api\ExportController;
@@ -33,10 +34,12 @@ Route::middleware('cache.headers:public;max_age=60;s_maxage=300;stale_while_reva
     Route::get('/yearly-stats', [YearlyStatsController::class, 'index']);
     Route::get('/rate-points', [RatePointController::class, 'index']);
     Route::get('/shorelines', [ShorelineController::class, 'index']);
+    Route::get('/alt-sources', [AltSourceController::class, 'index']);
 
     Route::get('/transects', [TransectController::class, 'index']);
     Route::get('/transects/{id}', [TransectController::class, 'show'])->where('id', '[0-9]{1,9}');
     Route::get('/transects/{id}/history', [TransectController::class, 'history'])->where('id', '[0-9]{1,9}');
+    Route::get('/transects/{id}/compare', [AltSourceController::class, 'compare'])->where('id', '[0-9]{1,9}');
 
     Route::get('/erosion-hotspots', [ErosionHotspotController::class, 'index']);
     Route::get('/reference-events', [ReferenceEventController::class, 'index']);

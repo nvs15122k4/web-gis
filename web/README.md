@@ -54,6 +54,17 @@ php artisan webgis:import /duong/dan/output
 php artisan webgis:compare-reference                    # đối chiếu hotspot ↔ sạt lở tham chiếu 2019–2020
 ```
 
+Hai bản dữ liệu **đối chứng độc lập** (Sentinel-2 Collection 1, Landsat 8/9) nạp riêng bằng `--alt` (chạy sau import thường,
+cùng UPSERT, không đụng bản chính; đường bờ MNDWI từ `pipeline/data/alt`, LRR từ `alt_transects.json`, độ tin cậy từ `alt_compare.json`):
+
+```bash
+php artisan webgis:import ../pipeline/output --alt=../pipeline/data/alt
+```
+
+Đường bờ đối chứng nằm cùng bảng `shorelines` (cột `source`: `main` | `s2c1` | `landsat`). `GET /api/shorelines` mặc định chỉ trả
+bản chính, thêm `?source=s2c1|landsat` để lấy bản đối chứng; `GET /api/alt-sources` liệt kê năm và năm độ tin cậy thấp;
+`GET /api/transects/{id}/compare` so LRR ba nguồn. Đây là số liệu kiểm tra chéo, không phải dự báo sạt lở.
+
 Chưa có dữ liệu thật? Nạp dữ liệu **tổng hợp** để xem giao diện: `php artisan db:seed --class=E2eFixtureSeeder`
 (ghi đè bảng không gian — chỉ dùng trên DB dev/test).
 

@@ -1,0 +1,84 @@
+{
+ "item": [
+  "100E_20Nv1_3_2020"
+ ],
+ "note": "occurrence 0–100 (%); 255 = không dữ liệu",
+ "main": {
+  "2018": {
+   "precision": 0.8828,
+   "recall": 0.9865,
+   "f1": 0.9317,
+   "iou": 0.8722,
+   "pixels": 1347862,
+   "water_but_jrc_lt25_share": 0.0427
+  },
+  "2019": {
+   "precision": 0.8632,
+   "recall": 0.9865,
+   "f1": 0.9207,
+   "iou": 0.8531,
+   "pixels": 1347886,
+   "water_but_jrc_lt25_share": 0.059
+  },
+  "2020": {
+   "precision": 0.8692,
+   "recall": 0.9828,
+   "f1": 0.9225,
+   "iou": 0.8562,
+   "pixels": 1347878,
+   "water_but_jrc_lt25_share": 0.0426
+  }
+ },
+ "landsat": {
+  "2018": {
+   "precision": 0.8934,
+   "recall": 0.9849,
+   "f1": 0.937,
+   "iou": 0.8814,
+   "pixels": 149778,
+   "water_but_jrc_lt25_share": 0.0336
+  },
+  "2019": {
+   "precision": 0.8732,
+   "recall": 0.989,
+   "f1": 0.9275,
+   "iou": 0.8648,
+   "pixels": 149788,
+   "water_but_jrc_lt25_share": 0.047
+  },
+  "2020": {
+   "precision": 0.9161,
+   "recall": 0.979,
+   "f1": 0.9465,
+   "iou": 0.8985,
+   "pixels": 148762,
+   "water_but_jrc_lt25_share": 0.0219
+  }
+ },
+ "s2c1": {
+  "2018": {
+   "precision": 0.6994,
+   "recall": 0.9866,
+   "f1": 0.8185,
+   "iou": 0.6928,
+   "pixels": 1347886,
+   "water_but_jrc_lt25_share": 0.2054
+  },
+  "2019": {
+   "precision": 0.5273,
+   "recall": 0.9907,
+   "f1": 0.6882,
+   "iou": 0.5247,
+   "pixels": 1184734,
+   "water_but_jrc_lt25_share": 0.1562
+  },
+  "2020": {
+   "precision": 0.8672,
+   "recall": 0.9829,
+   "f1": 0.9214,
+   "iou": 0.8542,
+   "pixels": 1347886,
+   "water_but_jrc_lt25_share": 0.0439
+  }
+ }
+}

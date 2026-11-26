@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
- * Nạp output pipeline THẬT (pipeline/output) rồi kiểm số liệu chốt: 267 transect, phân lớp 81/167/18/1,
- * 1 hotspot (T0094), 2 sự kiện sạt lở tham chiếu; /api/summary phải khớp. Chạy trong transaction nên được rollback.
+ * Nạp output pipeline THẬT (pipeline/output) rồi kiểm số liệu chốt: 266 transect, phân lớp 71/181/10/4,
+ * 3 hotspot (T0020, T0094, T0200–T0201), 2 sự kiện sạt lở tham chiếu; /api/summary phải khớp. Chạy trong transaction nên được rollback.
  */
 class ImportRealPipelineOutputTest extends TestCase
 {
@@ -40,9 +40,9 @@ class ImportRealPipelineOutputTest extends TestCase
     {
         $this->importReal();
 
-        $this->assertSame(267, $this->pg()->table('transects')->count());
-        $this->assertSame(267, $this->pg()->table('shoreline_change_stats')->count());
-        $this->assertSame(1, $this->pg()->table('erosion_hotspots')->count());
+        $this->assertSame(266, $this->pg()->table('transects')->count());
+        $this->assertSame(266, $this->pg()->table('shoreline_change_stats')->count());
+        $this->assertSame(3, $this->pg()->table('erosion_hotspots')->count());
         $this->assertSame(2, $this->pg()->table('reference_landslide_events')->count());
     }
 
@@ -55,19 +55,22 @@ class ImportRealPipelineOutputTest extends TestCase
             ->map(fn ($n) => (int) $n)->all();
         ksort($byClass);
 
-        $this->assertSame(['accretion' => 81, 'mild_erosion' => 18, 'severe_erosion' => 1, 'stable' => 167], $byClass);
+        $this->assertSame(['accretion' => 71, 'mild_erosion' => 10, 'severe_erosion' => 4, 'stable' => 181], $byClass);
     }
 
-    public function test_single_hotspot_is_on_transect_t0094(): void
+    public function test_hotspots_are_on_severe_erosion_transects(): void
     {
         $this->importReal();
 
         $severe = $this->pg()->table('shoreline_change_stats as s')->join('transects as t', 't.id', '=', 's.transect_id')
             ->where('s.change_class', 'severe_erosion')->pluck('t.transect_code')->all();
-        $this->assertSame(['T0094'], $severe);
+        sort($severe);
+        $this->assertSame(['T0020', 'T0094', 'T0200', 'T0201'], $severe);
 
-        $hotspot = $this->pg()->table('erosion_hotspots')->first();
-        $this->assertStringContainsString('T0094', (string) $hotspot->notes, 'Ghi chú hotspot phải nêu transect T0094');
+        $notes = $this->pg()->table('erosion_hotspots')->pluck('notes')->implode(' ');
+        foreach (['T0020', 'T0094', 'T0200'] as $code) {
+            $this->assertStringContainsString($code, $notes, "Ghi chú hotspot phải nêu transect $code");
+        }
     }
 
     public function test_summary_api_matches_imported_numbers(): void
@@ -76,13 +79,13 @@ class ImportRealPipelineOutputTest extends TestCase
 
         $s = $this->getJson('/api/summary')->assertOk()->json();
 
-        $this->assertSame(267, $s['transects']['total']);
+        $this->assertSame(266, $s['transects']['total']);
         $this->assertSame(
-            ['accretion' => 81, 'stable' => 167, 'mild_erosion' => 18, 'severe_erosion' => 1],
+            ['accretion' => 71, 'stable' => 181, 'mild_erosion' => 10, 'severe_erosion' => 4],
             $s['transects']['by_class']
         );
-        $this->assertSame(1, $s['hotspots']['count']);
+        $this->assertSame(3, $s['hotspots']['count']);
         $this->assertSame(2, $s['reference_events']['count']);
-        $this->assertSame('T0094', $s['transects']['max_erosion']['transect_code']);
+        $this->assertSame('T0200', $s['transects']['max_erosion']['transect_code']);
     }
 }

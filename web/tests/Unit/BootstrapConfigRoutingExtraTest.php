@@ -235,7 +235,7 @@ class BootstrapConfigRoutingExtraTest extends PretendQueryCase
         $m = (new \ReflectionClass(MapController::class))->getMethod('availableYears');
         $r = $this->capture(fn () => $m->invoke(new MapController));
         $this->assertSame([], $r['result']);
-        $this->assertStringContainsString('select distinct "year" from "shorelines" order by "year" asc', $r['queries'][0]['sql']);
+        $this->assertStringContainsString('select distinct "year" from "shorelines" where shorelines.source = \'main\' order by "year" asc', $r['queries'][0]['sql']);
     }
 
     public function test_available_years_nuot_loi_ket_noi_va_tra_mang_rong(): void

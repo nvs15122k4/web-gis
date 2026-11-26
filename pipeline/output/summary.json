@@ -1,31 +1,31 @@
 {
- "transects": 267,
+ "transects": 266,
  "classes": {
-  "accretion": 81,
-  "stable": 167,
-  "mild_erosion": 18,
-  "severe_erosion": 1
+  "stable": 181,
+  "accretion": 71,
+  "severe_erosion": 4,
+  "mild_erosion": 10
  },
- "despiked_observations": 13,
- "M_lrr_erosion": -1.4609473684210523,
- "S_lrr_erosion": 0.4690833228144975,
+ "despiked_observations": 9,
+ "M_lrr_erosion": -1.9100714285714286,
+ "S_lrr_erosion": 0.7385189403628896,
  "severe_threshold_lrr": -2.0,
  "min_consecutive_decline": 3,
  "confidence": 0.95,
  "ci_distribution": "student_t_df_n_minus_2",
  "u_georef_sigma_m": 6.0,
- "hotspots": 1,
+ "hotspots": 3,
  "water_index": "mndwi",
  "u_shoreline_by_year": {
-  "2018": 17.0,
-  "2019": 21.47,
-  "2020": 21.47,
-  "2021": 21.47,
-  "2022": 19.98,
-  "2023": 21.47,
-  "2024": 21.47,
-  "2025": 21.47,
-  "2026": 21.46
+  "2018": 18.46,
+  "2019": 23.06,
+  "2020": 23.06,
+  "2021": 23.06,
+  "2022": 19.46,
+  "2023": 23.06,
+  "2024": 23.06,
+  "2025": 23.06,
+  "2026": 23.05
  },
  "u_classify_is_placeholder": false
 }

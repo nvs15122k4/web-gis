@@ -2,36 +2,36 @@
  "events": [
   {
    "event_date": "2019-08-01",
-   "zone_length_m": 3271,
-   "nearest_hotspot_m": 5234,
-   "within_radius": false,
+   "zone_length_m": 3377,
+   "nearest_hotspot_m": 355,
+   "within_radius": true,
    "radius_m": 500,
-   "transects_in_zone": 69,
+   "transects_in_zone": 70,
    "classes": {
-    "accretion": 41,
-    "stable": 28
+    "stable": 32,
+    "accretion": 38
    },
-   "mean_lrr_m_per_year": 1.14,
-   "share_eroding": 0.014,
+   "mean_lrr_m_per_year": 1.153,
+   "share_eroding": 0.029,
    "share_significant_erosion": 0.0
   },
   {
    "event_date": "2020-05-27",
-   "zone_length_m": 3271,
-   "nearest_hotspot_m": 5234,
-   "within_radius": false,
+   "zone_length_m": 3377,
+   "nearest_hotspot_m": 355,
+   "within_radius": true,
    "radius_m": 500,
-   "transects_in_zone": 69,
+   "transects_in_zone": 70,
    "classes": {
-    "accretion": 41,
-    "stable": 28
+    "stable": 32,
+    "accretion": 38
    },
-   "mean_lrr_m_per_year": 1.14,
-   "share_eroding": 0.014,
+   "mean_lrr_m_per_year": 1.153,
+   "share_eroding": 0.029,
    "share_significant_erosion": 0.0
   }
  ],
- "matched": 0,
+ "matched": 2,
  "total": 2,
  "note": "Vùng cảnh báo là đoạn bờ dài, không phải điểm sạt; dữ liệu chỉ để kiểm chứng, không dùng huấn luyện."
 }
