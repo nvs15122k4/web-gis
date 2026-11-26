@@ -19,20 +19,28 @@
             <div><dt>Giai đoạn</dt><dd>2018–2026</dd></div>
         </dl>
     </aside>
-    <main class="admin" id="main-content" tabindex="-1">
-        <div class="admin-card">
-            <h1>Đăng nhập</h1>
-            <p class="lead">Dành cho tài khoản quản trị để xem các trang nội bộ như báo cáo công việc.</p>
+    <main class="sheet-page" id="main-content" tabindex="-1">
+        <div class="sheet">
+            <div class="sheet-body">
+                <h1>Đăng nhập</h1>
+                <p class="lead">Dành cho tài khoản quản trị để xem các trang nội bộ như báo cáo công việc.</p>
 
-            <form method="post" action="/dang-nhap" id="session-login-form">
-                @csrf
-                <label>Email <input type="email" name="email" value="{{ old('email') }}" autocomplete="username" required @if ($errors->any()) aria-describedby="login-error" aria-invalid="true" @endif></label>
-                <label>Mật khẩu <input type="password" name="password" autocomplete="current-password" required @if ($errors->any()) aria-describedby="login-error" aria-invalid="true" @endif></label>
-                @if ($errors->any())
-                    <p class="field-error" id="login-error" role="alert">{{ $errors->first() }}</p>
-                @endif
-                <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
-            </form>
+                <form method="post" action="/dang-nhap" id="session-login-form" class="sheet-form">
+                    @csrf
+                    <label>Email <input type="email" name="email" value="{{ old('email') }}" autocomplete="username" required @if ($errors->any()) aria-describedby="login-error" aria-invalid="true" @endif></label>
+                    <label>Mật khẩu <input type="password" name="password" autocomplete="current-password" required @if ($errors->any()) aria-describedby="login-error" aria-invalid="true" @endif></label>
+                    @if ($errors->any())
+                        <p class="field-error" id="login-error" role="alert">{{ $errors->first() }}</p>
+                    @endif
+                    <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+                </form>
+
+                <ol class="sheet-notes" aria-label="Ghi chú">
+                    <li>Bản đồ, phương pháp và hướng dẫn xem được mà không cần đăng nhập.</li>
+                    <li>Sau 5 lần nhập sai liên tiếp, địa chỉ mạng và email đó bị khoá tạm thời.</li>
+                    <li>Tài khoản quản trị chỉ chỉnh được ngưỡng hiển thị hotspot; kết quả phân tích do pipeline tính sẵn.</li>
+                </ol>
+            </div>
         </div>
     </main>
 </div>
