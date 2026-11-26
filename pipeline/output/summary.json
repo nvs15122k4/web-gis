@@ -1,14 +1,14 @@
 {
  "transects": 266,
  "classes": {
-  "stable": 179,
-  "accretion": 72,
+  "stable": 181,
+  "accretion": 71,
   "severe_erosion": 4,
-  "mild_erosion": 11
+  "mild_erosion": 10
  },
- "despiked_observations": 12,
- "M_lrr_erosion": -1.9042000000000001,
- "S_lrr_erosion": 0.7120178769826339,
+ "despiked_observations": 9,
+ "M_lrr_erosion": -1.9100714285714286,
+ "S_lrr_erosion": 0.7385189403628896,
  "severe_threshold_lrr": -2.0,
  "min_consecutive_decline": 3,
  "confidence": 0.95,
@@ -17,7 +17,7 @@
  "hotspots": 3,
  "water_index": "mndwi",
  "u_shoreline_by_year": {
-  "2018": 18.84,
+  "2018": 18.46,
   "2019": 23.06,
   "2020": 23.06,
   "2021": 23.06,
