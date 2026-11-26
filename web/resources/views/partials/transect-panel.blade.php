@@ -10,6 +10,10 @@
     </header>
     <div class="inspector-body">
         <div id="transect-detail"><p class="hint">Chọn một transect trên bản đồ.</p></div>
+        <div id="alt-compare">
+            <h3 class="subhead">So sánh ba nguồn dữ liệu (LRR)</h3>
+            <div id="alt-compare-body"><p class="hint">Chọn một transect để so sánh bản chính với hai bản đối chứng độc lập.</p></div>
+        </div>
         <h3 class="subhead">Lịch sử vị trí đường bờ</h3>
         <div class="chart-box">
             <canvas id="history-chart"></canvas>
