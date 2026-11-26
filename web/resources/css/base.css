@@ -122,6 +122,15 @@ input[type=checkbox] { accent-color: var(--accent); }
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
+/* toast: thông báo nổi ngắn ở góc dưới (toast.js) */
+.toasts { position: fixed; z-index: 3500; right: 16px; bottom: 16px; display: grid; gap: 8px; max-width: min(360px, calc(100vw - 32px)); pointer-events: none; }
+.toast {
+    padding: 9px 14px; font-size: var(--fs-sm); color: var(--float); background: var(--ink);
+    border-left: 3px solid var(--mark); box-shadow: var(--float-shadow); cursor: pointer; pointer-events: auto;
+}
+.toast-ok { border-left-color: var(--ok); }
+.toast-error { border-left-color: var(--error); }
+
 /* ---- truy cập ---- */
 @media (pointer: coarse) {
     .btn, .icon-btn, input[type=number], input[type=email], input[type=password], input[type=text], select { min-height: 44px; }
