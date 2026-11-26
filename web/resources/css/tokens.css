@@ -1,80 +1,71 @@
 /*
  * Design tokens — WebGIS Sông Hậu.
- * Design System "Transect": Cool Grey / Paper / Ink, nhấn Cobalt, điểm nhấn Vermilion (chỉ dùng tiết chế).
- * Ngôn ngữ Point–Line–Plane: mặt phẳng phẳng, đường phân cách mảnh 1px, góc gần như vuông, không đổ bóng nặng.
+ * Ngôn ngữ "Atlas": giấy kem ấm, mực nâu đen, đường kẻ mảnh như bản đồ in. Serif cho tiêu đề và tên khu vực,
+ * sans nhẹ cho giao diện, mono cho mã transect. Nhấn Cobalt (dữ liệu, liên kết), Vermilion chỉ cho điểm đang chọn và cảnh báo.
  * Màu dữ liệu (--c-*) theo quy ước bản đồ trong colors.css, không áp màu thương hiệu lên lớp dữ liệu.
  */
 :root {
     color-scheme: light;
 
-    --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    --serif: 'Source Serif 4', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+    --font: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
     /* cỡ chữ */
-    --fs-xs: 11px;
-    --fs-sm: 12px;
-    --fs-md: 13px;
+    --fs-xs: 11.5px;
+    --fs-sm: 12.5px;
+    --fs-md: 13.5px;
     --fs-lg: 15px;
     --fs-xl: 18px;
     --fs-2xl: 24px;
-    --fs-kpi: 28px;
 
-    /* bề mặt (sáng) */
-    --canvas: #e8e9e7;           /* nền trang nội dung */
-    --surface: #f5f5f1;          /* bảng, thẻ */
-    --surface-2: #ecece8;        /* nền phụ, rail, hàng chẵn */
-    --surface-3: #e2e3df;        /* hover */
-    --line: #d2d3cf;             /* viền mảnh */
-    --line-strong: #a9aba6;
-    --control-line: #77797a;     /* viền ô nhập, công tắc: >= 3:1 (WCAG 1.4.11) */
+    /* giấy */
+    --canvas: #efe9da;           /* nền trang nội dung */
+    --surface: #f8f4e9;          /* tờ giấy: bảng, panel */
+    --surface-2: #eee8d7;        /* nền phụ, hàng chẵn */
+    --surface-3: #e4dcc7;        /* hover */
+    --line: #d7cdb5;             /* đường kẻ mảnh */
+    --line-strong: #b3a88c;
+    --control-line: #7a7058;     /* viền ô nhập, nút: >= 3:1 (WCAG 1.4.11) */
 
-    /* chữ */
-    --ink: #17191b;
-    --ink-2: #3b3e41;
-    --ink-3: #585b5d;            /* >= 4.5:1 trên --surface và --surface-2 */
-
-    /* thanh tiêu đề tối */
-    --bar: #17191b;
-    --bar-2: #26292c;
-    --bar-line: #3a3e42;
-    --bar-ink: #f5f5f1;
-    --bar-ink-2: #aeb1b3;
+    /* mực */
+    --ink: #1f1c17;
+    --ink-2: #3f3a30;
+    --ink-3: #5a5446;            /* >= 4.5:1 trên --surface và --surface-2 */
 
     /* màu nhấn */
     --accent: #2855b8;           /* Cobalt: chữ trắng trên accent đạt ~6.7:1 */
-    --mark: #e94b35;             /* Vermilion: điểm nhấn (gạch chân mục đang chọn, đo đạc), không dùng làm chữ nhỏ */
-    --bar-mark: #e94b35;
+    --mark: #e04a33;             /* Vermilion: chỉ điểm đang chọn, đo đạc, cảnh báo */
     --accent-hover: #1f4496;
-    --accent-soft: #dde4f4;
+    --accent-soft: #dfe5f2;
     --accent-ink: #1f4496;       /* chữ accent trên nền sáng */
     --focus: #2855b8;
 
     /* trạng thái */
-    --warn-bg: #fdf3e1;
-    --warn-line: #e3b567;
-    --warn-ink: #6b3f06;
+    --warn-bg: #fbf0d8;
+    --warn-line: #d9ac5b;
+    --warn-ink: #66400a;
     --ok: #1a6b3a;
-    --ok-bg: #e8f5ec;
+    --ok-bg: #e6f1e3;
     --error: #b3261e;
-    --error-bg: #fdeceb;
+    --error-bg: #fbe9e4;
 
     /* nền bản đồ & bề mặt nổi trên bản đồ */
     --map-sea: #c9d9e3;
-    --float: #ffffff;
-    --float-line: rgba(23, 25, 27, .28);
-    --float-shadow: 0 1px 0 rgba(23, 25, 27, .12), 0 1px 6px rgba(23, 25, 27, .12);
+    --float: #fbf8ef;
+    --float-line: #4a4538;
+    --float-shadow: 0 1px 0 rgba(31, 28, 23, .08);
 
     /* biểu đồ */
     --chart-line: #2855b8;
-    --chart-grid: #dcdcd8;
+    --chart-grid: #ddd4bd;
 
-    /* hình học */
-    --r: 2px;
-    --r-lg: 2px;
-    --appbar-h: 48px;
-    --rail-w: 64px;
-    --panel-w: 328px;
-    --inspector-w: 348px;
+    /* hình học: góc vuông như bản in */
+    --r: 0;
+    --r-lg: 0;
+    --appbar-h: 56px;
+    --panel-w: 340px;
+    --inspector-w: 360px;
     --timeline-h: 64px;
     --ease: cubic-bezier(.2, .7, .3, 1);
     --ease-out: cubic-bezier(.16, 1, .3, 1);
