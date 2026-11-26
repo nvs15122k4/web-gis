@@ -6,7 +6,7 @@ data/ground_truth/ground_truth.gpkg, lớp water_<năm>: polygon MỌI mặt nư
   - Sai số đường bờ: đường bờ tham chiếu = viền polygon `song` (bỏ phần trùng cạnh ô mẫu); đo chênh khoảng cách
     từ gốc transect tới đường bờ tự động và tới đường bờ tham chiếu (mean, mean |.|, RMSE).
 Chỉ đánh giá ô mẫu đã số hoá (có ít nhất 1 polygon) — ô chưa vẽ bị bỏ qua, không bị tính là "toàn đất".
-Đầu ra: output/evaluation.json. RMSE của chỉ số được chọn là U_classify cần điền vào config.U_CLASSIFY (Mục 2.5b).
+Đầu ra: output/evaluation.json. Chỉ số được chọn bằng `select_index` (F1, hoà thì RMSE); RMSE của chỉ số đó là U_classify cần điền vào config.U_CLASSIFY (Mục 2.5b).
 """
 import json
 
@@ -18,6 +18,7 @@ from rasterio.features import geometry_mask
 from shapely.geometry import Point
 
 import config as C
+from s3_shoreline import extract
 
 GPKG = C.DATA / "ground_truth" / "ground_truth.gpkg"
 
@@ -46,11 +47,36 @@ def nearest_hit(transect, line):
     return min((o.distance(q) for q in pts), default=None)
 
 
-def shoreline_error(year, ref, transects, zone):
-    f = C.DATA / "shoreline" / f"{year}.json"
-    if ref is None or ref.is_empty or not f.exists():
+def select_index(report, tie_f1=C.SELECT_TIE_F1):
+    """Chọn chỉ số nước theo đề cương (Mục 3.4): F1 trung bình cao nhất; nếu chênh F1 so với chỉ số đứng đầu
+    không quá `tie_f1` thì coi là hoà và chọn chỉ số có RMSE đường bờ trung bình thấp nhất.
+    Trả về (chỉ số, giải thích, f1 trung bình, rmse trung bình)."""
+    years = list(report)
+    f1 = {i: float(np.mean([report[y][i]["f1"] for y in years])) for i in C.WATER_INDICES}
+    rmse = {}
+    for i in C.WATER_INDICES:
+        v = [report[y]["shoreline_error"][i]["rmse_m"] for y in years if report[y].get("shoreline_error", {}).get(i)]
+        rmse[i] = float(np.mean(v)) if v else None
+    top = max(f1.values())
+    tied = [i for i in C.WATER_INDICES if top - f1[i] <= tie_f1 + 1e-9]
+    if len(tied) == 1:
+        return tied[0], f"F1 trung bình cao nhất ({f1[tied[0]]:.4f})", f1, rmse
+    scored = [i for i in tied if rmse[i] is not None]
+    if not scored:
+        best = max(tied, key=f1.get)
+        return best, "hoà F1 nhưng thiếu RMSE, lấy F1 cao nhất", f1, rmse
+    best = min(scored, key=rmse.get)
+    return best, f"hoà F1 (chênh ≤ {tie_f1}) giữa {tied}; chọn RMSE đường bờ thấp nhất ({rmse[best]:.2f} m)", f1, rmse
+
+
+def shoreline_error(year, ref, transects, zone, index):
+    """Sai số đường bờ của chỉ số `index`: vector hoá lại từ raster nước của chỉ số đó, không đọc file đường bờ mặc định."""
+    if ref is None or ref.is_empty or not (C.DATA / "water" / f"{year}_{index}.tif").exists():
         return None
-    auto = gpd.read_file(f).geometry.union_all()
+    geom = extract(year, index)
+    if geom is None:
+        return None
+    auto = geom
     diffs = []
     for t in transects:
         if not t.intersects(zone):
@@ -88,16 +114,17 @@ def main():
             ref = geometry_mask(water.geometry.intersection(zone), **kw)
             valid = extent & (a.values != 255)
             report[y][idx] = pixel_metrics(a.values[valid] == 1, ref[valid])
-        report[y]["shoreline_error"] = shoreline_error(y, reference_shoreline(water, done), transects, zone)
+        ref_line = reference_shoreline(water, done)
+        report[y]["shoreline_error"] = {i: shoreline_error(y, ref_line, transects, zone, i) for i in C.WATER_INDICES}
     if not report:
         raise SystemExit("Các lớp water_<năm> còn trống — số hoá trong QGIS trước.")
-    years = list(report)
-    best = max(C.WATER_INDICES, key=lambda i: np.mean([report[y][i]["f1"] for y in years]))
-    rmse = {y: report[y]["shoreline_error"]["rmse_m"] for y in years if report[y]["shoreline_error"]}
-    out = {"by_year": report, "best_index_by_mean_f1": best,
-           "u_classify_suggestion": rmse,
-           "note": f"Đổi config.DEFAULT_INDEX = '{best}' và điền config.U_CLASSIFY = {rmse}, rồi chạy lại "
-                   "`run.py --skip-download` (nếu đổi chỉ số, chạy lại gt RMSE vì đường bờ tự động đổi theo)."}
+    best, reason, mean_f1, mean_rmse = select_index(report)
+    rmse = {y: report[y]["shoreline_error"][best]["rmse_m"] for y in report if report[y]["shoreline_error"].get(best)}
+    out = {"by_year": report, "mean_f1": {k: round(v, 4) for k, v in mean_f1.items()},
+           "mean_rmse_m": {k: (round(v, 2) if v is not None else None) for k, v in mean_rmse.items()},
+           "selected_index": best, "selection_reason": reason,
+           "best_index_by_mean_f1": max(mean_f1, key=mean_f1.get), "u_classify_suggestion": rmse,
+           "note": f"Chỉ số được chọn: {best} ({reason}). Cần config.DEFAULT_INDEX = '{best}' và config.U_CLASSIFY = {rmse}."}
     C.OUTPUT.mkdir(parents=True, exist_ok=True)
     (C.OUTPUT / "evaluation.json").write_text(json.dumps(out, indent=1, ensure_ascii=False))
     print(json.dumps(out, indent=1, ensure_ascii=False))
