@@ -101,8 +101,27 @@ def vectorize(raw, tr, field=None):
     return MultiLineString(parts) if parts else None
 
 
+QGIS_OUT = C.DATA / "qgis" / "shoreline"
+
+
+def import_qgis(years, index=C.DEFAULT_INDEX):
+    """Nhận đường bờ do QGIS giải đoán (qgis_interpret.py) làm đường bờ chính: ghi data/shoreline/<năm>.json cùng khuôn với bản Python."""
+    for y in years:
+        f = QGIS_OUT / f"{y}.json"
+        if not f.exists():
+            print(f"{y}: bỏ qua (chưa có đường bờ QGIS — chạy python3 qgis_interpret.py trước)")
+            continue
+        g = gpd.read_file(f).geometry.iloc[0]
+        if g.geom_type == "LineString":
+            g = MultiLineString([g])
+        gpd.GeoDataFrame({"year": [y], "water_index": [index]}, geometry=[g], crs=C.CRS).to_file(OUT / f"{y}.json", driver="GeoJSON")
+        print(f"{y}: {len(g.geoms)} đoạn, tổng {g.length / 1000:.2f} km (QGIS)")
+
+
 def main(years, index=C.DEFAULT_INDEX):
     OUT.mkdir(parents=True, exist_ok=True)
+    if C.SHORELINE_ENGINE == "qgis":
+        return import_qgis(years, index)
     for y in years:
         if not (C.DATA / "water" / f"{y}_{index}.tif").exists():
             print(f"{y}: bỏ qua (không có raster nước)")
