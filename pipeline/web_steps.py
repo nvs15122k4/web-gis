@@ -68,7 +68,7 @@ def main(data, out):
     save(fig, out, "b3-mat-na-nuoc")
 
     # vùng phóng to quanh hotspot
-    hs = tr[tr["cls"] == "severe_erosion"].geometry.union_all().centroid
+    hs = tr[tr["transect_code"] == "T0094"].geometry.union_all().centroid   # transect được phân tích chi tiết ở bước 7
     r = 1300; crop = (hs.x - r, hs.y - r * 0.7, hs.x + r, hs.y + r * 0.7)
 
     # 4. Đường bờ 2018→2026
@@ -89,7 +89,7 @@ def main(data, out):
     save(fig, out, "b5-transect")
 
     # 6. Chuỗi khoảng cách của transect điểm nóng + hồi quy
-    row = tr[tr["cls"] == "severe_erosion"].iloc[0]
+    row = tr[tr["transect_code"] == "T0094"].iloc[0]
     props = json.loads(json.dumps(row.drop("geometry").to_dict(), default=str))
     d = props["distances"]; st = props["stats"]
     d = d if isinstance(d, dict) else json.loads(d); st = st if isinstance(st, dict) else json.loads(st)
@@ -112,7 +112,7 @@ def extra(data, out):
     commune = gpd.read_file(data / "ref" / "binhmy_osm.json").to_crs(C.CRS)
     tr = gpd.read_file(C.OUTPUT / "transects.json").to_crs(C.CRS)
     tr["cls"] = tr["stats"].map(lambda s: s["change_class"])
-    hs = tr[tr["cls"] == "severe_erosion"].geometry.union_all().centroid
+    hs = tr[tr["transect_code"] == "T0094"].geometry.union_all().centroid   # transect được phân tích chi tiết ở bước 7
     rgb = np.clip(np.dstack([a[2].values, a[1].values, a[0].values]) / 0.35, 0, 1)
 
     # A. Lọc cảnh: mỗi cảnh một điểm, trục x = ngày trong mùa, tô theo tỉ lệ pixel bị che; X đỏ = cảnh bị loại

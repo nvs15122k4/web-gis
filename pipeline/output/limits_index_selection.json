@@ -13,9 +13,9 @@
  },
  "top_by_f1": "awei",
  "mean_rmse_m": {
-  "ndwi": 28.11,
-  "mndwi": 17.83,
-  "awei": 62.54
+  "ndwi": 27.83,
+  "mndwi": 18.45,
+  "awei": 60.01
  },
  "selection_by_tie": {
   "0.0": "awei",
@@ -51,58 +51,58 @@
  "leave_one_year_out": {
   "none": {
    "selected": "mndwi",
-   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (17.83 m)",
+   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.45 m)",
    "mean_f1": {
     "ndwi": 0.9398,
     "mndwi": 0.9456,
     "awei": 0.9457
    },
    "mean_rmse_m": {
-    "ndwi": 28.11,
-    "mndwi": 17.83,
-    "awei": 62.54
+    "ndwi": 27.83,
+    "mndwi": 18.45,
+    "awei": 60.01
    }
   },
   "drop_2018": {
    "selected": "mndwi",
-   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (19.19 m)",
+   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (19.73 m)",
    "mean_f1": {
     "ndwi": 0.9355,
     "mndwi": 0.9452,
     "awei": 0.947
    },
    "mean_rmse_m": {
-    "ndwi": 29.39,
-    "mndwi": 19.19,
-    "awei": 32.29
+    "ndwi": 29.93,
+    "mndwi": 19.73,
+    "awei": 32.37
    }
   },
   "drop_2022": {
    "selected": "mndwi",
-   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['ndwi', 'mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (17.54 m)",
+   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['ndwi', 'mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.61 m)",
    "mean_f1": {
     "ndwi": 0.9414,
     "mndwi": 0.9438,
     "awei": 0.9461
    },
    "mean_rmse_m": {
-    "ndwi": 25.48,
-    "mndwi": 17.54,
-    "awei": 76.29
+    "ndwi": 23.99,
+    "mndwi": 18.61,
+    "awei": 71.37
    }
   },
   "drop_2026": {
    "selected": "mndwi",
-   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (16.75 m)",
+   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (17.03 m)",
    "mean_f1": {
     "ndwi": 0.9425,
     "mndwi": 0.9479,
     "awei": 0.944
    },
    "mean_rmse_m": {
-    "ndwi": 29.45,
-    "mndwi": 16.75,
-    "awei": 79.05
+    "ndwi": 29.57,
+    "mndwi": 17.03,
+    "awei": 76.28
    }
   }
  },
@@ -125,19 +125,19 @@
  },
  "rmse_by_year": {
   "2018": {
-   "ndwi": 25.54,
-   "mndwi": 15.1,
-   "awei": 123.05
+   "ndwi": 23.63,
+   "mndwi": 15.91,
+   "awei": 115.29
   },
   "2022": {
-   "ndwi": 33.36,
-   "mndwi": 18.39,
-   "awei": 35.05
+   "ndwi": 35.51,
+   "mndwi": 18.15,
+   "awei": 37.28
   },
   "2026": {
-   "ndwi": 25.43,
-   "mndwi": 19.99,
-   "awei": 29.53
+   "ndwi": 24.35,
+   "mndwi": 21.3,
+   "awei": 27.45
   }
  },
  "years_where_awei_has_higher_f1_than_mndwi": [

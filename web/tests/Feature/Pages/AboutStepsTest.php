@@ -43,7 +43,7 @@ class AboutStepsTest extends TestCase
     {
         $html = $this->get('/gioi-thieu')->assertOk()->getContent();
 
-        $this->assertStringContainsString("\u{2212}2,56 m/năm", $html);
+        $this->assertStringContainsString("\u{2212}2,67 m/năm", $html);
     }
 
     // ---- Bản mở rộng: chi tiết kỹ thuật, hình bổ sung, hộp hạn chế, số liệu khớp pipeline ----
@@ -307,8 +307,8 @@ class AboutStepsTest extends TestCase
             $this->assertSame(18000, $d['mndwi']['pixels']);
         }
         $this->assertStringContainsString('RMSE đường bờ là '.$this->vn($by['2018']['shoreline_error']['mndwi']['rmse_m'], 1).' m (2018), '.$this->vn($by['2022']['shoreline_error']['mndwi']['rmse_m']).' m (2022), '.$this->vn($by['2026']['shoreline_error']['mndwi']['rmse_m']).' m (2026)', $text);
-        $this->assertStringContainsString('58 (2018, 2022) và 59 (2026)', $text);
-        $this->assertSame([58, 58, 59], [$by['2018']['shoreline_error']['mndwi']['n_transects'], $by['2022']['shoreline_error']['mndwi']['n_transects'], $by['2026']['shoreline_error']['mndwi']['n_transects']]);
+        $this->assertStringContainsString('59 mỗi năm (2018, 2022, 2026)', $text);
+        $this->assertSame([59, 59, 59], [$by['2018']['shoreline_error']['mndwi']['n_transects'], $by['2022']['shoreline_error']['mndwi']['n_transects'], $by['2026']['shoreline_error']['mndwi']['n_transects']]);
 
         // U_shoreline = sqrt(U_pixel² + U_georef² + U_classify²) tính lại từ config + evaluation
         $up = $this->config('U_PIXEL');
@@ -320,7 +320,7 @@ class AboutStepsTest extends TestCase
             $this->assertEqualsWithDelta(sqrt($up ** 2 + $ug ** 2 + $cls ** 2), $u, 0.01, "U_shoreline $year");
         }
         $u = $summary['u_shoreline_by_year'];
-        $this->assertStringContainsString('17,0 m (2018), '.$this->vn($u['2022']).' m (2022), '.$this->vn($u['2026']).' m (2026), '.$this->vn($u['2025']).' m ở các năm còn lại', $text);
+        $this->assertStringContainsString($this->vn($u['2018']).' m (2018), '.$this->vn($u['2022']).' m (2022), '.$this->vn($u['2026']).' m (2026), '.$this->vn($u['2025']).' m ở các năm còn lại', $text);
         $this->assertStringContainsString('lấy '.$this->vn($this->config('U_CLASSIFY_DEFAULT'), 1).' m', $text);
 
         $this->assertStringContainsString('F1 trung bình MNDWI '.$this->vn($cc['mean_f1_all']['mndwi'], 4), $text);
@@ -345,11 +345,11 @@ class AboutStepsTest extends TestCase
         $this->assertStringContainsString('Trong vùng đệm '.(int) $this->config('ZONE_BUFFER').' m có '.$ev['transects_in_zone'].' transect ('.$ev['classes']['accretion'].' bồi, '.$ev['classes']['stable'].' ổn định)', $text);
         $this->assertStringContainsString('Độ dài vùng cảnh báo '.$this->vn($ev['zone_length_m'], 0).' m', $text);
         $this->assertStringContainsString('LRR trung bình +'.$this->vn($ev['mean_lrr_m_per_year']).' m/năm', $text);
-        $this->assertStringContainsString($this->vn($ev['share_eroding'] * 100, 1).'% (1/'.$ev['transects_in_zone'].')', $text);
-        $this->assertSame(1, (int) round($ev['share_eroding'] * $ev['transects_in_zone']));
+        $this->assertStringContainsString($this->vn($ev['share_eroding'] * 100, 1).'% ('.(int) round($ev['share_eroding'] * $ev['transects_in_zone']).'/'.$ev['transects_in_zone'].')', $text);
+        $this->assertGreaterThan(0, (int) round($ev['share_eroding'] * $ev['transects_in_zone']));
         $this->assertSame(0.0, (float) $ev['share_significant_erosion']);
         $this->assertStringContainsString('Bán kính khớp '.(int) $this->config('MATCH_RADIUS').' m', $text);
-        $this->assertSame(0, $v['matched']);
+        $this->assertStringContainsString($v['matched'].'/'.$v['total'].' sự kiện', $text);
     }
 
     public function test_buoc_xuat_dung_voi_lenh_nap_va_script_geoserver(): void

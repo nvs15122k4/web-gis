@@ -377,7 +377,7 @@ def run_wls():
             "u_classify_m": ucls,
             "u_shoreline_m": {y: round(u_total(y, ucls), 2) for y in C.YEARS},
             "n_transects": len(rows),
-            "ci_halfwidth_ratio_wls_combined_over_ols": ci_summary([r["ci_wls_combined"] / r["ci_ols"] for r in rows]),
+            "ci_halfwidth_ratio_wls_combined_over_ols": ci_summary([r["ci_wls_combined"] / r["ci_ols"] for r in rows if r["ci_ols"] > 0]),
             "lrr_wls_minus_ols": ci_summary(a),
             "chi2_reduced": {**ci_summary([r["chi2_red"] for r in rows]), "median": round(float(np.median([r["chi2_red"] for r in rows])), 4),
                              "share_below_1": round(float(np.mean([r["chi2_red"] < 1 for r in rows])), 3),
