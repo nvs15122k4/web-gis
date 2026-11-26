@@ -35,7 +35,7 @@ class SummaryController extends Controller
             ->orderBy('lrr_m_per_year', $dir)
             ->first(['t.id', 't.transect_code', 'lrr_m_per_year']);
 
-        $years = Shoreline::main()->distinct()->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all();
+        $years = Shoreline::query()->distinct()->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all();
 
         $hotspots = ErosionHotspot::query()
             ->selectRaw('COUNT(*) AS n, COALESCE(SUM(CASE WHEN GeometryType(geom) LIKE \'%LINESTRING\' THEN ST_Length(geom::geography) ELSE ST_MaxDistance(ST_Transform(geom, 32648), ST_Transform(geom, 32648)) END), 0) AS length_m')

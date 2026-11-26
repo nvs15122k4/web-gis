@@ -20,7 +20,7 @@ class ExportController extends Controller
              FROM transects t LEFT JOIN shoreline_change_stats s ON s.transect_id = t.id',
             't', 't.transect_code',
         ],
-        'shorelines' => ['SELECT l.id, l.year, l.water_index, l.source_image_date FROM shorelines l WHERE l.source = \'main\'', 'l', 'l.year'],
+        'shorelines' => ['SELECT l.id, l.year, l.water_index, l.source_image_date FROM shorelines l', 'l', 'l.year'],
         'hotspots' => ['SELECT h.id, h.severity, h.period_start_year, h.period_end_year, h.notes FROM erosion_hotspots h', 'h', 'h.id'],
         'reference' => [
             'SELECT r.id, r.event_date, r.danger_level, r.length_m, r.location, r.description, r.source

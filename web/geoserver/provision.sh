@@ -62,20 +62,11 @@ for sld in change_class shoreline hotspot reference; do style "$sld"; done
 # layer:bảng nguồn:style mặc định
 echo "→ publish layers"
 for spec in shorelines:shorelines:shoreline transects:transects_styled:change_class \
-            erosion_hotspots:erosion_hotspots:hotspot reference_landslide_events:reference_landslide_events:reference \
-            shorelines_alt:shorelines:shoreline; do
+            erosion_hotspots:erosion_hotspots:hotspot reference_landslide_events:reference_landslide_events:reference; do
   IFS=: read -r name native sld <<<"$spec"
   publish "$STORE" "$name" "$native" "$sld"
   echo "   $WS:$name ← $native (style $sld)"
 done
-
-# Bản chính và hai bản đối chứng độc lập (S2 C1, Landsat 8/9) cùng nằm trong bảng shorelines, phân biệt bằng cột source.
-# Lớp "shorelines" luôn chỉ lấy bản chính (hành vi WMS/WFS cũ không đổi); "shorelines_alt" chỉ lấy các bản đối chứng,
-# lọc thêm bằng CQL_FILTER (year=2020 AND source='s2c1'). Bộ lọc gắn ở cấu hình layer nên áp cho cả WMS lẫn WFS.
-cql() { json -X PUT -d "{\"featureType\":{\"cqlFilter\":\"$3\"}}" "$GS/rest/workspaces/$WS/datastores/$1/featuretypes/$2" >/dev/null; }
-echo "→ lọc nguồn đường bờ (main / đối chứng)"
-cql "$STORE" shorelines "source = 'main'"
-cql "$STORE" shorelines_alt "source <> 'main'"
 
 # WFS (đề cương hứa WMS + WFS): các lớp trên cũng phục vụ qua WFS (GeoJSON, lọc CQL/bbox). Bật dịch vụ WFS riêng cho workspace
 # và nạp lại cấu hình để cột mới của view/bảng (vd. unc_lrr) xuất hiện trong schema lớp.
