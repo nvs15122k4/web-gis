@@ -23,6 +23,7 @@ SCL_MASK = [0, 1, 3, 8, 9, 10, 11] # no-data, bão hoà, bóng mây, mây TB/cao
 BANDS = ["B03", "B08", "B11", "B12", "SCL"]
 
 WATER_INDICES = ["ndwi", "mndwi", "awei"]
+SELECT_TIE_F1 = 0.005             # chênh F1 TB ≤ ngưỡng này thì coi là hoà và xét RMSE đường bờ (s7_evaluate.select_index, Mục 3.4)
 DEFAULT_INDEX = "mndwi"           # F1 TB mndwi 0,9456 ≈ awei 0,9457 (hoà); chọn mndwi vì RMSE đường bờ thấp hơn nhiều (Mục 2.4)
 
 # Transect (Mục 2.3)
@@ -61,3 +62,7 @@ U_CLASSIFY_DEFAULT = 20.0          # các năm không có ground truth: lấy gi
 SEVERE_LRR = -2.0                  # m/năm: lùi bờ mạnh khi LRR <= SEVERE_LRR
 MIN_CONSECUTIVE_DECLINE = 3        # số mốc năm liên tiếp khoảng cách giảm dần (3 mốc = 2 giai đoạn liền nhau)
 R2_CAUTION = 0.3                   # chỉ là CỜ chất lượng (low_r2_caution), không dùng để loại hay đổi nhóm
+
+# Đối chiếu sạt lở tham chiếu (s9_validate, Mục 2.4): khớp khi hotspot cách vùng cảnh báo ≤ MATCH_RADIUS; thống kê transect trong vùng đệm ZONE_BUFFER.
+MATCH_RADIUS = 500                 # m — quy ước của đồ án (cùng bậc độ không chắc chắn vị trí của vùng cảnh báo)
+ZONE_BUFFER = 100                  # m — transect cách vùng cảnh báo ≤ ngưỡng này coi là thuộc vùng
