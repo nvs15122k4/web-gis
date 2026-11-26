@@ -56,7 +56,12 @@ export async function loadSummary(onSelectTransect) {
             ${fact('Bồi mạnh nhất', link(t.max_accretion))}
             ${fact('Hotspot', s.hotspots.count ? `${s.hotspots.count} đoạn · ${hotLen}` : UPDATING)}
             ${fact('Sạt lở tham chiếu', s.reference_events.count ? `${s.reference_events.count} sự kiện` : UPDATING)}
-        </dl>`;
+        </dl>
+        <h3 class="sub-title">Dịch chuyển bờ trung bình theo năm</h3>
+        <div class="chart-box short"><canvas id="yearly-chart" aria-label="Biểu đồ dịch chuyển bờ trung bình theo năm"></canvas></div>
+        <p class="hint">Cột đỏ: bờ lùi vào so với năm trước; cột xanh: bờ tiến ra. Trung bình trên các transect có dữ liệu hai năm liền kề.</p>
+        <div id="yearly-table"></div>`;
+    loadYearly(body);
 
     // Số liệu đếm lên khi bảng tổng quan hiện ra (đặt lại về giá trị cuối nếu giảm chuyển động).
     countUp(body.querySelector('#kpi-transects'), t.total);
@@ -68,4 +73,21 @@ export async function loadSummary(onSelectTransect) {
         e.preventDefault();
         onSelectTransect(Number(a.dataset.transect));
     }));
+}
+
+/** Biểu đồ + bảng thống kê theo năm (tổng hợp từ khoảng cách baseline → bờ của từng transect). */
+async function loadYearly(body) {
+    let stats;
+    try {
+        stats = await api.yearlyStats();
+    } catch {
+        body.querySelector('#yearly-table').innerHTML = `<p class="updating">Thống kê theo năm: ${UPDATING.toLowerCase()}.</p>`;
+        return;
+    }
+    const { renderYearlyChart } = await import('./chart');
+    renderYearlyChart(body.querySelector('#yearly-chart'), stats);
+    const sign = (v) => (v === null ? '—' : `${v > 0 ? '+' : ''}${v.toFixed(1)}`);
+    body.querySelector('#yearly-table').innerHTML = `<table class="mini-table"><thead><tr><th>Năm</th><th>Δ năm (m)</th><th>Tích luỹ (m)</th><th>Lùi</th><th>Bồi</th></tr></thead><tbody>${stats
+        .map((r) => `<tr><td>${r.year}</td><td class="num">${sign(r.mean_delta_m)}</td><td class="num">${sign(r.cumulative_m)}</td><td class="num">${r.mean_delta_m === null ? '—' : r.eroding}</td><td class="num">${r.mean_delta_m === null ? '—' : r.accreting}</td></tr>`)
+        .join('')}</tbody></table>`;
 }
