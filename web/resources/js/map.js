@@ -5,6 +5,7 @@ import { initPermalink, readPermalink } from './permalink';
 import { loadSummary } from './summary';
 import { initTabs } from './tabs';
 import { initTimeline } from './timeline';
+import { initToolbar } from './toolbar';
 import { initTransectPanel, showTransect, zoomToTransect } from './transect-panel';
 
 const DEFAULT_CENTER = [10.545, 105.29];
@@ -16,7 +17,7 @@ const VIET_NAM = L.latLngBounds([4.5, 100.0], [24.5, 119.5]);
 
 export function initMap() {
     const link = readPermalink();
-    const map = L.map('map', { minZoom: MIN_ZOOM, maxBounds: VIET_NAM, maxBoundsViscosity: 1 })
+    const map = L.map('map', { zoomControl: false, minZoom: MIN_ZOOM, maxBounds: VIET_NAM, maxBoundsViscosity: 1 })
         .setView(link.view?.center ?? DEFAULT_CENTER, link.view?.zoom ?? DEFAULT_ZOOM);
 
     initBasemaps(map, window.WEBGIS.vietmapKey);
@@ -50,6 +51,7 @@ export function initMap() {
     initTransectPanel(map, permalink);
     initTabs(document.getElementById('sidebar'));
     initTimeline(map);
+    initToolbar(map);
     const sidebar = initSidebarToggle(map);
 
     const select = (id) => {

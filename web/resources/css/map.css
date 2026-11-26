@@ -143,7 +143,7 @@
     display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; height: 24px; padding: 0 8px;
     font: 500 var(--fs-sm) var(--font); color: var(--bar-ink); background: var(--bar-2); border: 1px solid var(--bar-line); border-radius: var(--r); cursor: pointer;
 }
-.timeline-play:hover:not(:disabled) { border-color: #4fc3d9; }
+.timeline-play:hover:not(:disabled) { border-color: var(--bar-mark); }
 .timeline-play:disabled { opacity: .45; cursor: default; }
 .timeline-play svg { width: 12px; height: 12px; fill: currentColor; stroke: none; }
 .timeline-play .ico-stop, .timeline-play[aria-pressed=true] .ico-play { display: none; }
@@ -161,7 +161,7 @@
 .tick.is-on { background: var(--bar-2); font-weight: 650; }
 .tick.is-empty { color: #6f8798; cursor: default; }
 .tick.is-empty .tick-mark { background: repeating-linear-gradient(90deg, var(--bar-line) 0 3px, transparent 3px 6px); box-shadow: none; }
-.tick:focus-visible, .timeline-play:focus-visible { outline: 2px solid #8fd3e2; outline-offset: -2px; }
+.tick:focus-visible, .timeline-play:focus-visible { outline: 2px solid #f5f5f1; outline-offset: -2px; }
 
 /* ================= Điện thoại ================= */
 @media (max-width: 640px) {
@@ -195,4 +195,30 @@
 @media (forced-colors: active) {
     .tick.is-on { outline: 2px solid Highlight; outline-offset: -2px; }
     .class-badge { border: 1px solid CanvasText; }
+}
+
+/* ================= Thanh công cụ nổi ================= */
+.float-toolbar { display: grid; gap: 6px; }
+.tool-group { display: grid; background: var(--float); border: 1px solid var(--float-line); border-radius: var(--r); box-shadow: var(--float-shadow); }
+.tool-btn {
+    display: grid; place-items: center; width: 32px; height: 32px; padding: 0; color: var(--ink);
+    background: none; border: 0; border-bottom: 1px solid var(--line); cursor: pointer;
+}
+.tool-btn:last-child { border-bottom: 0; }
+.tool-btn:hover { background: var(--surface-3); }
+.tool-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.tool-btn[aria-pressed=true] { color: #fff; background: var(--accent); box-shadow: inset 3px 0 0 var(--mark); }
+.tool-btn:focus-visible { outline-offset: -2px; }
+.measure-readout {
+    position: absolute; z-index: 820; left: 50%; top: 10px; transform: translateX(-50%); max-width: calc(100% - 120px);
+    padding: 5px 12px; font: 500 var(--fs-sm) var(--mono); font-variant-numeric: tabular-nums; color: var(--ink);
+    background: var(--float); border: 1px solid var(--float-line); border-left: 3px solid var(--mark); border-radius: var(--r); box-shadow: var(--float-shadow);
+}
+/* khi đo: lớp vector không bắt chuột để nhấp không mở thẻ transect */
+.map-wrap.measuring .leaflet-interactive { pointer-events: none !important; }
+@media (pointer: coarse) { .tool-btn { width: 40px; height: 40px; } }
+@media (prefers-reduced-motion: no-preference) {
+    .tool-btn { transition: background-color .12s var(--ease); }
+    .measure-readout { animation: readout-in .16s var(--ease); }
+    @keyframes readout-in { from { opacity: 0; transform: translate(-50%, -4px); } }
 }

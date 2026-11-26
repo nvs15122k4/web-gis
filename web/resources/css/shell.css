@@ -24,10 +24,10 @@
 .topnav a:hover, .topnav button:hover { color: #fff; background: var(--bar-2); }
 .topnav a.active, .topnav a[aria-current=page] { color: #fff; }
 .topnav a.active::after, .topnav a[aria-current=page]::after {
-    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #4fc3d9;
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--bar-mark);
 }
 .nav-logout { display: flex; margin: 0; border-left: 1px solid var(--bar-line); }
-.appbar :focus-visible { outline-color: #8fd3e2; outline-offset: -2px; }
+.appbar :focus-visible { outline-color: #f5f5f1; outline-offset: -2px; }
 
 /* ================= Trang bản đồ: rail + bảng + bản đồ ================= */
 body.map-page { display: grid; grid-template-rows: var(--appbar-h) minmax(0, 1fr); height: 100vh; height: 100dvh; overflow: hidden; }
