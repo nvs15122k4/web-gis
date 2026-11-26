@@ -82,6 +82,8 @@ function initSidebarToggle(map) {
     }
     toggle.addEventListener('click', () => setCollapsed(!sidebar.classList.contains('collapsed')));
     map.invalidateSize();
+    // Thanh bên trượt mượt nên kích thước bản đồ đổi liên tục: báo cho Leaflet để lớp nền không bị lệch.
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => map.invalidateSize({ pan: false })).observe(map.getContainer());
     return {
         collapseOnMobile: () => mobile.matches && setCollapsed(true),
     };
