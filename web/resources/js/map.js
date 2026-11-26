@@ -4,6 +4,7 @@ import { initBasemaps } from './basemaps';
 import { initGraticule } from './graticule';
 import { initLayers, layers } from './layers';
 import { initLayerTree } from './layer-tree';
+import { applyLayerSettings } from './layer-settings';
 import { initPermalink, readPermalink } from './permalink';
 import { initPrint } from './print';
 import { initSearch } from './search';
@@ -60,6 +61,7 @@ export function initMap() {
     initToolbar(map);
     initGraticule(map);
     initLayerTree(map);
+    applyLayerSettings(map);
     initPrint();
     initSwipe(map, window.WEBGIS.years);
     initAttrTable(map);
