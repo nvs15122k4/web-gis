@@ -7,7 +7,8 @@ Với từng ảnh data/composite/<năm>.tif, QGIS tự làm lại toàn bộ ch
   3. Otsu trên histogram do QgsRasterDataProvider.histogram() của QGIS trả về (QGIS không có sẵn thuật toán Otsu)
   4. gdal:rastercalculator + gdal:sieve          — mặt nạ nước, lọc đốm/lỗ nhỏ (thay cho mở hình thái học của Python)
   5. gdal:polygonize → giữ vùng nước lớn nhất → native:polygonstolines → native:clip theo ranh giới xã (đệm 100 m)
-So sánh với Python (đầu ra output/qgis_interpret.json, dữ liệu trung gian data/qgis/):
+So sánh với bản Python ĐÃ LƯU (data/shoreline_python, data/transects_python.json, output/transects_python.json — mốc đối chiếu cố định
+vì đường bờ chính của pipeline nay là bản QGIS, xem config.SHORELINE_ENGINE). Đầu ra output/qgis_interpret.json, dữ liệu trung gian data/qgis/):
   - ngưỡng Otsu và diện tích nước hai bên;
   - khoảng cách giữa hai đường bờ (lấy mẫu mỗi 10 m trên đường bờ QGIS, đo tới đường bờ Python);
   - khoảng cách theo transect (giao điểm gần gốc nhất, như s4_transects.distance) và LRR dựng lại từ đường bờ QGIS,
@@ -199,11 +200,11 @@ def main(years):
     zone_bank = run("native:buffer", {"INPUT": reproj, "DISTANCE": BANK_ZONE, "DISSOLVE": True, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
 
     py_thr = json.loads((DATA / "water" / "thresholds.json").read_text())
-    transects = json.loads((DATA / "transects.json").read_text())["features"]
+    transects = json.loads((DATA / "transects_python.json").read_text())["features"]
     tgeom = {f["properties"]["transect_code"]: QgsGeometry.fromPolylineXY([QgsPointXY(*c) for c in f["geometry"]["coordinates"]])
              for f in transects}
     py_stats = {f["properties"]["transect_code"]: (f["properties"].get("stats") or {}).get("lrr_m_per_year")
-                for f in json.loads((OUTPUT / "transects.json").read_text())["features"]}
+                for f in json.loads((OUTPUT / "transects_python.json").read_text())["features"]}
     py_dist = {f["properties"]["transect_code"]: f["properties"]["distances"] for f in transects}
 
     per_year, qdist = {}, {c: {} for c in tgeom}
@@ -212,7 +213,7 @@ def main(years):
             print(f"{y}: bỏ qua (không có ảnh composite)")
             continue
         qline, thr, area = interpret_year(y, zone_buf, zone_bank)
-        pf = DATA / "shoreline" / f"{y}.json"
+        pf = DATA / "shoreline_python" / f"{y}.json"
         pl = QgsVectorLayer(str(pf), "py", "ogr")
         pline = QgsGeometry.unaryUnion([f.geometry() for f in pl.getFeatures()])
         res = {"otsu_qgis": round(thr, 4), "otsu_python": py_thr[str(y)]["mndwi"],
