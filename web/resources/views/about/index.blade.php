@@ -27,6 +27,7 @@
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
     <p class="doc-toc-title">Mục lục</p>
+    <a href="#giai-doan-anh">Giải đoán ảnh</a>
     <a href="#muc-tieu">Mục tiêu</a>
     <a href="#du-lieu">Dữ liệu</a>
     <a href="#phuong-phap">Phương pháp</a>
