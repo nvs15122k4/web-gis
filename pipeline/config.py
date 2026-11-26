@@ -24,6 +24,9 @@ BANDS = ["B03", "B08", "B11", "B12", "SCL"]
 
 WATER_INDICES = ["ndwi", "mndwi", "awei"]
 SELECT_TIE_F1 = 0.005             # chênh F1 TB ≤ ngưỡng này thì coi là hoà và xét RMSE đường bờ (s7_evaluate.select_index, Mục 3.4)
+# Engine giải đoán đường bờ: "qgis" = đường bờ do QGIS tự giải đoán từ ảnh (qgis_interpret.py: MNDWI → Otsu → sieve → polygonize),
+# "python" = đường bờ contour dưới pixel của s3_shoreline.vectorize. Raster nước của s2 chỉ còn dùng để xác định phía đất khi dựng baseline (s4).
+SHORELINE_ENGINE = "qgis"
 DEFAULT_INDEX = "mndwi"           # F1 TB mndwi 0,9456 ≈ awei 0,9457 (hoà); chọn mndwi vì RMSE đường bờ thấp hơn nhiều (Mục 2.4)
 
 # Transect (Mục 2.3)
