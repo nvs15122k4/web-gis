@@ -4,14 +4,14 @@
   "2018": {
    "otsu_qgis": 0.1687,
    "otsu_python": 0.1633,
-   "water_area_km2_qgis": 11.71,
-   "length_km_qgis": 15.82,
+   "water_area_km2_qgis": 11.67,
+   "length_km_qgis": 15.37,
    "length_km_python": 15.12,
    "qgis_to_python": {
-    "mean_m": 12.44,
-    "median_m": 2.78,
-    "p95_m": 7.53,
-    "rmse_m": 56.23
+    "mean_m": 3.05,
+    "median_m": 2.69,
+    "p95_m": 6.54,
+    "rmse_m": 3.88
    },
    "python_to_qgis": {
     "mean_m": 2.94,
@@ -19,27 +19,27 @@
     "p95_m": 6.45,
     "rmse_m": 3.57
    },
-   "hausdorff_m": 384.68,
-   "within_1px_pct": 98.1,
-   "within_2px_pct": 98.4,
+   "hausdorff_m": 31.27,
+   "within_1px_pct": 99.5,
+   "within_2px_pct": 99.8,
    "transect_offset": {
     "n": 267,
-    "mean_m": -0.8,
-    "mean_abs_m": 6.03,
-    "rmse_m": 29.75
+    "mean_m": 2.37,
+    "mean_abs_m": 2.94,
+    "rmse_m": 3.52
    }
   },
   "2019": {
    "otsu_qgis": 0.0708,
    "otsu_python": 0.0673,
-   "water_area_km2_qgis": 11.7,
-   "length_km_qgis": 15.47,
+   "water_area_km2_qgis": 11.67,
+   "length_km_qgis": 15.15,
    "length_km_python": 15.25,
    "qgis_to_python": {
-    "mean_m": 9.9,
-    "median_m": 3.09,
-    "p95_m": 7.54,
-    "rmse_m": 45.97
+    "mean_m": 3.33,
+    "median_m": 3.03,
+    "p95_m": 6.9,
+    "rmse_m": 4.57
    },
    "python_to_qgis": {
     "mean_m": 5.04,
@@ -47,20 +47,20 @@
     "p95_m": 7.45,
     "rmse_m": 14.49
    },
-   "hausdorff_m": 364.7,
-   "within_1px_pct": 96.7,
-   "within_2px_pct": 97.4,
+   "hausdorff_m": 133.22,
+   "within_1px_pct": 97.7,
+   "within_2px_pct": 98.5,
    "transect_offset": {
     "n": 267,
-    "mean_m": 0.78,
-    "mean_abs_m": 5.32,
-    "rmse_m": 24.06
+    "mean_m": 2.86,
+    "mean_abs_m": 3.29,
+    "rmse_m": 4.05
    }
   },
   "2020": {
    "otsu_qgis": 0.1372,
    "otsu_python": 0.1349,
-   "water_area_km2_qgis": 11.57,
+   "water_area_km2_qgis": 11.56,
    "length_km_qgis": 14.86,
    "length_km_python": 14.7,
    "qgis_to_python": {
@@ -88,7 +88,7 @@
   "2021": {
    "otsu_qgis": 0.1219,
    "otsu_python": 0.1211,
-   "water_area_km2_qgis": 11.6,
+   "water_area_km2_qgis": 11.59,
    "length_km_qgis": 15.13,
    "length_km_python": 14.92,
    "qgis_to_python": {
@@ -116,7 +116,7 @@
   "2022": {
    "otsu_qgis": 0.12,
    "otsu_python": 0.1207,
-   "water_area_km2_qgis": 11.6,
+   "water_area_km2_qgis": 11.58,
    "length_km_qgis": 15.17,
    "length_km_python": 15.13,
    "qgis_to_python": {
@@ -144,7 +144,7 @@
   "2023": {
    "otsu_qgis": 0.1326,
    "otsu_python": 0.1289,
-   "water_area_km2_qgis": 11.59,
+   "water_area_km2_qgis": 11.58,
    "length_km_qgis": 15.25,
    "length_km_python": 15.06,
    "qgis_to_python": {
@@ -172,14 +172,14 @@
   "2024": {
    "otsu_qgis": 0.0411,
    "otsu_python": 0.0404,
-   "water_area_km2_qgis": 11.65,
-   "length_km_qgis": 15.29,
+   "water_area_km2_qgis": 11.62,
+   "length_km_qgis": 14.85,
    "length_km_python": 14.67,
    "qgis_to_python": {
-    "mean_m": 5.74,
-    "median_m": 3.12,
-    "p95_m": 7.69,
-    "rmse_m": 18.1
+    "mean_m": 3.23,
+    "median_m": 3.0,
+    "p95_m": 6.81,
+    "rmse_m": 3.85
    },
    "python_to_qgis": {
     "mean_m": 3.2,
@@ -187,14 +187,14 @@
     "p95_m": 6.77,
     "rmse_m": 3.83
    },
-   "hausdorff_m": 164.39,
-   "within_1px_pct": 98.2,
-   "within_2px_pct": 98.8,
+   "hausdorff_m": 13.05,
+   "within_1px_pct": 99.5,
+   "within_2px_pct": 100.0,
    "transect_offset": {
     "n": 267,
-    "mean_m": 0.27,
-    "mean_abs_m": 5.81,
-    "rmse_m": 24.05
+    "mean_m": 2.84,
+    "mean_abs_m": 3.36,
+    "rmse_m": 3.95
    }
   },
   "2025": {
@@ -257,9 +257,9 @@
  "trend_lrr": {
   "n_transects": 267,
   "pearson_r": 0.95,
-  "bias_mps": 0.029,
-  "mae_mps": 0.279,
-  "rmse_mps": 0.349,
+  "bias_mps": 0.022,
+  "mae_mps": 0.278,
+  "rmse_mps": 0.348,
   "same_sign_pct": 90.6,
   "severe_agree": 3,
   "severe_qgis": 4,
@@ -270,9 +270,9 @@
   "T0002": 0.082,
   "T0003": -0.538,
   "T0004": 3.319,
-  "T0005": 0.885,
-  "T0006": 0.544,
-  "T0007": -1.793,
+  "T0005": 0.641,
+  "T0006": 0.214,
+  "T0007": -1.992,
   "T0016": 0.203,
   "T0017": -0.264,
   "T0018": -0.848,
@@ -281,9 +281,9 @@
   "T0021": -0.402,
   "T0022": -0.043,
   "T0023": -0.333,
-  "T0024": -0.794,
-  "T0025": 1.147,
-  "T0026": 2.255,
+  "T0024": -1.166,
+  "T0025": 0.954,
+  "T0026": 1.896,
   "T0027": 1.562,
   "T0028": 1.277,
   "T0029": -0.916,
