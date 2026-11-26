@@ -23,6 +23,32 @@
 .step-fig img { display: block; width: 100%; height: auto; max-height: 68vh; object-fit: contain; background: var(--surface-2); }
 .step-fig figcaption { margin-top: 8px; font: 400 var(--fs-md)/1.45 var(--font); color: var(--ink-3); }
 
+/* Chi tiết kỹ thuật: details/summary gốc của trình duyệt, đọc được và mở được bằng bàn phím, không cần JS */
+.step-more { margin: 14px 0 0; border: 1px solid var(--line-strong); background: var(--surface); }
+.step-more > summary {
+    cursor: pointer; padding: 10px 14px; font: 600 var(--fs-md) var(--font); color: var(--accent-ink); list-style: none;
+    display: flex; align-items: center; gap: 8px;
+}
+.step-more > summary::-webkit-details-marker { display: none; }
+.step-more > summary::before { content: "+"; display: inline-block; width: 1em; font: 600 16px var(--mono); }
+.step-more[open] > summary::before { content: "\2212"; }
+.step-more > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.step-more-body { padding: 4px 14px 14px; font: 400 15px/1.6 var(--font); color: var(--ink); border-top: 1px solid var(--line); }
+.spec { margin: 10px 0 0; }
+.spec dt { margin-top: 12px; font: 600 var(--fs-sm) var(--mono); letter-spacing: .02em; text-transform: uppercase; color: var(--ink-3); }
+.spec dd { margin: 3px 0 0; }
+.spec code { font: 500 .92em var(--mono); background: var(--surface-2); padding: 0 3px; overflow-wrap: anywhere; }
+.more-fig { margin: 14px 0 0; }
+.more-fig img { display: block; width: 100%; height: auto; background: var(--surface-2); border: 1px solid var(--line); }
+.more-fig figcaption { margin-top: 6px; font: 400 var(--fs-md)/1.45 var(--font); color: var(--ink-3); }
+
+/* Hộp hạn chế */
+.step-limits { margin: 32px 0 8px; padding: 18px 22px; background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); }
+.step-limits h3 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
+.step-limits p { margin: 0 0 10px; font: 400 15px/1.6 var(--font); }
+.step-limits ul { margin: 0; padding-left: 20px; font: 400 15px/1.6 var(--font); }
+.step-limits li { margin: 0 0 8px; }
+
 @media (prefers-reduced-motion: reduce) { .step { transition: none; } }
 
 @media (max-width: 860px) {
