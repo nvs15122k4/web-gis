@@ -55,8 +55,8 @@ def main():
 def write_aoi():
     """AOI cho web (Mục 2.2): ranh giới xã + vùng nghiên cứu = dải bờ sông mà transect phủ tới."""
     tr = gpd.read_file(C.DATA / "transects.json").to_crs(C.CRS)
-    study = tr.buffer(C.TRANSECT_SPACING).union_all().simplify(20)
-    commune = gpd.read_file(C.COMMUNE_FILE).to_crs(C.CRS).geometry.iloc[0].simplify(10)
+    study = tr.buffer(C.TRANSECT_SPACING).union_all().simplify(0.5)
+    commune = gpd.read_file(C.COMMUNE_FILE).to_crs(C.CRS).geometry.iloc[0].simplify(0.5)
     aoi = gpd.GeoDataFrame([
         {"name": "Vùng nghiên cứu — đoạn bờ sông Hậu thuộc xã Bình Mỹ", "role": "study_area", "geometry": study},
         {"name": "Ranh giới xã Bình Mỹ (OpenStreetMap, sau sáp nhập 2025)", "role": "commune", "geometry": commune},
