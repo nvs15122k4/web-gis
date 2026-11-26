@@ -6,3 +6,6 @@ data/water/
 data/*.log
 data/ground_truth/img/
 data/crosscheck/*.tif
+data/alt/*/composite/
+data/alt/*/water/
+data/alt/jrc/*.tif
