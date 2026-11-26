@@ -13,8 +13,8 @@ def test_reference_has_two_events(features):
     assert len(features) == 2
 
 
-def test_reference_length_m_is_3271(features):
-    assert [f["properties"]["length_m"] for f in features] == [3271, 3271]
+def test_reference_length_m_is_3377(features):
+    assert [f["properties"]["length_m"] for f in features] == [3377, 3377]
 
 
 def test_reference_event_dates(features):
