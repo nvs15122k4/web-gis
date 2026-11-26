@@ -14,7 +14,7 @@ from qgis.core import (  # noqa: E402
     Qgis, QgsApplication, QgsFillSymbol, QgsGraduatedSymbolRenderer, QgsLayoutExporter, QgsLayoutItemLabel,
     QgsLayoutItemLegend, QgsLayoutItemMap, QgsLayoutItemPicture, QgsLayoutItemScaleBar, QgsLayoutPoint, QgsLayoutSize,
     QgsPrintLayout, QgsProject, QgsRendererRange, QgsSymbol, QgsTextFormat, QgsUnitTypes, QgsCategorizedSymbolRenderer,
-    QgsRendererCategory, QgsRectangle, QgsVectorLayer,
+    QgsRendererCategory, QgsRectangle,
 )
 from qgis.PyQt.QtGui import QColor, QFont  # noqa: E402
 
@@ -45,31 +45,6 @@ def transect_layer(field, name, bins):
     return lyr
 
 
-def qgis_transects():
-    """Bản sao lớp transect + trường qgis_lrr / qgis_diff (LRR dựng từ đường bờ QGIS, output/qgis_interpret.json), ghi ra tệp để lưu trong project."""
-    import json
-    from qgis.core import QgsFeature, QgsField, QgsVectorFileWriter
-    from qgis.PyQt.QtCore import QVariant
-    q = json.loads((Q.OUTPUT / "qgis_interpret.json").read_text())["transect_lrr"]
-    src = Q.vector(Q.OUTPUT / "alt_transects.json", "src")
-    mem = QgsVectorLayer(f"LineString?crs={Q.CRS.authid()}", "t", "memory")
-    mem.dataProvider().addAttributes([QgsField("transect_code", QVariant.String), QgsField("main_lrr", QVariant.Double),
-                                      QgsField("qgis_lrr", QVariant.Double), QgsField("qgis_diff", QVariant.Double)])
-    mem.updateFields()
-    out = []
-    for f in src.getFeatures():
-        v, m = q.get(f["transect_code"]), f["main_lrr"]
-        g = QgsFeature(mem.fields()); g.setGeometry(f.geometry())
-        g.setAttributes([f["transect_code"], m, v, (round(v - m, 3) if v is not None and m is not None else None)])
-        out.append(g)
-    mem.dataProvider().addFeatures(out)
-    path = Q.DATA / "qgis" / "transects_lrr"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    QgsVectorFileWriter.writeAsVectorFormat(mem, str(path) + ".geojson", "utf-8", mem.crs(), "GeoJSON")
-    os.replace(str(path) + ".geojson", str(path) + ".json")
-    return path.with_suffix(".json")
-
-
 def text(lay, s, x, y, w, h, size, bold=False):
     it = QgsLayoutItemLabel(lay)
     it.setText(s)
@@ -98,21 +73,19 @@ def three_panel(project, name, title, subtitle, panels, extent, legend_layer, no
     lg = QgsLayoutItemLegend(lay)
     lg.setTitle(legend_title); lg.setLinkedMap(first); lg.setAutoUpdateModel(False)
     for node in lg.model().rootGroup().findLayers():
-        if node.layerId() not in {l.id() for l in (legend_layer if isinstance(legend_layer, (list, tuple)) else [legend_layer])}:
+        if node.layerId() != legend_layer.id():
             node.parent().removeChildNode(node)
-    if isinstance(legend_layer, (list, tuple)):
-        lg.setColumnCount(2); lg.setSymbolHeight(3); lg.setLineSpacing(0.6)
     lg.attemptMove(QgsLayoutPoint(8, 153)); lay.addLayoutItem(lg)
     sb = QgsLayoutItemScaleBar(lay)
     sb.setStyle("Single Box"); sb.setLinkedMap(first)
     sb.setUnits(QgsUnitTypes.DistanceKilometers); sb.setUnitLabel("km"); sb.setUnitsPerSegment(2)
     sb.setNumberOfSegments(2); sb.setNumberOfSegmentsLeft(0)
-    sb.attemptMove(QgsLayoutPoint(150, 183) if isinstance(legend_layer, (list, tuple)) else QgsLayoutPoint(110, 178)); lay.addLayoutItem(sb)
+    sb.attemptMove(QgsLayoutPoint(110, 178)); lay.addLayoutItem(sb)
     na = QgsLayoutItemPicture(lay)
     na.setPicturePath(QgsApplication.pkgDataPath() + "/svg/arrows/NorthArrow_02.svg")
     na.setLinkedMap(first); na.attemptMove(QgsLayoutPoint(270, 150)); na.attemptResize(QgsLayoutSize(14, 20))
     lay.addLayoutItem(na)
-    text(lay, note + f" Hệ toạ độ WGS 84 / UTM 48N. Thành lập bằng QGIS {Qgis.version().split('-')[0]}.", 110 if not isinstance(legend_layer, (list, tuple)) else 120, 150, 145, 26, 7)
+    text(lay, note + f" Hệ toạ độ WGS 84 / UTM 48N. Thành lập bằng QGIS {Qgis.version().split('-')[0]}.", 110, 150, 155, 26, 7)
     project.layoutManager().addLayout(lay)
     return lay
 
@@ -128,17 +101,11 @@ def main():
     lrr = {k: transect_layer(f"{k}_lrr", "Phân nhóm LRR (m/năm)", LRR_BINS) for k in SRC}
     diff = {k: transect_layer(f"{k}_diff", "Chênh LRR (m/năm)", DIFF_BINS) for k in ("s2c1", "landsat")}
     # đường bờ 2026 ba nguồn
-    shore, short, width = {}, {"main": "Bờ 2026 — bản chính (S2 PC)", "s2c1": "Bờ 2026 — Sentinel-2 C1", "landsat": "Bờ 2026 — Landsat 8/9",
-                                      "qgis": "Bờ 2026 — QGIS tự giải đoán"}, \
-        {"main": 0.4, "s2c1": 1.0, "landsat": 1.8, "qgis": 0.8}   # nét mảnh nằm trên nét dày để thấy cả ba khi chúng trùng nhau
-    for k, (lab, col) in {**SRC, "qgis": ("", "#e91e63")}.items():
-        f = {"main": Q.DATA / "shoreline" / "2026.json", "qgis": Q.DATA / "qgis" / "shoreline" / "2026.json"}.get(
-            k, Q.DATA / "alt" / k / "shoreline" / "2026_mndwi.json")
+    shore, short, width = {}, {"main": "Bờ 2026 — bản chính (S2 PC)", "s2c1": "Bờ 2026 — Sentinel-2 C1", "landsat": "Bờ 2026 — Landsat 8/9"}, \
+        {"main": 0.4, "s2c1": 1.0, "landsat": 1.8}   # nét mảnh nằm trên nét dày để thấy cả ba khi chúng trùng nhau
+    for k, (lab, col) in SRC.items():
+        f = (Q.DATA / "shoreline" / "2026.json") if k == "main" else (Q.DATA / "alt" / k / "shoreline" / "2026_mndwi.json")
         lyr = Q.vector(f, short[k]); lyr.renderer().setSymbol(Q.line(col, width[k])); shore[k] = lyr
-    qt = qgis_transects()
-    lrr["qgis"] = Q.vector(qt, "Phân nhóm LRR (m/năm)"); lrr["qgis"].setRenderer(graduated("qgis_lrr", LRR_BINS))
-    lrr["main_q"] = Q.vector(qt, "Phân nhóm LRR (m/năm)"); lrr["main_q"].setRenderer(graduated("main_lrr", LRR_BINS))
-    diff["qgis"] = Q.vector(qt, "Chênh LRR (m/năm)"); diff["qgis"].setRenderer(graduated("qgis_diff", DIFF_BINS))
     layers = [img, xa, *lrr.values(), *diff.values(), *shore.values()]
     for l in layers:
         project.addMapLayer(l)
@@ -149,7 +116,7 @@ def main():
     tr_ext = lrr["main"].extent(); tr_ext.grow(300)
     maps = [
         three_panel(project, "so_sanh_lrr_3_nguon", "So sánh tốc độ biến động bờ (LRR) giữa ba nguồn dữ liệu, 2018–2026",
-                    "Cùng bộ 267 transect, cùng thủ tục khử đột biến/hồi quy (bước 5); khác nguồn ảnh, bản xử lý và cảm biến",
+                    "Cùng bộ 266 transect, cùng thủ tục khử đột biến/hồi quy (bước 5); khác nguồn ảnh, bản xử lý và cảm biến",
                     [("Bản chính — Sentinel-2 L2A (PC), 9 năm", [lrr["main"], xa, img]),
                      ("Đối chứng 1 — Sentinel-2 C1 (AWS), 6 năm tin cậy", [lrr["s2c1"], xa, img]),
                      ("Đối chứng 2 — Landsat 8/9 (30 m), 9 năm", [lrr["landsat"], xa, img])],
@@ -160,23 +127,15 @@ def main():
                     "Màu xám = hai nguồn khớp trong ±0,5 m/năm; đỏ = đối chứng lùi nhiều hơn bản chính, xanh = bồi nhiều hơn",
                     [("Sentinel-2 C1 − bản chính", [diff["s2c1"], xa, img]), ("Landsat − bản chính", [diff["landsat"], xa, img])],
                     tr_ext, diff["s2c1"], "Chênh LRR (m/năm) tính trên cùng transect; Sentinel-2 C1 chỉ dùng 6 năm tin cậy.", legend_title="Chênh LRR (đối chứng − chính)"),
-        three_panel(project, "so_sanh_lrr_python_qgis", "LRR dựng từ đường bờ Python và từ đường bờ QGIS tự giải đoán, 2018–2026",
-                    "Cùng ảnh Sentinel-2 L2A (PC), cùng 267 transect và thủ tục hồi quy; chỉ khác phần giải đoán ảnh (Python/scikit-image và QGIS/GDAL)",
-                    [("Python — bản chính", [lrr["main_q"], xa, img]), ("QGIS tự giải đoán", [lrr["qgis"], xa, img]),
-                     ("Chênh LRR (QGIS − Python)", [diff["qgis"], xa, img])],
-                    tr_ext, [lrr["main_q"], diff["qgis"]],
-                    "QGIS làm lại MNDWI → Otsu → sieve → polygonize → mở hình thái học vector (buffer ∓50 m) rồi đo khoảng cách theo transect. "
-                    "Hai cột đầu cùng thang LRR; cột ba dùng thang chênh LRR (xám = khớp trong ±0,5 m/năm)."),
     ]
     # bản đồ chi tiết đường bờ 2026 quanh transect lùi mạnh nhất của bản chính
     worst = max(lrr["main"].getFeatures(), key=lambda f: -(f["main_lrr"] or 0))
     c = worst.geometry().centroid().asPoint()
     ext = QgsRectangle(c.x() - 450, c.y() - 330, c.x() + 450, c.y() + 330)
     detail = Q.add_layout(project, "so_sanh_duong_bo_diem_nong",
-                          "Đường bờ 2026 của ba nguồn và bản QGIS quanh transect lùi mạnh nhất (" + str(worst["transect_code"]) + ")",
+                          "Đường bờ 2026 của ba nguồn quanh transect lùi mạnh nhất (" + str(worst["transect_code"]) + ")",
                           [*shore.values(), lrr["main"], img], [*shore.values(), lrr["main"]], extent=ext,
-                          subtitle="Chênh lệch giữa các đường bờ phản ánh độ bất định định vị/phân loại, cỡ 1–3 pixel Sentinel-2; "
-                                   "đường QGIS (hồng) tự giải đoán lại từ ảnh bản chính, lệch trung vị ~3 m so với bản Python")
+                          subtitle="Chênh lệch giữa ba đường bờ phản ánh độ bất định định vị/phân loại, cỡ 1–3 pixel Sentinel-2")
     maps.append(detail)
     Q.FIG.mkdir(parents=True, exist_ok=True); PROJECT.parent.mkdir(parents=True, exist_ok=True)
     for lay in maps:
