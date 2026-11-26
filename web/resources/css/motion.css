@@ -13,6 +13,13 @@
 @keyframes ring-settle { from { opacity: 1; transform: translate(-50%, -50%) scale(1.25); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 @keyframes path-in { from { opacity: 0; } }
 @keyframes skeleton-sweep { to { background-position: -200% 0; } }
+@keyframes page-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes panel-in-right { from { opacity: 0; transform: translateX(24px); } }
+@keyframes panel-out-right { to { opacity: 0; transform: translateX(24px); } }
+@keyframes panel-in-up { from { opacity: 0; transform: translateY(20px); } }
+@keyframes panel-out-down { to { opacity: 0; transform: translateY(20px); } }
+@keyframes drop-out { to { opacity: 0; transform: translateY(-4px); } }
 
 @media (prefers-reduced-motion: no-preference) {
     /* bảng nội dung trượt nhẹ khi đổi tab, danh sách hiện lần lượt */
@@ -53,11 +60,38 @@
     .tick, .tick-mark { transition: background-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), transform var(--dur-2) var(--ease-out); }
     .timeline-playhead { transition: transform .5s var(--ease-out), width .3s var(--ease-out), opacity .2s var(--ease); }
 
-    /* hiện trạng thái tải/lỗi */
+    /* hiện trạng thái tải/lỗi; nội dung thật hiện dần thay cho khung chờ */
     .state-block { animation: fade-in var(--dur-2) var(--ease-out) both; }
+    #transect-detail > :not(.detail-skeleton, .state-block), #summary-body > :not(.skeleton) { animation: fade-in var(--dur-3) var(--ease-out) both; }
+
+    /* chuyển trang: nội dung trang tĩnh trượt nhẹ vào; trang bản đồ không đụng tới để khỏi ảnh hưởng hiệu năng */
+    body.page main#main-content { animation: page-in var(--dur-3) var(--ease-out) backwards; }
+
+    /* mở/đóng bảng: chỉ transform + opacity (compositor), lớp .is-closing do motion.js gắn khi đóng */
+    .inspector { animation: panel-in-right var(--dur-3) var(--ease-out) backwards; }
+    .inspector.is-closing { animation: panel-out-right var(--dur-2) var(--ease) forwards; pointer-events: none; }
+    .attr-table { animation: panel-in-up var(--dur-3) var(--ease-out) backwards; }
+    .attr-table.is-closing { animation: panel-out-down var(--dur-2) var(--ease) forwards; pointer-events: none; }
+    .search-results { animation: drop-in var(--dur-2) var(--ease-out) backwards; }
+    .search-results.is-closing { animation: drop-out var(--dur-1) var(--ease) forwards; pointer-events: none; }
+    .search-results li { animation: slide-in-left var(--dur-2) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 24ms); }
+    .search-results li:nth-child(2) { --i: 1; }
+    .search-results li:nth-child(3) { --i: 2; }
+    .search-results li:nth-child(4) { --i: 3; }
+    .search-results li:nth-child(n + 5) { --i: 4; }
+
+    /* hover / nhấn */
+    .btn { transition: background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease); }
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .icon-btn, .topnav a, .topnav button, .search-results button, .attr-grid tbody tr, .tree-group > summary, .map-legend summary { transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+    .icon-btn:active { transform: scale(.94); }
+    .topnav a.active::after, .topnav a[aria-current=page]::after { animation: bar-grow var(--dur-3) var(--ease-out) both; }
 }
 
 @media (prefers-reduced-motion: no-preference) and (max-width: 720px) {
     @keyframes sheet-up { from { transform: translateY(28px); opacity: 0; } }
     .sidebar:not(.collapsed) { animation: sheet-up var(--dur-3) var(--ease-out); }
+    /* thẻ chi tiết thành bottom sheet: trượt từ dưới lên thay vì từ phải */
+    .inspector { animation-name: panel-in-up; }
+    .inspector.is-closing { animation-name: panel-out-down; }
 }
