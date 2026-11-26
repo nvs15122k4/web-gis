@@ -7,7 +7,9 @@ async function get(path, params = {}) {
 }
 
 export const api = {
-    shorelines: (year) => get('/shorelines', year ? { year } : {}),
+    shorelines: (year, source) => get('/shorelines', { ...(year ? { year } : {}), ...(source ? { source } : {}) }),
+    altSources: () => get('/alt-sources'),
+    transectCompare: (id) => get(`/transects/${id}/compare`),
     transect: (id) => get(`/transects/${id}`),
     transectHistory: (id) => get(`/transects/${id}/history`),
     hotspots: (minRate) => get('/erosion-hotspots', minRate != null && minRate !== '' ? { min_rate: minRate } : {}),

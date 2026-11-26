@@ -2,6 +2,7 @@ import L from 'leaflet';
 import { createAttrTable } from './attr-table';
 import { initBasemaps } from './basemaps';
 import { initGraticule } from './graticule';
+import { initAltSources, initComparePanel } from './alt-sources';
 import { initLayers, layers } from './layers';
 import { initLayerTree } from './layer-tree';
 import { applyLayerSettings } from './layer-settings';
@@ -56,6 +57,8 @@ export function initMap() {
 
     const permalink = initPermalink(map);
     initLayers(map);
+    layers.alt = initAltSources(map);
+    initComparePanel();
     initTransectPanel(map, permalink);
     initTabs(document.getElementById('sidebar'));
     initTimeline(map);

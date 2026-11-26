@@ -31,7 +31,7 @@ class MapController extends Controller
     {
         try {
             // Danh sách năm chỉ đổi khi chạy lại pipeline: nhớ 60s để trang chủ không truy vấn PostGIS mỗi lượt tải.
-            return Cache::remember('map.available_years', 60, fn () => Shoreline::query()->distinct()->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all());
+            return Cache::remember('map.available_years', 60, fn () => Shoreline::main()->distinct()->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all());
         } catch (Throwable $e) {
             report($e);
 

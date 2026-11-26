@@ -10,15 +10,15 @@ import s5_stats as S  # noqa: E402
 
 # Giá trị chốt từ tính tay: sqrt(5² + 6² + U_classify²)
 @pytest.mark.parametrize("year,expected", [
-    (2018, 17.00),   # sqrt(25+36+15.1²) = 17.00
-    (2019, 21.47),   # năm không có ground truth: U_CLASSIFY_DEFAULT = 20
-    (2020, 21.47),
-    (2021, 21.47),
-    (2022, 19.98),   # sqrt(25+36+18.39²)
-    (2023, 21.47),
-    (2024, 21.47),
-    (2025, 21.47),
-    (2026, 21.46),   # sqrt(25+36+19.99²)
+    (2018, 18.46),   # sqrt(25+36+16.73²)
+    (2019, 23.063),   # năm không có ground truth: U_CLASSIFY_DEFAULT = 21.7
+    (2020, 23.063),
+    (2021, 23.063),
+    (2022, 19.456),   # sqrt(25+36+17.82²)
+    (2023, 23.063),
+    (2024, 23.063),
+    (2025, 23.063),
+    (2026, 23.053),   # sqrt(25+36+21.69²)
 ])
 def test_u_shoreline_year_values(year, expected):
     assert S.u_shoreline(year) == pytest.approx(expected, abs=0.005)

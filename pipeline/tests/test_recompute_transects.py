@@ -1,4 +1,4 @@
-"""Tái tính độc lập 267 transect từ output/transects.json bằng scipy.stats.linregress rồi so với số đã công bố."""
+"""Tái tính độc lập 266 transect từ output/transects.json bằng scipy.stats.linregress rồi so với số đã công bố."""
 import math
 
 import pytest
@@ -42,11 +42,11 @@ def _expected_class(lr, n, cons, tc):
     return "mild_erosion"
 
 
-def test_there_are_267_transects(transects):
-    assert len(transects) == 267
+def test_there_are_266_transects(transects):
+    assert len(transects) == 266
 
 
-def test_recompute_267_transects_with_linregress(transects):
+def test_recompute_266_transects_with_linregress(transects):
     checked = 0
     counts = {}
     for f in transects:
@@ -62,11 +62,13 @@ def test_recompute_267_transects_with_linregress(transects):
 
         assert st["n_years"] == n, code
         assert st["lrr_m_per_year"] == pytest.approx(lr.slope, abs=6e-4), code
-        assert st["se_lrr"] == pytest.approx(lr.stderr, abs=6e-5), code
-        assert st["r_squared"] == pytest.approx(lr.rvalue ** 2, abs=6e-4), code
+        # chuỗi hằng (đường bờ QGIS đi theo cạnh pixel nên có transect cắt cùng một cạnh mọi năm): linregress trả stderr = nan, thực tế 0
+        se = 0.0 if len(set(vals)) == 1 else lr.stderr
+        assert st["se_lrr"] == pytest.approx(se, abs=6e-5), code
+        assert st["r_squared"] == pytest.approx(0.0 if len(set(vals)) == 1 else lr.rvalue ** 2, abs=6e-4), code
         tc = float(sps.t.ppf(0.975, n - 2))
         assert st["t_crit"] == pytest.approx(tc, abs=6e-4), code
-        assert st["unc_lrr"] == pytest.approx(tc * lr.stderr, abs=2e-3), code
+        assert st["unc_lrr"] == pytest.approx(tc * se, abs=2e-3), code
         assert st["nsm_m"] == pytest.approx(vals[-1] - vals[0], abs=6e-3), code
         assert st["epr_m_per_year"] == pytest.approx((vals[-1] - vals[0]) / (years[-1] - years[0]), abs=6e-4), code
         assert st["consecutive_erosion_periods"] == _longest_decline(s), code
@@ -76,8 +78,8 @@ def test_recompute_267_transects_with_linregress(transects):
         assert st["change_class"] == cls, code
         counts[cls] = counts.get(cls, 0) + 1
         checked += 1
-    assert checked == 267
-    assert counts == {"accretion": 81, "stable": 167, "mild_erosion": 18, "severe_erosion": 1}
+    assert checked == 266
+    assert counts == {"accretion": 71, "stable": 181, "mild_erosion": 10, "severe_erosion": 4}
 
 
 def test_recomputed_classes_match_summary(transects, summary):
@@ -85,10 +87,10 @@ def test_recomputed_classes_match_summary(transects, summary):
     for f in transects:
         c = f["properties"]["stats"]["change_class"]
         got[c] = got.get(c, 0) + 1
-    assert summary["transects"] == 267
+    assert summary["transects"] == 266
     assert summary["classes"] == got
-    assert summary["classes"] == {"accretion": 81, "stable": 167, "mild_erosion": 18, "severe_erosion": 1}
-    assert sum(summary["classes"].values()) == 267
+    assert summary["classes"] == {"accretion": 71, "stable": 181, "mild_erosion": 10, "severe_erosion": 4}
+    assert sum(summary["classes"].values()) == 266
 
 
 def test_significance_flag_matches_ci_excluding_zero(transects):
@@ -102,7 +104,7 @@ def test_significance_flag_matches_ci_excluding_zero(transects):
 def test_summary_mean_of_significant_erosion_lrr(transects, summary):
     lrrs = [f["properties"]["stats"]["lrr_m_per_year"] for f in transects
             if f["properties"]["stats"]["is_significant"] and f["properties"]["stats"]["lrr_m_per_year"] < 0]
-    assert len(lrrs) == 19  # 18 mild + 1 severe
+    assert len(lrrs) == 14  # 10 mild + 4 severe
     mean = sum(lrrs) / len(lrrs)
     assert summary["M_lrr_erosion"] == pytest.approx(mean, abs=2e-3)
     sd = math.sqrt(sum((x - mean) ** 2 for x in lrrs) / (len(lrrs) - 1))

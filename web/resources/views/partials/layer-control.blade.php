@@ -57,6 +57,14 @@
     <div id="year-list" class="year-grid"></div>
 </section>
 
+<section id="alt-sources" class="card tree" aria-labelledby="alt-sources-title">
+    <h2 class="section-title" id="alt-sources-title">Đường bờ đối chứng</h2>
+    <p class="hint">Hai bản dữ liệu ảnh vệ tinh khác (Sentinel-2 Collection 1, Landsat 8/9) đặt cạnh bản chính để kiểm tra chéo. Đây là bản đối chứng độc lập, không thay thế bản chính và không phải dự báo sạt lở.</p>
+    <div id="alt-source-list" class="alt-source-list"><p class="hint">Đang tải…</p></div>
+    <p id="alt-low-note" class="note" role="note" hidden></p>
+    <div class="btn-row"><button type="button" class="btn btn-ghost" id="alt-clear">Tắt hết đường bờ đối chứng</button></div>
+</section>
+
 <section id="compare" class="card">
     <h2 class="section-title">So sánh hai năm</h2>
     <div class="compare-row">

@@ -15,7 +15,7 @@ def row(stats):
 
 
 # ---------- u_shoreline ----------
-@pytest.mark.parametrize("year,cls", [(2018, 15.1), (2022, 18.39), (2026, 19.99), (2020, C.U_CLASSIFY_DEFAULT),
+@pytest.mark.parametrize("year,cls", [(2018, 16.73), (2022, 17.82), (2026, 21.69), (2020, C.U_CLASSIFY_DEFAULT),
                                       (1900, C.U_CLASSIFY_DEFAULT)])
 def test_u_shoreline_formula(year, cls):
     exp = math.sqrt(C.U_PIXEL ** 2 + C.U_GEOREF ** 2 + cls ** 2)

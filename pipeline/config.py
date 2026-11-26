@@ -24,6 +24,9 @@ BANDS = ["B03", "B08", "B11", "B12", "SCL"]
 
 WATER_INDICES = ["ndwi", "mndwi", "awei"]
 SELECT_TIE_F1 = 0.005             # chênh F1 TB ≤ ngưỡng này thì coi là hoà và xét RMSE đường bờ (s7_evaluate.select_index, Mục 3.4)
+# Engine giải đoán đường bờ: "qgis" = đường bờ do QGIS tự giải đoán từ ảnh (qgis_interpret.py: MNDWI → Otsu → sieve → polygonize),
+# "python" = đường bờ contour dưới pixel của s3_shoreline.vectorize. Raster nước của s2 chỉ còn dùng để xác định phía đất khi dựng baseline (s4).
+SHORELINE_ENGINE = "qgis"
 DEFAULT_INDEX = "mndwi"           # F1 TB mndwi 0,9456 ≈ awei 0,9457 (hoà); chọn mndwi vì RMSE đường bờ thấp hơn nhiều (Mục 2.4)
 
 # Transect (Mục 2.3)
@@ -53,8 +56,13 @@ U_PIXEL = 5.0                      # m, nửa pixel 10 m (nửa pixel, Vos et al
 U_GEOREF_95 = 12.0                 # m, ESA: định vị tuyệt đối Sentinel-2 L1C < 12 m ở độ tin cậy 95,5% (2σ) — ESA, đặc tả sản phẩm; quy về 1σ là suy luận của đồ án
 GEOREF_SIGMA_K = 2.0               # 95,5% ứng với 2σ
 U_GEOREF = U_GEOREF_95 / GEOREF_SIGMA_K   # m, quy về 1σ = 6 m để cộng bình phương cùng chuẩn với U_pixel/U_classify
-U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}  # RMSE đường bờ vs ground_truth (output/evaluation.json, Mục 2.4), xem là 1σ
-U_CLASSIFY_DEFAULT = 20.0          # các năm không có ground truth: lấy giá trị lớn nhất đã đo (thận trọng)
+# RMSE đường bờ CHÍNH (bản QGIS) vs ground_truth, trên các quan sát còn lại sau despike — đúng tập quan sát dùng cho NSM/EPR/LRR
+# (output/evaluation.json: u_classify_suggestion, cơ sở ghi ở u_classify_basis; Mục 2.4). Xem là 1σ. Số đo từ dữ liệu, không phải tiêu chí tự chọn.
+# Từng có lỗi QGIS giữ ao phía đất làm một mảnh bờ ở 2018 (3 transect T0025–T0027 lệch 276–307 m, RMSE 66,95 m); đã sửa trong
+# qgis_interpret.py (chỉ giữ phần nước liên thông lớn nhất), nay 2018 không còn quan sát nào bị despike loại.
+# Trước khi đổi sang đường bờ QGIS, giá trị đo trên bản Python là 15,1 / 18,39 / 19,99.
+U_CLASSIFY = {2018: 16.73, 2022: 17.82, 2026: 21.69}
+U_CLASSIFY_DEFAULT = 21.7          # các năm không có ground truth: lấy giá trị lớn nhất đã đo, làm tròn lên (thận trọng)
 
 # Phân loại biến động (Mục 2.5a). Ngưỡng tuyệt đối, đặt trước, không phụ thuộc phân phối kết quả.
 # −2 m/năm là QUY ƯỚC CỦA ĐỒ ÁN, tham chiếu khoảng phân lớp xói của Luijendijk et al. (2018) và Nguyen & Khoi (2020);
