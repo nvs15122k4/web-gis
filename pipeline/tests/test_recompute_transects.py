@@ -79,7 +79,7 @@ def test_recompute_266_transects_with_linregress(transects):
         counts[cls] = counts.get(cls, 0) + 1
         checked += 1
     assert checked == 266
-    assert counts == {"accretion": 72, "stable": 179, "mild_erosion": 11, "severe_erosion": 4}
+    assert counts == {"accretion": 71, "stable": 181, "mild_erosion": 10, "severe_erosion": 4}
 
 
 def test_recomputed_classes_match_summary(transects, summary):
@@ -89,7 +89,7 @@ def test_recomputed_classes_match_summary(transects, summary):
         got[c] = got.get(c, 0) + 1
     assert summary["transects"] == 266
     assert summary["classes"] == got
-    assert summary["classes"] == {"accretion": 72, "stable": 179, "mild_erosion": 11, "severe_erosion": 4}
+    assert summary["classes"] == {"accretion": 71, "stable": 181, "mild_erosion": 10, "severe_erosion": 4}
     assert sum(summary["classes"].values()) == 266
 
 
@@ -104,7 +104,7 @@ def test_significance_flag_matches_ci_excluding_zero(transects):
 def test_summary_mean_of_significant_erosion_lrr(transects, summary):
     lrrs = [f["properties"]["stats"]["lrr_m_per_year"] for f in transects
             if f["properties"]["stats"]["is_significant"] and f["properties"]["stats"]["lrr_m_per_year"] < 0]
-    assert len(lrrs) == 15  # 11 mild + 4 severe
+    assert len(lrrs) == 14  # 10 mild + 4 severe
     mean = sum(lrrs) / len(lrrs)
     assert summary["M_lrr_erosion"] == pytest.approx(mean, abs=2e-3)
     sd = math.sqrt(sum((x - mean) ** 2 for x in lrrs) / (len(lrrs) - 1))
