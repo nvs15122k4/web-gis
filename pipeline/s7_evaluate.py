@@ -91,12 +91,57 @@ def shoreline_error(year, ref, transects, zone, index):
             "mean_abs_m": round(float(np.abs(d).mean()), 2), "rmse_m": round(float(np.sqrt((d ** 2).mean())), 2)}
 
 
+def _err_stats(diffs):
+    d = np.asarray(diffs, float)
+    if d.size == 0:
+        return None
+    return {"n_transects": int(d.size), "mean_m": round(float(d.mean()), 2),
+            "mean_abs_m": round(float(np.abs(d).mean()), 2), "rmse_m": round(float(np.sqrt((d ** 2).mean())), 2)}
+
+
+def kept_after_despike(year):
+    """Mã transect có quan sát năm `year` CÒN LẠI sau despike của s5 (output/transects.json); None nếu chưa có file."""
+    f = C.OUTPUT / "transects.json"
+    if not f.exists():
+        return None
+    rows = json.loads(f.read_text(encoding="utf-8")).get("features", [])
+    return {r["properties"]["transect_code"] for r in rows if (r["properties"].get("distances") or {}).get(str(year)) is not None}
+
+
+def main_shoreline_error(auto, ref, transects, codes, zone, kept=None):
+    """Sai số của đường bờ CHÍNH đang dùng (data/shoreline/<năm>.json, theo C.SHORELINE_ENGINE), không vector hoá lại.
+
+    Trả về hai số liệu trên cùng ô mẫu:
+      all   — mọi transect cắt được cả hai đường bờ;
+      kept  — chỉ các (transect, năm) mà s5 giữ lại sau despike, tức đúng tập quan sát dùng cho NSM/EPR/LRR. Quan sát bị despike
+              (lệch > C.DESPIKE_M so với trung vị chuỗi) không phải là sai số định vị ngẫu nhiên mà là cắt nhầm bờ khác nên bị loại
+              khỏi thống kê; U_classify tính trên tập còn lại cho nhất quán, còn `all` và số bị loại vẫn được báo cáo.
+    """
+    if auto is None or ref is None or ref.is_empty:
+        return None
+    rows = []
+    for t, code in zip(transects, codes):
+        if not t.intersects(zone):
+            continue
+        da, dr = nearest_hit(t, auto), nearest_hit(t, ref)
+        if da is not None and dr is not None:
+            rows.append((code, da - dr))
+    if not rows:
+        return None
+    out = {"all": _err_stats([d for _, d in rows])}
+    if kept is not None:
+        out["kept"] = _err_stats([d for c, d in rows if c in kept])
+        out["n_excluded_by_despike"] = sum(1 for c, _ in rows if c not in kept)
+    return out
+
+
 def main():
     if not GPKG.exists():
         raise SystemExit("Chưa có bộ số hoá — chạy `python gt_kit.py` trước.")
     windows = gpd.read_file(GPKG, layer="windows").to_crs(C.CRS)
     layers = [name for name, _ in pyogrio.list_layers(GPKG) if name.startswith("water_")]
-    transects = list(gpd.read_file(C.DATA / "transects.json").geometry)
+    tgdf = gpd.read_file(C.DATA / "transects.json")
+    transects, tcodes = list(tgdf.geometry), list(tgdf["transect_code"])
     report = {}
     for layer in sorted(layers):
         y = int(layer.split("_")[1])
@@ -115,16 +160,31 @@ def main():
             valid = extent & (a.values != 255)
             report[y][idx] = pixel_metrics(a.values[valid] == 1, ref[valid])
         ref_line = reference_shoreline(water, done)
+        # So sánh CHỈ SỐ: cùng một cách trích xuất (vector hoá lại từ raster từng chỉ số) để chọn chỉ số công bằng.
         report[y]["shoreline_error"] = {i: shoreline_error(y, ref_line, transects, zone, i) for i in C.WATER_INDICES}
+        # SẢN PHẨM chính đang dùng: đo đúng file đường bờ đã giao (QGIS hoặc Python theo C.SHORELINE_ENGINE).
+        main_file = C.DATA / "shoreline" / f"{y}.json"
+        if main_file.exists():
+            auto = gpd.read_file(main_file).geometry.iloc[0]
+            report[y]["main_shoreline_error"] = main_shoreline_error(auto, ref_line, transects, tcodes, zone, kept_after_despike(y))
     if not report:
         raise SystemExit("Các lớp water_<năm> còn trống — số hoá trong QGIS trước.")
     best, reason, mean_f1, mean_rmse = select_index(report)
-    rmse = {y: report[y]["shoreline_error"][best]["rmse_m"] for y in report if report[y]["shoreline_error"].get(best)}
+    from_main = {y: report[y]["main_shoreline_error"]["kept"]["rmse_m"] for y in report
+                 if (report[y].get("main_shoreline_error") or {}).get("kept")}
+    if from_main:
+        rmse, basis = from_main, f"đường bờ chính ({C.SHORELINE_ENGINE}), các quan sát còn lại sau despike"
+    else:
+        rmse = {y: report[y]["shoreline_error"][best]["rmse_m"] for y in report if report[y]["shoreline_error"].get(best)}
+        basis = f"đường bờ trích xuất lại từ raster chỉ số {best} (chưa có đường bờ chính để đo)"
     out = {"by_year": report, "mean_f1": {k: round(v, 4) for k, v in mean_f1.items()},
            "mean_rmse_m": {k: (round(v, 2) if v is not None else None) for k, v in mean_rmse.items()},
            "selected_index": best, "selection_reason": reason,
            "best_index_by_mean_f1": max(mean_f1, key=mean_f1.get), "u_classify_suggestion": rmse,
-           "note": f"Chỉ số được chọn: {best} ({reason}). Cần config.DEFAULT_INDEX = '{best}' và config.U_CLASSIFY = {rmse}."}
+           "u_classify_basis": basis,
+           "note": f"Chỉ số được chọn: {best} ({reason}). Cần config.DEFAULT_INDEX = '{best}' và config.U_CLASSIFY = {rmse} "
+                   f"(cơ sở: {basis}). RMSE từng chỉ số (mean_rmse_m) dùng cách trích xuất Python thống nhất để so sánh chỉ số; "
+                   f"sai số sản phẩm chính nằm ở by_year[năm].main_shoreline_error."}
     C.OUTPUT.mkdir(parents=True, exist_ok=True)
     (C.OUTPUT / "evaluation.json").write_text(json.dumps(out, indent=1, ensure_ascii=False))
     print(json.dumps(out, indent=1, ensure_ascii=False))
