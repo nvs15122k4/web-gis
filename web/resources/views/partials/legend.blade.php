@@ -8,6 +8,10 @@
         <h3>Đường bờ theo năm</h3>
         <div class="legend-ramp years" aria-hidden="true"><i style="background:#0d0887"></i><i style="background:#47039f"></i><i style="background:#7301a8"></i><i style="background:#9c179e"></i><i style="background:#bd3786"></i><i style="background:#d8576b"></i><i style="background:#ed7953"></i><i style="background:#fb9f3a"></i><i style="background:#e8b800"></i></div>
         <div class="legend-ramp-labels"><span>2018</span><span>2026</span></div>
+        <h3>Nguồn dữ liệu đường bờ (đối chứng)</h3>
+        <div class="legend-item"><span class="legend-swatch" style="background:#1565c0"></span> Bản chính</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#00c853"></span> Sentinel-2 Collection 1 (đối chứng độc lập)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#ff6d00"></span> Landsat 8/9 (đối chứng độc lập)</div>
         <h3>Mức biến động transect</h3>
         <div class="legend-item"><span class="legend-swatch" style="background:var(--c-accretion)"></span> Bồi</div>
         <div class="legend-item"><span class="legend-swatch" style="background:var(--c-stable)"></span> Ổn định</div>
