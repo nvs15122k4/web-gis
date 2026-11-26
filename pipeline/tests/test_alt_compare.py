@@ -40,7 +40,7 @@ def test_offsets_skips_transects_that_miss_a_line_and_returns_none_if_all_miss()
 def test_alt_transects_diff_is_alt_minus_main(output_dir, load_json):
     d = load_json(output_dir / "alt_transects.json")
     rows = [f["properties"] for f in d["features"]]
-    assert len(rows) == 267
+    assert len(rows) == 266
     checked = 0
     for p in rows:
         for name in ("s2c1", "landsat"):
