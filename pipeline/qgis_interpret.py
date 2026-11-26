@@ -115,7 +115,10 @@ def interpret_year(year, zone_buf, zone_bank):
     opened = run("native:buffer", {"INPUT": run("native:buffer", {"INPUT": body, "DISTANCE": -OPEN_M, "SEGMENTS": 8,
                  "DISSOLVE": False, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"], "DISTANCE": OPEN_M, "SEGMENTS": 8,
                  "DISSOLVE": False, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
-    parts = sorted(opened.getFeatures(), key=lambda f: -f.geometry().area())
+    # Sau phép mở, polygon sông có thể tách thành sông + ao/vũng nước phía đất rồi gộp lại trong cùng một feature đa phần
+    # (nối nhau bằng cổ hẹp < 100 m): tách thành từng phần đơn rồi chỉ giữ phần liên thông lớn nhất, như s3_shoreline.clean_water.
+    singles = run("native:multiparttosingleparts", {"INPUT": opened, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
+    parts = sorted(singles.getFeatures(), key=lambda f: -f.geometry().area())
     area_km2 = parts[0].geometry().area() / 1e6          # vùng nước liên thông lớn nhất (sông Hậu + Vàm Nao)
     mem = QgsVectorLayer(f"Polygon?crs={CRS}", "water1", "memory")
     mem.dataProvider().addFeatures([_feat(QgsFeature(mem.fields()), parts[0].geometry())])
