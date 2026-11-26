@@ -52,10 +52,24 @@ def main():
     write_aoi()
 
 
+CLOSE_RADIUS = 250  # m — lấp các khe hẹp/chỗ tự cắt giữa các transect xoè ở đầu dải
+OPEN_RADIUS = 150   # m — bo tròn các mũi nhọn
+
+
+def smooth_area(geom):
+    """Bo tròn vùng nghiên cứu: đóng rồi mở bằng buffer đầu tròn; kết quả là một đa giác hợp lệ."""
+    g = geom.buffer(CLOSE_RADIUS, join_style=1).buffer(-CLOSE_RADIUS - OPEN_RADIUS, join_style=1)
+    g = g.buffer(OPEN_RADIUS, join_style=1)
+    if g.geom_type == "MultiPolygon":
+        g = max(g.geoms, key=lambda x: x.area)
+    return g.simplify(0.5)
+
+
 def write_aoi():
     """AOI cho web (Mục 2.2): ranh giới xã + vùng nghiên cứu = dải bờ sông mà transect phủ tới."""
     tr = gpd.read_file(C.DATA / "transects.json").to_crs(C.CRS)
-    study = tr.buffer(C.TRANSECT_SPACING).union_all().simplify(0.5)
+    study = tr.buffer(C.TRANSECT_SPACING).union_all()
+    study = smooth_area(study)
     commune = gpd.read_file(C.COMMUNE_FILE).to_crs(C.CRS).geometry.iloc[0].simplify(0.5)
     aoi = gpd.GeoDataFrame([
         {"name": "Vùng nghiên cứu — đoạn bờ sông Hậu thuộc xã Bình Mỹ", "role": "study_area", "geometry": study},
