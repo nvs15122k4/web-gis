@@ -40,6 +40,14 @@ describe('loadSummary', () => {
         expect(body().textContent).toBe(`Số liệu tổng quan: ${UPDATING.toLowerCase()}.`);
     });
 
+    it('thống kê theo năm không phải mảng thì hiện thông báo đang cập nhật, không ném lỗi', async () => {
+        document.body.innerHTML = '<div id="summary-body"></div>';
+        globalThis.fetch = vi.fn(async (url) => ({ ok: true, status: 200, json: async () => (String(url).includes('yearly-stats') ? {} : summary()) }));
+        await loadSummary(() => {});
+        await new Promise((r) => setTimeout(r, 0));
+        expect(document.getElementById('yearly-table').textContent).toContain(UPDATING.toLowerCase());
+    });
+
     it('chưa có transect nào thì hiện thông báo chưa có kết quả phân tích', async () => {
         mockFetch(summary({ transects: { total: 0 } }));
         await loadSummary(() => {});
