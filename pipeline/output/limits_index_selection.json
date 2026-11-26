@@ -1,0 +1,151 @@
+{
+ "current_tie_f1": 0.005,
+ "selected_current": "mndwi",
+ "mean_f1_unrounded": {
+  "ndwi": 0.9398,
+  "mndwi": 0.945633,
+  "awei": 0.9457
+ },
+ "f1_gap_to_top": {
+  "ndwi": 0.0059,
+  "mndwi": 6.7e-05,
+  "awei": 0.0
+ },
+ "top_by_f1": "awei",
+ "mean_rmse_m": {
+  "ndwi": 27.83,
+  "mndwi": 18.45,
+  "awei": 60.01
+ },
+ "selection_by_tie": {
+  "0.0": "awei",
+  "5e-05": "awei",
+  "0.0001": "mndwi",
+  "0.0002": "mndwi",
+  "0.0005": "mndwi",
+  "0.001": "mndwi",
+  "0.002": "mndwi",
+  "0.003": "mndwi",
+  "0.004": "mndwi",
+  "0.005": "mndwi",
+  "0.0058": "mndwi",
+  "0.006": "mndwi",
+  "0.007": "mndwi",
+  "0.0075": "mndwi",
+  "0.01": "mndwi",
+  "0.015": "mndwi",
+  "0.02": "mndwi",
+  "0.03": "mndwi",
+  "0.05": "mndwi"
+ },
+ "selection_flip_points": [
+  {
+   "tie_from": 0.0,
+   "selected": "awei"
+  },
+  {
+   "tie_from": 7e-05,
+   "selected": "mndwi"
+  }
+ ],
+ "leave_one_year_out": {
+  "none": {
+   "selected": "mndwi",
+   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.45 m)",
+   "mean_f1": {
+    "ndwi": 0.9398,
+    "mndwi": 0.9456,
+    "awei": 0.9457
+   },
+   "mean_rmse_m": {
+    "ndwi": 27.83,
+    "mndwi": 18.45,
+    "awei": 60.01
+   }
+  },
+  "drop_2018": {
+   "selected": "mndwi",
+   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (19.73 m)",
+   "mean_f1": {
+    "ndwi": 0.9355,
+    "mndwi": 0.9452,
+    "awei": 0.947
+   },
+   "mean_rmse_m": {
+    "ndwi": 29.93,
+    "mndwi": 19.73,
+    "awei": 32.37
+   }
+  },
+  "drop_2022": {
+   "selected": "mndwi",
+   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['ndwi', 'mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.61 m)",
+   "mean_f1": {
+    "ndwi": 0.9414,
+    "mndwi": 0.9438,
+    "awei": 0.9461
+   },
+   "mean_rmse_m": {
+    "ndwi": 23.99,
+    "mndwi": 18.61,
+    "awei": 71.37
+   }
+  },
+  "drop_2026": {
+   "selected": "mndwi",
+   "reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (17.03 m)",
+   "mean_f1": {
+    "ndwi": 0.9425,
+    "mndwi": 0.9479,
+    "awei": 0.944
+   },
+   "mean_rmse_m": {
+    "ndwi": 29.57,
+    "mndwi": 17.03,
+    "awei": 76.28
+   }
+  }
+ },
+ "f1_by_year": {
+  "2018": {
+   "ndwi": 0.9483,
+   "mndwi": 0.9465,
+   "awei": 0.943
+  },
+  "2022": {
+   "ndwi": 0.9366,
+   "mndwi": 0.9493,
+   "awei": 0.945
+  },
+  "2026": {
+   "ndwi": 0.9345,
+   "mndwi": 0.9411,
+   "awei": 0.9491
+  }
+ },
+ "rmse_by_year": {
+  "2018": {
+   "ndwi": 23.63,
+   "mndwi": 15.91,
+   "awei": 115.29
+  },
+  "2022": {
+   "ndwi": 35.51,
+   "mndwi": 18.15,
+   "awei": 37.28
+  },
+  "2026": {
+   "ndwi": 24.35,
+   "mndwi": 21.3,
+   "awei": 27.45
+  }
+ },
+ "years_where_awei_has_higher_f1_than_mndwi": [
+  "2026"
+ ],
+ "years_where_mndwi_has_lower_rmse_than_awei": [
+  "2018",
+  "2022",
+  "2026"
+ ]
+}
