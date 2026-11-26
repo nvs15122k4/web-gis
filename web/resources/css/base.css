@@ -7,15 +7,14 @@ body {
     background: var(--canvas);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    font-feature-settings: 'cv11', 'ss03';
 }
-h1, h2, h3, h4 { margin: 0; line-height: 1.25; font-weight: 600; text-wrap: balance; }
+h1, h2, h3, h4 { margin: 0; font-family: var(--serif); line-height: 1.2; font-weight: 600; text-wrap: balance; }
 p { margin: 0; }
 a { color: var(--accent-ink); text-underline-offset: 2px; }
 a:hover { color: var(--accent-hover); }
-code, kbd { font: 12px var(--mono); padding: 1px 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 2px; }
+code, kbd { font: 12px var(--mono); padding: 0 3px; background: var(--surface-2); border-bottom: 1px solid var(--line-strong); }
 /* chỉ áp cho icon giao diện, không đụng tới SVG vẽ lớp vector của Leaflet */
-:where(.appbar, .sidebar, .inspector, .legend, .timeline, .page-nav, .btn, .chip) svg {
+:where(.appbar, .sidebar, .inspector, .legend, .timeline, .page-nav, .btn) svg {
     width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75;
     stroke-linecap: round; stroke-linejoin: round; flex: none;
 }
@@ -23,19 +22,19 @@ code, kbd { font: 12px var(--mono); padding: 1px 4px; background: var(--surface-
 [hidden] { display: none !important; }
 .skip-link {
     position: absolute; left: 8px; top: -64px; z-index: 3000; padding: 8px 12px;
-    background: var(--surface); color: var(--ink); border: 2px solid var(--focus); border-radius: var(--r);
+    background: var(--surface); color: var(--ink); border: 2px solid var(--focus);
     font-weight: 600; text-decoration: none;
 }
 .skip-link:focus { top: 8px; }
 
 /* ---- văn bản phụ ---- */
-.eyebrow { font-size: var(--fs-xs); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.eyebrow { font: italic 400 var(--fs-md) var(--serif); color: var(--ink-3); }
 .hint { margin: 6px 0; font-size: var(--fs-sm); color: var(--ink-3); }
 .hint:empty { display: none; }
 .updating { color: var(--warn-ink); font-style: italic; }
 p.updating, div.updating {
     margin: 6px 0; padding: 8px 10px; font-style: normal; font-size: var(--fs-sm);
-    border: 1px dashed var(--warn-line); border-radius: var(--r); background: var(--warn-bg);
+    border: 1px dashed var(--warn-line); background: var(--warn-bg);
 }
 .note {
     margin: 8px 0; padding: 8px 10px; font-size: var(--fs-sm);
@@ -44,32 +43,28 @@ p.updating, div.updating {
 .msg-ok { color: var(--ok); }
 .msg-error, .field-error { color: var(--error); }
 .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; flex: none; }
-.legend-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; flex: none; }
+.legend-swatch { display: inline-block; width: 12px; height: 12px; flex: none; }
 .num { font-variant-numeric: tabular-nums; }
 
-.chip {
-    display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px;
-    border: 1px solid var(--line-strong); border-radius: 2px; background: var(--surface-2);
-    color: var(--ink-2); font-size: var(--fs-xs); font-weight: 500; white-space: nowrap;
-}
+.chip { display: inline; color: var(--ink-2); font-size: var(--fs-sm); white-space: nowrap; }
+.chip + .chip::before { content: '\00b7'; margin: 0 .5em; color: var(--ink-3); }
 
 /* ---- nút ---- */
 .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     min-height: 32px; padding: 0 12px; white-space: nowrap; text-decoration: none;
     font: 500 var(--fs-md) var(--font);
-    border: 1px solid var(--line-strong); border-radius: var(--r);
+    border: 1px solid var(--control-line); border-radius: var(--r);
     background: var(--surface); color: var(--ink); cursor: pointer;
     transition: background-color .12s var(--ease), border-color .12s var(--ease);
 }
 .btn:hover { background: var(--surface-3); border-color: var(--control-line); color: var(--ink); }
-.btn:active { transform: translateY(1px); }
 .btn:disabled, .btn[aria-disabled=true] { opacity: .55; cursor: not-allowed; transform: none; }
-.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
 .btn-primary:active { background: #183a80; }
-.btn-ghost { background: transparent; border-color: transparent; color: var(--ink-2); }
-.btn-ghost:hover { background: var(--surface-3); border-color: transparent; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.btn-ghost:hover { background: transparent; border-color: transparent; text-decoration-thickness: 2px; }
 .btn-block { width: 100%; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .icon-btn {
@@ -88,7 +83,6 @@ input:hover, select:hover { border-color: var(--ink-3); }
 input:disabled, select:disabled { background: var(--surface-2); color: var(--ink-3); cursor: not-allowed; }
 input[aria-invalid=true] { border-color: var(--error); }
 input, select { transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease); }
-input:focus, select:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 18%, transparent); }
 input:focus, select:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: var(--focus); }
 input[type=checkbox] { accent-color: var(--accent); }
 .field { display: grid; gap: 4px; flex: 1; min-width: 0; }
@@ -100,11 +94,11 @@ input[type=checkbox] { accent-color: var(--accent); }
 /* công tắc bật/tắt: vẫn là checkbox thật để bàn phím và trình đọc màn hình dùng được */
 .switch {
     appearance: none; -webkit-appearance: none; flex: none; margin: 0; position: relative;
-    width: 32px; height: 18px; border-radius: 9px; background: var(--control-line); cursor: pointer;
+    width: 30px; height: 16px; border-radius: 8px; background: var(--control-line); cursor: pointer;
     transition: background-color .12s var(--ease);
 }
 .switch::after {
-    content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+    content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%;
     background: #fff; transition: transform .12s var(--ease);
 }
 .switch:checked { background: var(--accent); }
@@ -117,15 +111,14 @@ input[type=checkbox] { accent-color: var(--accent); }
     background: var(--warn-bg); color: var(--warn-ink); border-bottom: 1px solid var(--warn-line);
 }
 .status { margin: 0; padding: 0 12px; font-size: var(--fs-sm); color: var(--warn-ink); }
-.status:not(:empty)::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 8px; vertical-align: 1px; background: var(--warn-line); transform: rotate(45deg); }
+.status:not(:empty)::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 8px; vertical-align: 1px; background: var(--warn-line); }
 .status:empty { display: none; }
 .skeleton {
-    height: 132px; border-radius: var(--r);
+    height: 132px;
     background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%) 0 0 / 200% 100%;
     animation: shimmer 1.4s linear infinite;
-    /* khung chờ dạng chỉ số + các dòng, đúng hình dáng bảng tổng quan */
-    -webkit-mask: linear-gradient(#000 0 0) 0 0 / 100% 54px no-repeat, repeating-linear-gradient(#000 0 12px, transparent 12px 22px) 0 66px / 100% 66px no-repeat;
-    mask: linear-gradient(#000 0 0) 0 0 / 100% 54px no-repeat, repeating-linear-gradient(#000 0 12px, transparent 12px 22px) 0 66px / 100% 66px no-repeat;
+    -webkit-mask: repeating-linear-gradient(#000 0 14px, transparent 14px 22px);
+    mask: repeating-linear-gradient(#000 0 14px, transparent 14px 22px);
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 

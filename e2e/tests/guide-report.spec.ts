@@ -66,6 +66,6 @@ test.describe('Hướng dẫn và Báo cáo', () => {
         await page.emulateMedia({ colorScheme: 'dark' });
         await sessionLogin(page);
         const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-        expect(bg).toBe('rgb(232, 233, 231)');
+        expect(bg).toBe('rgb(239, 233, 218)');
     });
 });

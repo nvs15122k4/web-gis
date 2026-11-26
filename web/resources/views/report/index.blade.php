@@ -32,11 +32,10 @@
 <main id="main-content" tabindex="-1">
 <header class="page-head">
     <div class="page-head-inner">
-        <p class="eyebrow">Trang nội bộ · chỉ quản trị viên</p>
+        <p class="eyebrow">Trang nội bộ, chỉ quản trị viên</p>
         <h1>Báo cáo công việc đã làm</h1>
         <p class="lead">Tổng hợp từ lịch sử git và các tính năng đã hoàn thành của đề tài “WebGIS giám sát biến động bờ sông Hậu, xã Bình Mỹ, An Giang”,
         đối chiếu với đề cương. Trang nội bộ, chỉ tài khoản admin xem được. Số liệu chốt ngày 23/11/2026.</p>
-        <p class="page-meta"><span class="chip">Dành cho tài khoản admin</span></p>
         <dl class="page-stamp" aria-label="Thông tin tài liệu">
             <div><dt>Phạm vi</dt><dd>Nội bộ · admin</dd></div>
             <div><dt>Số liệu</dt><dd>23/11/2026</dd></div>
@@ -58,21 +57,27 @@
 
     <section id="so-lieu">
         <h2>Số liệu chung</h2>
-        <div class="figures">
-            <div><b>372</b><span>commit trên nhánh chính</span></div>
-            <div><b>5</b><span>ngày có commit (27/09 – 23/11/2026)</span></div>
-            <div><b>{{ $transectCount }}</b><span>transect phân tích</span></div>
-            <div><b>{{ $hotspotCount }}</b><span>hotspot lùi mạnh ({{ $severeCount }} transect lùi mạnh)</span></div>
-            <div><b>9</b><span>năm đường bờ (2018–2026)</span></div>
-            <div><b>{{ $done }}/{{ $total }}</b><span>hạng mục đề cương hoàn thành</span></div>
-        </div>
-        <div class="progress" style="--n: {{ $total }}" role="progressbar" aria-label="Tiến độ theo đề cương" aria-valuemin="0" aria-valuemax="{{ $total }}" aria-valuenow="{{ $done }}"><i style="width: {{ round($done / $total * 100) }}%"></i></div>
-        <p class="progress-caption"><span>0</span><span>{{ $done }} / {{ $total }} hạng mục ({{ round($done / $total * 100) }}%)</span><span>{{ $total }}</span></p>
+        <table class="stats">
+            <caption>Các con số chính của đề tài tính đến ngày 23/11/2026.</caption>
+            <tbody>
+                <tr><th scope="row">Commit trên nhánh chính</th><td class="v">372</td><td class="n">5 ngày có commit, từ 27/09 đến 23/11/2026</td></tr>
+                <tr><th scope="row">Transect phân tích</th><td class="v">{{ $transectCount }}</td><td class="n">mặt cắt vuông góc với bờ</td></tr>
+                <tr><th scope="row">Hotspot lùi mạnh</th><td class="v">{{ $hotspotCount }}</td><td class="n">gộp từ {{ $severeCount }} transect lùi mạnh</td></tr>
+                <tr><th scope="row">Năm đường bờ</th><td class="v">9</td><td class="n">giai đoạn 2018–2026</td></tr>
+                <tr><th scope="row">Hạng mục đề cương hoàn thành</th><td class="v">{{ $done }}/{{ $total }}</td><td class="n">{{ round($done / $total * 100) }}% tổng số hạng mục</td></tr>
+            </tbody>
+        </table>
+        <figure class="fig">
+            <div class="progress" style="--n: {{ $total }}" role="progressbar" aria-label="Tiến độ theo đề cương" aria-valuemin="0" aria-valuemax="{{ $total }}" aria-valuenow="{{ $done }}"><i style="width: {{ round($done / $total * 100) }}%"></i></div>
+            <p class="progress-caption"><span>0</span><span>{{ $done }} / {{ $total }} hạng mục ({{ round($done / $total * 100) }}%)</span><span>{{ $total }}</span></p>
+            <figcaption>Tiến độ thực hiện theo đề cương; mỗi ô là một hạng mục.</figcaption>
+        </figure>
     </section>
 
     <section id="tien-do">
         <h2>Tiến độ theo đề cương</h2>
         <div class="table-wrap"><table>
+            <caption>Đối chiếu từng hạng mục của đề cương với kết quả và bằng chứng.</caption>
             <tr><th>Mục</th><th>Nội dung</th><th>Trạng thái</th><th>Kết quả / bằng chứng</th></tr>
             @foreach ($progress as [$no, $name, $state, $note])
                 <tr>
@@ -131,9 +136,10 @@
     <section id="kiem-thu">
         <h2>Kiểm thử</h2>
         <div class="table-wrap"><table>
+            <caption>Các bộ kiểm thử của dự án.</caption>
             <tr><th>Loại</th><th>Công cụ</th><th>Quy mô</th></tr>
             <tr><td>Unit + Feature (PHP)</td><td>PHPUnit</td><td>hơn 530 phương thức kiểm thử</td></tr>
-            <tr><td>JavaScript giao diện</td><td>Vitest</td><td>78 ca</td></tr>
+            <tr><td>JavaScript giao diện</td><td>Vitest</td><td>120 ca</td></tr>
             <tr><td>Pipeline</td><td>pytest</td><td>73 ca</td></tr>
             <tr><td>Đầu–cuối</td><td>Playwright (Chromium, Firefox, WebKit)</td><td>134 kịch bản</td></tr>
         </table></div>

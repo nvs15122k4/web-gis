@@ -11,12 +11,16 @@
 <main id="main-content" tabindex="-1">
 <header class="page-head">
     <div class="page-head-inner">
-        <p class="eyebrow">Phương pháp & dữ liệu</p>
+        <p class="eyebrow">Phương pháp và dữ liệu</p>
         <h1>Giới thiệu &amp; phương pháp</h1>
         <p class="lead">WebGIS giám sát biến động bờ sông Hậu tại xã Bình Mỹ, tỉnh An Giang, giai đoạn
         {{ $years[0] }}–{{ end($years) }}. Kết quả được tính sẵn bằng pipeline Python từ ảnh vệ tinh; web chỉ đọc và hiển thị,
         không tính lại các chỉ số.</p>
-        <p class="page-meta"><span class="chip">Sentinel-2 L2A · DSAS · Bình Mỹ, An Giang</span></p>
+        <dl class="page-stamp" aria-label="Thông tin dữ liệu">
+            <div><dt>Ảnh</dt><dd>Sentinel-2 L2A</dd></div>
+            <div><dt>Phương pháp</dt><dd>DSAS</dd></div>
+            <div><dt>Giai đoạn</dt><dd>{{ $years[0] }}–{{ end($years) }}</dd></div>
+        </dl>
     </div>
 </header>
 <div class="doc-layout">

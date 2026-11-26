@@ -11,11 +11,15 @@
 <main id="main-content" tabindex="-1">
 <header class="page-head">
     <div class="page-head-inner">
-        <p class="eyebrow">Hướng dẫn sử dụng</p>
+        <p class="eyebrow">Cách đọc bản đồ</p>
         <h1>Hướng dẫn sử dụng</h1>
         <p class="lead">Cách xem và đọc kết quả giám sát biến động bờ sông Hậu tại xã Bình Mỹ, An Giang. Bạn không cần đăng nhập
         để dùng các chức năng dưới đây.</p>
-        <p class="page-meta"><span class="chip">Không cần đăng nhập</span></p>
+        <dl class="page-stamp" aria-label="Thông tin trang">
+            <div><dt>Người dùng</dt><dd>Mọi người</dd></div>
+            <div><dt>Đăng nhập</dt><dd>Không cần</dd></div>
+            <div><dt>Thiết bị</dt><dd>Máy tính, điện thoại</dd></div>
+        </dl>
     </div>
 </header>
 <div class="doc-layout">
