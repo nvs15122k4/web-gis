@@ -1,0 +1,29 @@
+/*
+ * Họa tiết đường đồng mức: chỉ làm nền các dải tiêu đề, đầu sidebar và cột đăng nhập (không bao giờ phủ lên bản đồ).
+ * Dùng mask nên màu theo `color` của phần tử và độ mờ chỉnh qua --contour-o.
+ */
+.appbar, .sidebar-head, .auth-aside, .page-head { position: relative; isolation: isolate; }
+.appbar::before, .sidebar-head::before, .auth-aside::before, .page-head::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: currentColor; opacity: var(--contour-o, .06);
+    -webkit-mask: url('../img/contour.svg') center / cover no-repeat;
+    mask: url('../img/contour.svg') center / cover no-repeat;
+}
+.appbar { --contour-o: .1; color: var(--bar-ink); }
+.sidebar-head { --contour-o: .1; }
+.auth-aside { --contour-o: .16; }
+.auth-aside::before {
+    -webkit-mask: url('../img/contour.svg') 30% 40% / 170% auto no-repeat;
+    mask: url('../img/contour.svg') 30% 40% / 170% auto no-repeat;
+}
+.page-head { --contour-o: .11; }
+/* dải tiêu đề trang: mờ dần về phía chữ để không làm khó đọc */
+.page-head::before {
+    -webkit-mask: linear-gradient(to left, #000 15%, transparent 75%), url('../img/contour.svg') center / cover no-repeat;
+    -webkit-mask-composite: source-in;
+    mask: linear-gradient(to left, #000 15%, transparent 75%), url('../img/contour.svg') center / cover no-repeat;
+    mask-composite: intersect;
+}
+@media (forced-colors: active) {
+    .appbar::before, .sidebar-head::before, .auth-aside::before, .page-head::before { display: none; }
+}
