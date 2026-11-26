@@ -30,10 +30,24 @@
     "pixels": 18000
    },
    "shoreline_error": {
-    "n_transects": 58,
-    "mean_m": 1.58,
-    "mean_abs_m": 9.23,
-    "rmse_m": 15.1
+    "ndwi": {
+     "n_transects": 58,
+     "mean_m": -4.22,
+     "mean_abs_m": 12.21,
+     "rmse_m": 25.54
+    },
+    "mndwi": {
+     "n_transects": 58,
+     "mean_m": 1.58,
+     "mean_abs_m": 9.23,
+     "rmse_m": 15.1
+    },
+    "awei": {
+     "n_transects": 58,
+     "mean_m": -60.26,
+     "mean_abs_m": 63.09,
+     "rmse_m": 123.05
+    }
    }
   },
   "2022": {
@@ -66,10 +80,24 @@
     "pixels": 18000
    },
    "shoreline_error": {
-    "n_transects": 58,
-    "mean_m": 0.8,
-    "mean_abs_m": 11.38,
-    "rmse_m": 18.39
+    "ndwi": {
+     "n_transects": 58,
+     "mean_m": -9.37,
+     "mean_abs_m": 14.28,
+     "rmse_m": 33.36
+    },
+    "mndwi": {
+     "n_transects": 58,
+     "mean_m": 0.8,
+     "mean_abs_m": 11.38,
+     "rmse_m": 18.39
+    },
+    "awei": {
+     "n_transects": 58,
+     "mean_m": -12.69,
+     "mean_abs_m": 15.6,
+     "rmse_m": 35.05
+    }
    }
   },
   "2026": {
@@ -102,18 +130,44 @@
     "pixels": 18000
    },
    "shoreline_error": {
-    "n_transects": 59,
-    "mean_m": 4.01,
-    "mean_abs_m": 13.45,
-    "rmse_m": 19.99
+    "ndwi": {
+     "n_transects": 59,
+     "mean_m": -4.12,
+     "mean_abs_m": 12.6,
+     "rmse_m": 25.43
+    },
+    "mndwi": {
+     "n_transects": 59,
+     "mean_m": 4.01,
+     "mean_abs_m": 13.45,
+     "rmse_m": 19.99
+    },
+    "awei": {
+     "n_transects": 59,
+     "mean_m": -8.25,
+     "mean_abs_m": 14.35,
+     "rmse_m": 29.53
+    }
    }
   }
  },
+ "mean_f1": {
+  "ndwi": 0.9398,
+  "mndwi": 0.9456,
+  "awei": 0.9457
+ },
+ "mean_rmse_m": {
+  "ndwi": 28.11,
+  "mndwi": 17.83,
+  "awei": 62.54
+ },
+ "selected_index": "mndwi",
+ "selection_reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (17.83 m)",
  "best_index_by_mean_f1": "awei",
  "u_classify_suggestion": {
   "2018": 15.1,
   "2022": 18.39,
   "2026": 19.99
  },
- "note": "Đổi config.DEFAULT_INDEX = 'awei' và điền config.U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}, rồi chạy lại `run.py --skip-download` (nếu đổi chỉ số, chạy lại gt RMSE vì đường bờ tự động đổi theo)."
+ "note": "Chỉ số được chọn: mndwi (hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (17.83 m)). Cần config.DEFAULT_INDEX = 'mndwi' và config.U_CLASSIFY = {2018: 15.1, 2022: 18.39, 2026: 19.99}."
 }
