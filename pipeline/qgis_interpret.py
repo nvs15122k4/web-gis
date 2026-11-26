@@ -6,6 +6,7 @@ Với từng ảnh data/composite/<năm>.tif, QGIS tự làm lại toàn bộ ch
   2. gdal:rastercalculator                       — MNDWI = (Green − SWIR1)/(Green + SWIR1)
   3. Otsu trên histogram do QgsRasterDataProvider.histogram() của QGIS trả về (QGIS không có sẵn thuật toán Otsu)
   4. gdal:rastercalculator + gdal:sieve          — mặt nạ nước, lọc đốm/lỗ nhỏ (thay cho mở hình thái học của Python)
+  4b. gdal:fillnodata lấp cụm no-data nhỏ; cụm ≥ 25 pixel: đoạn bờ trong 2 pixel quanh nó bị cắt (native:difference)
   5. gdal:polygonize → giữ vùng nước lớn nhất → native:polygonstolines → native:clip theo ranh giới xã (đệm 100 m)
 So sánh với bản Python ĐÃ LƯU (data/shoreline_python, data/transects_python.json, output/transects_python.json — mốc đối chiếu cố định
 vì đường bờ chính của pipeline nay là bản QGIS, xem config.SHORELINE_ENGINE). Đầu ra output/qgis_interpret.json, dữ liệu trung gian data/qgis/):
@@ -41,6 +42,7 @@ ANALYSIS_BUFFER, BANK_ZONE = 1000, 100       # m — khớp s2_water.ANALYSIS_BU
 SIEVE_PX = 500                               # pixel (5 ha) — khớp MIN_HOLE của s3_shoreline
 OPEN_M = 50                                  # m — bán kính mở hình thái học (5 px)
 MIN_HOLE_M2 = 50_000                         # m² — lấp lỗ < 5 ha như MIN_HOLE
+MIN_GAP_PX = 25                              # pixel (10 m) — cụm no-data từ 0,25 ha coi là vùng thiếu dữ liệu thật (s3_shoreline.MIN_GAP)
 SAMPLE_STEP = 10                             # m
 MIN_PIECE = 200                              # m — như s3_shoreline.MIN_PIECE
 MIN_POINTS = 3
@@ -69,6 +71,32 @@ def otsu(values, counts):
     return float(values[np.nanargmax(var)])
 
 
+def big_gaps(composite, work, year):
+    """Polygon (đã đệm 2 pixel) của các cụm no-data từ MIN_GAP_PX pixel trở lên trong ảnh composite gốc; None nếu không có."""
+    from osgeo import gdal
+    src = gdal.Open(str(composite))
+    arr = src.GetRasterBand(1).ReadAsArray().astype(float)
+    nod = (~np.isfinite(arr)).astype(np.uint8)
+    if not nod.any():
+        return None
+    res = abs(src.GetGeoTransform()[1])
+    mask = work / f"{year}_gap.tif"
+    out = gdal.GetDriverByName("GTiff").Create(str(mask), src.RasterXSize, src.RasterYSize, 1, gdal.GDT_Byte)
+    out.SetGeoTransform(src.GetGeoTransform()); out.SetProjection(src.GetProjection())
+    out.GetRasterBand(1).WriteArray(nod); out.GetRasterBand(1).SetNoDataValue(255); out.FlushCache(); out = None
+    sieved = work / f"{year}_gap_sieve.tif"
+    min_px = max(1, round(MIN_GAP_PX / (res / 10) ** 2))       # như s3_shoreline: 25 px ở 10 m, quy theo diện tích pixel
+    run("gdal:sieve", {"INPUT": str(mask), "THRESHOLD": min_px, "EIGHT_CONNECTEDNESS": False, "NO_MASK": False, "OUTPUT": str(sieved)})
+    poly = run("gdal:polygonize", {"INPUT": str(sieved), "BAND": 1, "FIELD": "DN", "EIGHT_CONNECTEDNESS": False,
+                                   "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
+    poly = QgsVectorLayer(poly, "gap", "ogr") if isinstance(poly, str) else poly
+    poly.selectByExpression('"DN" = 1')
+    if not poly.selectedFeatureCount():
+        return None
+    sel = run("native:saveselectedfeatures", {"INPUT": poly, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
+    return run("native:buffer", {"INPUT": sel, "DISTANCE": 2 * res, "DISSOLVE": True, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
+
+
 def _feat(f, g):
     f.setGeometry(g)
     return f
@@ -94,9 +122,13 @@ def interpret_year(year, zone_buf, zone_bank):
     step = (st.maximumValue - st.minimumValue) / nb
     centers = st.minimumValue + step * (np.arange(nb) + 0.5)
     thr = otsu(centers, np.array(h.histogramVector))
+    # Cụm no-data nhỏ (mây/bão hoà sót vài pixel) lấp bằng giá trị hợp lệ gần nhất, như s3_shoreline.fill_small_gaps; cụm lớn xử lý ở cuối
+    filled = work / f"{year}_mndwi_fill.tif"
+    run("gdal:fillnodata", {"INPUT": str(mndwi), "BAND": 1, "DISTANCE": 10, "ITERATIONS": 0, "NO_MASK": False,
+                            "OUTPUT": str(filled)})
     water = work / f"{year}_water.tif"
     run("gdal:rastercalculator", {
-        "INPUT_A": str(mndwi), "BAND_A": 1, "FORMULA": f"(A>{thr:.6f})*1", "NO_DATA": 255, "RTYPE": 1, "OUTPUT": str(water)})
+        "INPUT_A": str(filled), "BAND_A": 1, "FORMULA": f"(A>{thr:.6f})*1", "NO_DATA": 255, "RTYPE": 1, "OUTPUT": str(water)})
     sieved = work / f"{year}_sieve.tif"
     run("gdal:sieve", {"INPUT": str(water), "THRESHOLD": SIEVE_PX, "EIGHT_CONNECTEDNESS": False, "NO_MASK": False,
                        "OUTPUT": str(sieved)})
@@ -125,6 +157,9 @@ def interpret_year(year, zone_buf, zone_bank):
     mem = run("native:deleteholes", {"INPUT": mem, "MIN_AREA": MIN_HOLE_M2, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
     lines = run("native:polygonstolines", {"INPUT": mem, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
     clipped = run("native:clip", {"INPUT": lines, "OVERLAY": zone_bank, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
+    gaps = big_gaps(DATA / "composite" / f"{year}.tif", work, year)
+    if gaps is not None:   # đoạn bờ chạy dọc rìa vùng không dữ liệu lớn là biên giả -> cắt bỏ (như s3_shoreline.vectorize)
+        clipped = run("native:difference", {"INPUT": clipped, "OVERLAY": gaps, "OUTPUT": "TEMPORARY_OUTPUT"})["OUTPUT"]
     parts = []
     for f in clipped.getFeatures():
         g = f.geometry()

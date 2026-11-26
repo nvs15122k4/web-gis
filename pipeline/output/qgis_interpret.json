@@ -4,7 +4,7 @@
   "2018": {
    "otsu_qgis": 0.1687,
    "otsu_python": 0.1633,
-   "water_area_km2_qgis": 11.67,
+   "water_area_km2_qgis": 11.92,
    "length_km_qgis": 15.37,
    "length_km_python": 15.12,
    "qgis_to_python": {
@@ -32,7 +32,7 @@
   "2019": {
    "otsu_qgis": 0.0708,
    "otsu_python": 0.0673,
-   "water_area_km2_qgis": 11.67,
+   "water_area_km2_qgis": 11.91,
    "length_km_qgis": 15.15,
    "length_km_python": 15.25,
    "qgis_to_python": {
@@ -60,7 +60,7 @@
   "2020": {
    "otsu_qgis": 0.1372,
    "otsu_python": 0.1349,
-   "water_area_km2_qgis": 11.56,
+   "water_area_km2_qgis": 11.79,
    "length_km_qgis": 14.86,
    "length_km_python": 14.7,
    "qgis_to_python": {
@@ -88,7 +88,7 @@
   "2021": {
    "otsu_qgis": 0.1219,
    "otsu_python": 0.1211,
-   "water_area_km2_qgis": 11.59,
+   "water_area_km2_qgis": 11.83,
    "length_km_qgis": 15.13,
    "length_km_python": 14.92,
    "qgis_to_python": {
@@ -116,7 +116,7 @@
   "2022": {
    "otsu_qgis": 0.12,
    "otsu_python": 0.1207,
-   "water_area_km2_qgis": 11.58,
+   "water_area_km2_qgis": 11.82,
    "length_km_qgis": 15.17,
    "length_km_python": 15.13,
    "qgis_to_python": {
@@ -144,13 +144,13 @@
   "2023": {
    "otsu_qgis": 0.1326,
    "otsu_python": 0.1289,
-   "water_area_km2_qgis": 11.58,
+   "water_area_km2_qgis": 11.82,
    "length_km_qgis": 15.25,
    "length_km_python": 15.06,
    "qgis_to_python": {
     "mean_m": 2.95,
     "median_m": 2.78,
-    "p95_m": 6.3,
+    "p95_m": 6.29,
     "rmse_m": 3.53
    },
    "python_to_qgis": {
@@ -172,13 +172,13 @@
   "2024": {
    "otsu_qgis": 0.0411,
    "otsu_python": 0.0404,
-   "water_area_km2_qgis": 11.62,
+   "water_area_km2_qgis": 11.9,
    "length_km_qgis": 14.85,
    "length_km_python": 14.67,
    "qgis_to_python": {
     "mean_m": 3.23,
-    "median_m": 3.0,
-    "p95_m": 6.81,
+    "median_m": 3.01,
+    "p95_m": 6.82,
     "rmse_m": 3.85
    },
    "python_to_qgis": {
@@ -200,7 +200,7 @@
   "2025": {
    "otsu_qgis": 0.0802,
    "otsu_python": 0.081,
-   "water_area_km2_qgis": 11.55,
+   "water_area_km2_qgis": 11.78,
    "length_km_qgis": 14.88,
    "length_km_python": 14.71,
    "qgis_to_python": {
@@ -228,7 +228,7 @@
   "2026": {
    "otsu_qgis": 0.1153,
    "otsu_python": 0.1129,
-   "water_area_km2_qgis": 11.53,
+   "water_area_km2_qgis": 11.76,
    "length_km_qgis": 14.92,
    "length_km_python": 14.74,
    "qgis_to_python": {
@@ -531,7 +531,7 @@
   "T0271": 1.075,
   "T0272": 0.947,
   "T0273": 1.305,
-  "T0274": 0.084,
+  "T0274": 0.085,
   "T0275": 5.713
  }
 }

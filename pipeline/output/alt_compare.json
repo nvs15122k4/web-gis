@@ -46,12 +46,12 @@
      "kappa": 0.7008
     },
     "shoreline_offset_vs_main": {
-     "n_transects": 265,
-     "mean_m": -1.52,
-     "mean_abs_m": 10.06,
-     "median_m": -3.11,
-     "rmse_m": 29.99,
-     "n_over_50m": 9
+     "n_transects": 246,
+     "mean_m": -5.88,
+     "mean_abs_m": 6.53,
+     "median_m": -3.71,
+     "rmse_m": 21.12,
+     "n_over_50m": 3
     }
    },
    "2020": {
@@ -177,18 +177,18 @@
      2026
     ],
     "n_transects": 264,
-    "pearson_lrr": 0.807,
-    "spearman_lrr": 0.747,
-    "mean_lrr_alt": 0.522,
+    "pearson_lrr": 0.844,
+    "spearman_lrr": 0.756,
+    "mean_lrr_alt": 0.569,
     "mean_lrr_main": 0.398,
-    "bias_lrr_alt_minus_main": 0.123,
-    "rmse_lrr": 0.663,
-    "sign_agreement": 0.78,
-    "class_agreement": 0.75,
+    "bias_lrr_alt_minus_main": 0.171,
+    "rmse_lrr": 0.615,
+    "sign_agreement": 0.784,
+    "class_agreement": 0.761,
     "classes_alt": {
-     "accretion": 40,
-     "stable": 221,
-     "mild_erosion": 2,
+     "accretion": 42,
+     "stable": 218,
+     "mild_erosion": 3,
      "severe_erosion": 1
     },
     "classes_main": {
@@ -199,8 +199,8 @@
     },
     "confusion_main_rows_alt_cols": {
      "accretion": {
-      "accretion": 28,
-      "stable": 43,
+      "accretion": 30,
+      "stable": 41,
       "mild_erosion": 0,
       "severe_erosion": 0
      },
@@ -212,8 +212,8 @@
      },
      "mild_erosion": {
       "accretion": 0,
-      "stable": 8,
-      "mild_erosion": 2,
+      "stable": 7,
+      "mild_erosion": 3,
       "severe_erosion": 0
      },
      "severe_erosion": {
@@ -226,7 +226,7 @@
     "main_severe_transects": 4,
     "main_severe_lrr_in_alt": [
      -1.84,
-     -2.16,
+     -2.24,
      -1.81,
      -0.56
     ],

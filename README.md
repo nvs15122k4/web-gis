@@ -235,6 +235,9 @@ lùi mạnh khi có ý nghĩa, LRR ≤ −2 m/năm và khoảng cách giảm li�
 Trước đó dùng z = 1,96 và ngưỡng M − S = −1,804 m/năm (tính trên chính kết quả, hậu nghiệm): 124 transect có ý nghĩa, 3 lùi mạnh, 2 hotspot.
 Hotspot (`hotspots.json`, giai đoạn 2018–2026): 3 đoạn — T0020 (1 transect, LRR −2,68 m/năm), T0094 (1 transect, −2,67 m/năm), T0200–T0201 (2 transect, ~100 m, −3,09 m/năm).
 So với bản Python cũ (267 transect, 1 lùi mạnh, 1 hotspot T0094), số lùi mạnh tăng do đường bờ QGIS đi theo cạnh pixel 10 m còn Python nội suy dưới pixel, nên các transect sát ngưỡng −2 m/năm đổi nhóm; LRR hai bản tương quan r = 0,95 (`output/qgis_interpret.json`). Đây là sai khác phương pháp cỡ một pixel, không phải thay đổi thực địa.
+Hai chỗ lệch hình học đã kiểm tra:
+- Khoảng cách Hausdorff 133 m giữa bản QGIS và Python năm 2019 là đầu một kênh rộng ~130 m tại (537090; 1158790): QGIS đóng đầu kênh bằng cung tròn (hệ quả của buffer ∓50 m), Python cắt phẳng cách đó ~125 m. Đây là hai cách xử lý miệng kênh khác nhau, không phải lỗi của bên nào.
+- Từng có đoạn bờ giả 450–640 m ở bản đối chứng Sentinel-2 C1 2019 và Landsat 2021: đó là rìa vùng không có dữ liệu (mặt nạ mây), không phải bờ thật. Chuỗi QGIS nay lấp cụm no-data nhỏ (`gdal:fillnodata`) và cắt đoạn bờ trong 2 pixel quanh cụm từ 25 pixel (như `s3_shoreline`); đường bờ chính không đổi, Landsat 2021 hết đoạn thừa, Sentinel-2 C1 2019 bị cắt thành 3 đoạn vì thiếu dữ liệu quá lớn (năm này đã bị loại khỏi biến thể "tin cậy").
 Độ bất định đường bờ `u_shoreline` (1σ, U_georef quy từ 12 m ở 95,5% về 6 m) theo năm: 18,46 m (2018), 19,46 m (2022), 23,06 m (các năm còn lại; 2026: 23,05 m).
 
 **Đánh giá so với ground truth số hoá** (`evaluation.json`, 5 ô mẫu mỗi năm, 18.000 pixel/chỉ số). Giá trị F1 / IoU:
