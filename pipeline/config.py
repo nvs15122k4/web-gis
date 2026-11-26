@@ -58,9 +58,10 @@ GEOREF_SIGMA_K = 2.0               # 95,5% ứng với 2σ
 U_GEOREF = U_GEOREF_95 / GEOREF_SIGMA_K   # m, quy về 1σ = 6 m để cộng bình phương cùng chuẩn với U_pixel/U_classify
 # RMSE đường bờ CHÍNH (bản QGIS) vs ground_truth, trên các quan sát còn lại sau despike — đúng tập quan sát dùng cho NSM/EPR/LRR
 # (output/evaluation.json: u_classify_suggestion, cơ sở ghi ở u_classify_basis; Mục 2.4). Xem là 1σ. Số đo từ dữ liệu, không phải tiêu chí tự chọn.
-# Năm 2018 có thêm 3 transect (T0025–T0027, ô W1) bị despike loại vì QGIS giữ một vùng nước phía đất làm bờ (lệch 276–307 m); RMSE tất cả
-# 59 transect là 66,95 m (evaluation.json: main_shoreline_error.all). Trước khi đổi sang đường bờ QGIS, giá trị đo trên bản Python là 15,1 / 18,39 / 19,99.
-U_CLASSIFY = {2018: 17.15, 2022: 17.82, 2026: 21.69}
+# Từng có lỗi QGIS giữ ao phía đất làm một mảnh bờ ở 2018 (3 transect T0025–T0027 lệch 276–307 m, RMSE 66,95 m); đã sửa trong
+# qgis_interpret.py (chỉ giữ phần nước liên thông lớn nhất), nay 2018 không còn quan sát nào bị despike loại.
+# Trước khi đổi sang đường bờ QGIS, giá trị đo trên bản Python là 15,1 / 18,39 / 19,99.
+U_CLASSIFY = {2018: 16.73, 2022: 17.82, 2026: 21.69}
 U_CLASSIFY_DEFAULT = 21.7          # các năm không có ground truth: lấy giá trị lớn nhất đã đo, làm tròn lên (thận trọng)
 
 # Phân loại biến động (Mục 2.5a). Ngưỡng tuyệt đối, đặt trước, không phụ thuộc phân phối kết quả.
