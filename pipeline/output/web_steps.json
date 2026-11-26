@@ -1,0 +1,65 @@
+{
+ "scenes": {
+  "2020": {
+   "total": 14,
+   "used": 13
+  },
+  "2018": {
+   "total": 13,
+   "used": 4
+  },
+  "2019": {
+   "total": 15,
+   "used": 9
+  },
+  "2021": {
+   "total": 14,
+   "used": 8
+  },
+  "2022": {
+   "total": 13,
+   "used": 5
+  },
+  "2023": {
+   "total": 12,
+   "used": 7
+  },
+  "2024": {
+   "total": 16,
+   "used": 7
+  },
+  "2025": {
+   "total": 11,
+   "used": 7
+  },
+  "2026": {
+   "total": 18,
+   "used": 6
+  }
+ },
+ "otsu": {
+  "year": 2026,
+  "threshold": 0.1129,
+  "pixels_in_zone": 1347886,
+  "water_share": 0.0982
+ },
+ "clean": {
+  "year": 2026,
+  "water_before_px": 206932,
+  "water_after_px": 155014,
+  "removed_px": 51918,
+  "added_px": 0,
+  "removed_ha": 519.2,
+  "window_m": [
+   2400,
+   1600
+  ]
+ },
+ "zoom": {
+  "window_m": [
+   1000,
+   600
+  ],
+  "transects": 17
+ }
+}
