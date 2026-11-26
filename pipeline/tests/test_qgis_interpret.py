@@ -54,3 +54,50 @@ def test_line_distance_stats_lech_song_song_5m():
     s = Q.line_distance_stats(_line((0, 0), (500, 0)), _line((0, 5), (500, 5)))
     assert s["qgis_to_python"]["median_m"] == pytest.approx(5.0)
     assert s["within_1px_pct"] == 100.0
+
+
+@pytest.fixture(scope="module")
+def qgis_processing():
+    """Khởi tạo QGIS + Processing một lần cho các test gọi thuật toán Processing."""
+    import os, sys
+    os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+    from qgis.core import QgsApplication
+    QgsApplication.setPrefixPath("/usr", True)
+    app = QgsApplication([], False)
+    app.initQgis()
+    sys.path.append("/usr/share/qgis/python/plugins")
+    from processing.core.Processing import Processing
+    Processing.initialize()
+    yield
+    # không gọi exitQgis(): PyQGIS 3.40 báo segfault khi dọn lớp tạm
+
+
+def _composite(path, nodata_blocks, size=60):
+    gdal = pytest.importorskip("osgeo.gdal")
+    arr = np.full((size, size), 0.2, np.float32)
+    for r0, r1, c0, c1 in nodata_blocks:
+        arr[r0:r1, c0:c1] = np.nan
+    ds = gdal.GetDriverByName("GTiff").Create(str(path), size, size, 1, gdal.GDT_Float32)
+    ds.SetGeoTransform((500000, 10, 0, 1000000, 0, -10))
+    ds.SetProjection('PROJCS["WGS 84 / UTM zone 48N",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563]],'
+                     'PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["Transverse_Mercator"],'
+                     'PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",105],PARAMETER["scale_factor",0.9996],'
+                     'PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1],AUTHORITY["EPSG","32648"]]')
+    ds.GetRasterBand(1).WriteArray(arr)
+    ds.FlushCache()
+    return path
+
+
+def test_big_gaps_none_khi_anh_khong_thieu_du_lieu(qgis_processing, tmp_path):
+    assert Q.big_gaps(_composite(tmp_path / "a.tif", []), tmp_path, 2000) is None
+
+
+def test_big_gaps_bo_cum_nho_giu_cum_lon(qgis_processing, tmp_path):
+    # cụm 2×2 = 4 px (< 25 px) bị bỏ; cụm 10×10 = 100 px (≥ 25 px) được giữ và đệm 2 pixel (20 m)
+    comp = _composite(tmp_path / "b.tif", [(5, 7, 5, 7), (30, 40, 30, 40)])
+    gaps = Q.big_gaps(comp, tmp_path, 2001)
+    assert gaps is not None and gaps.featureCount() == 1
+    g = next(gaps.getFeatures()).geometry()
+    assert g.area() > 100 * 100 and g.area() < (100 + 40) ** 2           # 100 px = 10 000 m², cộng đệm 20 m mỗi phía
+    assert g.contains(QgsGeometry.fromPointXY(QgsPointXY(500000 + 35 * 10, 1000000 - 35 * 10)))
+    assert not g.intersects(QgsGeometry.fromPointXY(QgsPointXY(500000 + 6 * 10, 1000000 - 6 * 10)))
