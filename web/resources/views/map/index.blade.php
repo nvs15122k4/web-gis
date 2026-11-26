@@ -62,9 +62,22 @@
 
     <main class="map-wrap" id="main-content" tabindex="-1" aria-label="Bản đồ">
         <div id="map"></div>
+        <form class="map-search" id="map-search" role="search" autocomplete="off">
+            <input type="search" placeholder="Tìm mã transect hoặc toạ độ (10.54, 105.29)" aria-label="Tìm kiếm trên bản đồ">
+            <ul class="search-results" hidden></ul>
+        </form>
+        <div class="map-actions">
+            <button type="button" class="tool-btn" id="map-print" title="In / xuất PDF bản đồ" aria-label="In bản đồ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg></button>
+            <button type="button" class="tool-btn" id="attr-toggle" title="Bảng thuộc tính" aria-label="Mở bảng thuộc tính" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3zM3 10h18M9 5v14"/></svg></button>
+        </div>
+        <div class="swipe-bar" id="swipe-bar" hidden>
+            <span class="swipe-tag a" id="swipe-label-a"></span><span class="swipe-tag b" id="swipe-label-b"></span>
+            <div class="swipe-handle" role="slider" tabindex="0" aria-label="Thanh vuốt so sánh" aria-valuemin="2" aria-valuemax="98" aria-valuenow="50"></div>
+        </div>
         <p id="measure-readout" class="measure-readout" role="status" hidden></p>
         @include('partials.transect-panel')
         @include('partials.legend')
+        @include('partials.attr-table')
         @include('partials.timeline')
     </main>
 </div>
