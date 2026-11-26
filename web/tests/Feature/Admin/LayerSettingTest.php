@@ -21,6 +21,19 @@ class LayerSettingTest extends TestCase
         $this->assertSame(100, $r->json('0.opacity'));
     }
 
+    public function test_missing_table_falls_back_to_defaults(): void
+    {
+        $model = new class extends LayerSetting
+        {
+            protected $table = 'layer_settings_chua_migrate';
+        };
+
+        $out = $model::resolved();
+
+        $this->assertSame(['transects', 'rates', 'hotspots', 'reference'], array_column($out, 'key'));
+        $this->assertSame(100, $out[0]['opacity']);
+    }
+
     public function test_admin_can_update_and_value_is_persisted_and_logged(): void
     {
         $this->actingAs($this->admin(), 'sanctum')
