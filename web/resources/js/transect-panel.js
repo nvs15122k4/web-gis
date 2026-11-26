@@ -146,6 +146,7 @@ export async function zoomToTransect(map, id) {
 }
 
 export async function showTransect(id) {
+    document.dispatchEvent(new CustomEvent('transect:selected', { detail: { id: Number(id) } }));
     showDetailLoading();
     let detail;
     let history;
