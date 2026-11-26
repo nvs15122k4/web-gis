@@ -74,6 +74,10 @@
             <span class="swipe-tag a" id="swipe-label-a"></span><span class="swipe-tag b" id="swipe-label-b"></span>
             <div class="swipe-handle" role="slider" tabindex="0" aria-label="Thanh vuốt so sánh" aria-valuemin="2" aria-valuemax="98" aria-valuenow="50"></div>
         </div>
+        <div class="north" aria-hidden="true">
+            <span>B</span>
+            <svg viewBox="0 0 24 40"><path d="M12 2 20 36 12 29 4 36Z"/><path class="n-half" d="M12 2 20 36 12 29Z"/></svg>
+        </div>
         <p id="measure-readout" class="measure-readout" role="status" hidden></p>
         @include('partials.transect-panel')
         @include('partials.legend')
