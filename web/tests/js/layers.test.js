@@ -9,7 +9,7 @@ const line = (id, props) => ({
 
 const setup = async (geoserver) => {
     document.body.innerHTML = `<div id="map"></div><div id="status"></div>
-        <input type="checkbox" id="layer-transects"><input type="checkbox" id="only-significant">
+        <input type="checkbox" id="layer-transects"><input type="checkbox" id="layer-rates" checked><input type="checkbox" id="only-significant">
         <input type="checkbox" id="layer-hotspots"><input type="checkbox" id="layer-reference"><span id="reference-status"></span>
         <div id="year-list"></div><select id="compare-a"></select><select id="compare-b"></select>
         <button id="compare-clear"></button><button id="compare-apply"></button>
