@@ -21,6 +21,16 @@ class LayerSettingTest extends TestCase
         $this->assertSame(100, $r->json('0.opacity'));
     }
 
+    public function test_saved_visible_true_is_returned_not_overridden_by_model_visible_property(): void
+    {
+        LayerSetting::create(['key' => 'transects', 'visible' => true, 'opacity' => 40, 'sort_order' => 1]);
+
+        $row = collect(LayerSetting::resolved())->firstWhere('key', 'transects');
+
+        $this->assertTrue($row['visible']);
+        $this->assertSame(40, $row['opacity']);
+    }
+
     public function test_missing_table_falls_back_to_defaults(): void
     {
         $model = new class extends LayerSetting
