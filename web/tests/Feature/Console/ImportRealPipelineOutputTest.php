@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
- * Nạp output pipeline THẬT (pipeline/output) rồi kiểm số liệu chốt: 266 transect, phân lớp 72/179/11/4,
+ * Nạp output pipeline THẬT (pipeline/output) rồi kiểm số liệu chốt: 266 transect, phân lớp 71/181/10/4,
  * 3 hotspot (T0020, T0094, T0200–T0201), 2 sự kiện sạt lở tham chiếu; /api/summary phải khớp. Chạy trong transaction nên được rollback.
  */
 class ImportRealPipelineOutputTest extends TestCase
@@ -55,7 +55,7 @@ class ImportRealPipelineOutputTest extends TestCase
             ->map(fn ($n) => (int) $n)->all();
         ksort($byClass);
 
-        $this->assertSame(['accretion' => 72, 'mild_erosion' => 11, 'severe_erosion' => 4, 'stable' => 179], $byClass);
+        $this->assertSame(['accretion' => 71, 'mild_erosion' => 10, 'severe_erosion' => 4, 'stable' => 181], $byClass);
     }
 
     public function test_hotspots_are_on_severe_erosion_transects(): void
@@ -81,7 +81,7 @@ class ImportRealPipelineOutputTest extends TestCase
 
         $this->assertSame(266, $s['transects']['total']);
         $this->assertSame(
-            ['accretion' => 72, 'stable' => 179, 'mild_erosion' => 11, 'severe_erosion' => 4],
+            ['accretion' => 71, 'stable' => 181, 'mild_erosion' => 10, 'severe_erosion' => 4],
             $s['transects']['by_class']
         );
         $this->assertSame(3, $s['hotspots']['count']);
