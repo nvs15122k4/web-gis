@@ -38,9 +38,17 @@ def alt_water(name, y, idx=INDEX):
     return rioxarray.open_rasterio(f).isel(band=0) if f.exists() else None
 
 
-def alt_line(name, y, idx=INDEX):
-    f = ALT / name / "shoreline" / f"{y}_{idx}.json"
+def alt_line(name, y, idx=INDEX, engine="python"):
+    """Đường bờ của bản đối chứng. engine="python": alt_data.py (contour dưới pixel, đủ 3 chỉ số); engine="qgis":
+    qgis_interpret_alt.py (cùng chuỗi QGIS với bản chính, chỉ MNDWI)."""
+    f = ALT / name / "qgis_shoreline" / f"{y}.json" if engine == "qgis" else ALT / name / "shoreline" / f"{y}_{idx}.json"
     return gpd.read_file(f).geometry.iloc[0] if f.exists() else None
+
+
+def default_engine():
+    """Cùng phương pháp tách đường bờ với bản chính: QGIS khi config.SHORELINE_ENGINE = "qgis" và đã chạy qgis_interpret_alt.py."""
+    have = all((ALT / n / "qgis_shoreline").exists() for n in NAMES if (ALT / n / "scenes.json").exists())
+    return "qgis" if C.SHORELINE_ENGINE == "qgis" and have else "python"
 
 
 def main_line(y):
@@ -62,7 +70,17 @@ def offsets(a, b, transects):
             "n_over_50m": int((np.abs(d) > 50).sum())}
 
 
-def water_level(name, transects):
+def line_offsets(name, transects, engine):
+    """Độ lệch đường bờ bản đối chứng so với bản chính dọc transect, từng năm, theo phương pháp tách bờ `engine`."""
+    out = {}
+    for y in C.YEARS:
+        al, ml = alt_line(name, y, engine=engine), main_line(y)
+        if al is not None and ml is not None:
+            out[y] = offsets(al, ml, transects)
+    return out
+
+
+def water_level(name, transects, engine="python"):
     out = {}
     for y in C.YEARS:
         aw, mw = alt_water(name, y), main_water(y)
@@ -76,17 +94,17 @@ def water_level(name, transects):
         po = (p == q).mean()
         pe = p.mean() * q.mean() + (1 - p.mean()) * (1 - q.mean())
         pm["kappa"] = round(float((po - pe) / (1 - pe)), 4) if pe < 1 else None
-        al, ml = alt_line(name, y), main_line(y)
+        al, ml = alt_line(name, y, engine=engine), main_line(y)
         off = offsets(al, ml, transects) if al is not None and ml is not None else None
         out[y] = {"agreement_vs_main": pm, "shoreline_offset_vs_main": off}
     return out
 
 
-def trend(name, transects_gdf, low_years):
+def trend(name, transects_gdf, low_years, engine="python"):
     """LRR/nhóm biến động của bản đối chứng trên cùng transect, so với output/transects.json (bản chính)."""
     main = gpd.read_file(C.OUTPUT / "transects.json")
     mstats = {r.transect_code: (json.loads(r.stats) if isinstance(r.stats, str) else r.stats) for r in main.itertuples()}
-    lines = {y: alt_line(name, y) for y in C.YEARS}
+    lines = {y: alt_line(name, y, engine=engine) for y in C.YEARS}
     res = {}
     for label, skip in (("all_years", set()), ("reliable_years", set(low_years))):
         rows = []
@@ -177,7 +195,7 @@ def export_transects(tgdf, low_years_by_name):
         if not (ALT / name / "scenes.json").exists():
             continue
         skip = set(low_years_by_name.get(name, []))
-        lines = {y: alt_line(name, y) for y in C.YEARS}
+        lines = {y: alt_line(name, y, engine=default_engine()) for y in C.YEARS}
         rows = []
         for rec in tgdf.itertuples():
             dist = {y: s4_transects.distance(rec.geometry, lines[y]) for y in C.YEARS if y not in skip and lines[y] is not None}
@@ -208,10 +226,15 @@ def main():
             continue
         scenes = json.loads((ALT / name / "scenes.json").read_text())
         low = [int(y) for y, v in scenes.items() if v.get("low_confidence")]
+        eng = default_engine()
         report[name] = {"scenes_used": {y: v["used"] for y, v in scenes.items()}, "low_confidence_years": low,
-                        "water": water_level(name, transects), "trend": trend(name, tgdf, low),
+                        "engine": eng,   # phương pháp tách đường bờ dùng cho shoreline_offset và trend (cùng phương pháp với bản chính)
+                        "water": water_level(name, transects, eng), "trend": trend(name, tgdf, low, eng),
                         "groundtruth": groundtruth(name, transects)}
-        print(name, "xong")
+        if eng != "python":   # độ nhạy theo phương pháp: cùng nguồn ảnh, đường bờ tách bằng code Python
+            report[name]["sensitivity_python"] = {"offsets": line_offsets(name, transects, "python"),
+                                                  "trend": trend(name, tgdf, low, "python")}
+        print(name, "xong", "(engine:", eng + ")")
     export_transects(tgdf, {n: r["low_confidence_years"] for n, r in report.items() if n == "s2c1"})
     (C.OUTPUT / "alt_compare.json").write_text(json.dumps(report, indent=1, ensure_ascii=False))
     print(json.dumps({n: {"trend": {k: {m: v.get(m) for m in ("pearson_lrr", "class_agreement", "sign_agreement", "bias_lrr_alt_minus_main")}
