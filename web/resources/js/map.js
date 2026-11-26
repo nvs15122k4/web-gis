@@ -1,7 +1,12 @@
 import L from 'leaflet';
+import { createAttrTable } from './attr-table';
 import { initBasemaps } from './basemaps';
 import { initLayers, layers } from './layers';
+import { initLayerTree } from './layer-tree';
 import { initPermalink, readPermalink } from './permalink';
+import { initPrint } from './print';
+import { initSearch } from './search';
+import { initSwipe } from './swipe';
 import { loadSummary } from './summary';
 import { initTabs } from './tabs';
 import { initTimeline } from './timeline';
@@ -52,12 +57,17 @@ export function initMap() {
     initTabs(document.getElementById('sidebar'));
     initTimeline(map);
     initToolbar(map);
+    initLayerTree(map);
+    initPrint();
+    initSwipe(map, window.WEBGIS.years);
+    initAttrTable(map);
     const sidebar = initSidebarToggle(map);
 
     const select = (id) => {
         sidebar.collapseOnMobile(); // màn hình nhỏ: nhường chỗ cho bản đồ và thẻ chi tiết
         return showTransect(id).then(() => zoomToTransect(map, id)).catch(() => {});
     };
+    initSearch(map, select);
     loadSummary(select);
     if (link.transectId) showTransect(link.transectId).catch(() => {});
 
@@ -110,4 +120,26 @@ function addHomeControl(map, bounds) {
         },
     });
     new Home().addTo(map);
+}
+
+/** Bảng thuộc tính đáy bản đồ: mở/đóng bằng nút trên bản đồ; chọn dòng ↔ chọn transect trên bản đồ. */
+function initAttrTable(map) {
+    const root = document.getElementById('attr-table');
+    const toggle = document.getElementById('attr-toggle');
+    if (!root || !toggle) return;
+    const table = createAttrTable({
+        map,
+        root,
+        onSelect: (id) => showTransect(id).catch(() => {}),
+    });
+    const set = (open) => {
+        root.hidden = !open;
+        toggle.setAttribute('aria-pressed', String(open));
+        document.getElementById('main-content').classList.toggle('has-attr', open);
+        map.invalidateSize({ pan: false });
+        if (open) table.render();
+    };
+    toggle.addEventListener('click', () => set(root.hidden));
+    document.getElementById('attr-close')?.addEventListener('click', () => set(false));
+    return table;
 }
