@@ -1,0 +1,32 @@
+[
+ {
+  "date": "2020-07-09",
+  "masked_fraction": 0.76,
+  "used": false,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-07-14",
+  "masked_fraction": 0.794,
+  "used": false,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-07-29",
+  "masked_fraction": 0.52,
+  "used": false,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-08-18",
+  "masked_fraction": 0.788,
+  "used": false,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-08-23",
+  "masked_fraction": 0.685,
+  "used": false,
+  "processing_baseline": "02.12"
+ }
+]
