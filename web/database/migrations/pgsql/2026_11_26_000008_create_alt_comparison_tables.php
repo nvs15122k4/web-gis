@@ -19,7 +19,7 @@ return new class extends Migration
         $db = DB::connection('pgsql');
 
         $db->statement('
-            CREATE TABLE transect_alt_lrr (
+            CREATE TABLE IF NOT EXISTS transect_alt_lrr (
                 id BIGSERIAL PRIMARY KEY,
                 transect_id BIGINT NOT NULL REFERENCES transects(id) ON DELETE CASCADE,
                 source VARCHAR(20) NOT NULL, -- s2c1 | landsat
@@ -30,7 +30,7 @@ return new class extends Migration
             )');
 
         $db->statement('
-            CREATE TABLE alt_source_years (
+            CREATE TABLE IF NOT EXISTS alt_source_years (
                 source VARCHAR(20) NOT NULL,
                 year SMALLINT NOT NULL,
                 scenes_used SMALLINT NULL,
