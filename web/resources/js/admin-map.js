@@ -3,6 +3,7 @@ import colors from './colors.json';
 import { api, get } from './api';
 import { createAttrTable } from './attr-table';
 import { UPDATING } from './status';
+import { initBasemaps } from './basemaps';
 
 const LABELS = { shorelines: 'Đường bờ (đối tượng)', transects: 'Transect', hotspots: 'Hotspot', reference_events: 'Sạt lở tham chiếu' };
 
@@ -31,7 +32,7 @@ export function initAdminMap() {
     const el = document.getElementById('admin-map');
     if (!el) return null;
     const map = L.map(el, { zoomControl: true }).setView([10.545, 105.29], 12);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+    initBasemaps(map, window.WEBGIS?.vietmapKey ?? null).catch(() => {});
 
     api.transects().then((fc) => {
         const layer = L.geoJSON(fc, {

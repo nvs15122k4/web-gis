@@ -52,11 +52,56 @@ async function renderThresholds() {
     });
 }
 
+const LAYER_LABELS = { transects: 'Transect (đường cắt)', rates: 'Điểm tốc độ biến động', hotspots: 'Hotspot lùi bờ mạnh', reference: 'Sạt lở tham chiếu 2019–2020' };
+
+async function saveLayer(key, body) {
+    const { res, body: out } = await request(`/admin/config/layers/${key}`, { method: 'PUT', body: JSON.stringify(body) });
+    if (res.ok) message(`Đã lưu cấu hình lớp ${LAYER_LABELS[key] ?? key}.`, true);
+    else if (res.status === 401 || res.status === 403) message('Không đủ quyền để sửa lớp (cần tài khoản admin).');
+    else message(out.message ?? 'Lưu cấu hình lớp thất bại.');
+    return res.ok;
+}
+
+/** Danh sách lớp, hiển thị từ trên (nằm trên cùng) xuống dưới; nút ↑↓ đổi chỗ sort_order của hai lớp kề nhau. */
+async function renderLayers() {
+    const el = $('layer-admin');
+    if (!el) return;
+    let list;
+    try {
+        list = await get('/config/layers');
+    } catch {
+        el.innerHTML = '<li class="updating">Cấu hình lớp đang cập nhật.</li>';
+        return;
+    }
+    const top = [...list].sort((a, b) => b.sort_order - a.sort_order);
+    el.innerHTML = top.map((l, i) => `<li data-key="${l.key}">
+        <label class="switch-row"><span><b>${l.label}</b></span><input type="checkbox" class="switch" data-f="visible" ${l.visible ? 'checked' : ''} aria-label="Hiển thị mặc định ${l.label}"></label>
+        <label class="layer-opts">Độ trong suốt <input type="range" min="10" max="100" step="5" value="${l.opacity}" data-f="opacity" aria-label="Độ mờ mặc định ${l.label}"><output>${l.opacity}%</output></label>
+        <span class="order-btns"><button type="button" class="btn btn-ghost" data-move="up" ${i === 0 ? 'disabled' : ''} aria-label="Đưa ${l.label} lên trên">↑</button><button type="button" class="btn btn-ghost" data-move="down" ${i === top.length - 1 ? 'disabled' : ''} aria-label="Đưa ${l.label} xuống dưới">↓</button></span>
+    </li>`).join('');
+    el.querySelectorAll('li').forEach((li) => {
+        const key = li.dataset.key;
+        li.querySelector('[data-f=visible]').addEventListener('change', (e) => saveLayer(key, { visible: e.target.checked }));
+        const range = li.querySelector('[data-f=opacity]');
+        range.addEventListener('input', () => { li.querySelector('output').textContent = `${range.value}%`; });
+        range.addEventListener('change', () => saveLayer(key, { opacity: Number(range.value) }));
+        li.querySelectorAll('[data-move]').forEach((b) => b.addEventListener('click', async () => {
+            const idx = top.findIndex((l) => l.key === key);
+            const other = top[b.dataset.move === 'up' ? idx - 1 : idx + 1];
+            const me = top[idx];
+            if (!other) return;
+            const ok = await saveLayer(key, { sort_order: other.sort_order }) && await saveLayer(other.key, { sort_order: me.sort_order });
+            if (ok) renderLayers();
+        }));
+    });
+}
+
 function showPanel(user) {
     $('login-form').hidden = true;
     $('admin-panel').hidden = false;
     $('admin-user').textContent = `${user.email} (${user.role})`;
     renderThresholds();
+    renderLayers();
 }
 
 $('login-form').addEventListener('submit', async (e) => {

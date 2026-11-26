@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Quản trị ngưỡng — WebGIS Sông Hậu</title>
     @vite(['resources/css/app.css', 'resources/js/admin.js', 'resources/js/admin-map.js'])
+    <script>window.WEBGIS = @json(['geoserver' => $geoserver, 'years' => $years, 'vietmapKey' => $vietmapKey]);</script>
 </head>
 <body class="page">
 @include('partials.nav')
@@ -24,6 +25,9 @@
             <div class="admin-user"><span>Đăng nhập: <strong id="admin-user"></strong></span> <button type="button" class="btn btn-ghost" id="logout">Đăng xuất</button></div>
             <h2 class="section-title">Ngưỡng hiển thị</h2>
             <div id="thresholds"></div>
+            <h2 class="section-title">Quản lý lớp bản đồ</h2>
+            <p class="hint">Đặt trạng thái mặc định của lớp trên bản đồ công khai: bật/tắt, độ trong suốt, thứ tự chồng lớp (trên cùng nằm trên).</p>
+            <ol id="layer-admin" class="layer-admin"></ol>
         </section>
 
         <h2 class="section-title">Dữ liệu trong hệ thống</h2>

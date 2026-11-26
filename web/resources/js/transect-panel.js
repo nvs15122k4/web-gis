@@ -23,6 +23,15 @@ let transectIndex = null;
 let mapRef = null;
 const highlight = L.layerGroup();
 
+/** Nội dung popup thuộc tính: mã, phân loại và các chỉ số chính; thiếu số thì ghi "Đang cập nhật". */
+export function popupHtml(p) {
+    const row = (k, v) => `<tr><th>${k}</th><td>${v}</td></tr>`;
+    const cls = CLASS_LABEL[p.change_class] ?? UPDATING;
+    return `<div class="feature-popup"><strong>${p.transect_code ?? 'Transect'}</strong>
+        <table>${row('Phân loại', cls)}${row('EPR', val(p.epr_m_per_year, ' m/năm'))}${row('NSM', val(p.nsm_m, ' m'))}${row('LRR', val(p.lrr_m_per_year, ' m/năm'))}${row('Ý nghĩa thống kê', missing(p.is_significant) ? val(null) : p.is_significant ? 'Có' : 'Không')}</table>
+        <small>Biểu đồ vị trí đường bờ theo năm ở khung bên phải.</small></div>`;
+}
+
 const geometries = () => (transectIndex ??= api.transects().then((fc) => new Map(fc.features.map((f) => [f.id, f.geometry]))));
 
 /**
@@ -35,24 +44,24 @@ export function initTransectPanel(map, link = null) {
     highlight.addTo(map);
     document.getElementById('inspector-close')?.addEventListener('click', closeInspector);
     document.addEventListener('keydown', (e) => e.key === 'Escape' && closeInspector());
-    if (!USE_WMS) {
+    {
         handlers.onTransectClick = async (f, latlng) => {
             const props = { ...f.properties, id: f.id };
-            L.popup().setLatLng(latlng).setContent(`<strong>${props.transect_code}</strong><br>${CLASS_LABEL[props.change_class] ?? ''}`).openOn(map);
+            L.popup({ maxWidth: 260 }).setLatLng(latlng).setContent(popupHtml(props)).openOn(map);
             try {
                 await showTransect(props.id);
             } catch {
                 setStatus(`Thông tin transect: ${UPDATING.toLowerCase()}.`);
             }
         };
-        return;
     }
+    if (!USE_WMS) return;
     map.on('click', async (e) => {
         if (!map.hasLayer(layers.transects)) return;
         try {
             const props = await featureAt(map, e.latlng);
             if (!props) return;
-            L.popup().setLatLng(e.latlng).setContent(`<strong>${props.transect_code}</strong><br>${CLASS_LABEL[props.change_class] ?? ''}`).openOn(map);
+            L.popup({ maxWidth: 260 }).setLatLng(e.latlng).setContent(popupHtml(props)).openOn(map);
             await showTransect(props.id);
         } catch {
             setStatus(`Thông tin transect (GeoServer): ${UPDATING.toLowerCase()}.`);

@@ -22,15 +22,16 @@ export function wms(name, params = {}) {
 export const WMS_URL = wmsUrl;
 export const TRANSECT_LAYER = USE_WMS ? `${geoserver.workspace}:transects` : null;
 
-const YEAR_COLORS = ['#6a3d9a', '#1f78b4', '#33a02c', '#e31a8c', '#ff7f00', '#a6761d', '#00838f', '#5c6bc0', '#546e7a'];
+// Thang màu tuần tự (plasma): năm càng gần đây càng sáng, như DEA Coastlines.
+const YEAR_COLORS = ['#0d0887', '#47039f', '#7301a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#e8b800'];
 const COMPARE_COLORS = { a: '#1f6feb', b: '#f0883e' };
 
 const hex = (c) => c.replace('#', '');
 
 function shorelineLayer(year, color) {
-    if (USE_WMS) return wms('shorelines', { cql_filter: `year=${year}`, env: `color:${hex(color)}` });
+    if (USE_WMS) return wms('shorelines', { cql_filter: `year=${year}`, env: `color:${hex(color)}`, pane: SHORELINE_PANE });
     // Chế độ GeoJSON: tải đường bờ của đúng năm khi lớp được tạo, vẽ vào lớp rỗng đã trả về.
-    const layer = L.geoJSON(null, { style: { color, weight: 3, opacity: 0.9, className: 'shoreline-path' }, interactive: false });
+    const layer = L.geoJSON(null, { pane: SHORELINE_PANE, style: { color, weight: 2, opacity: 0.95, className: 'shoreline-path' }, interactive: false });
     api.shorelines(year).then((fc) => layer.addData(fc)).catch(() => {
         setStatus(`Dữ liệu đường bờ năm ${year}: ${UPDATING.toLowerCase()}.`);
     });
@@ -71,9 +72,83 @@ function geoJsonTransects() {
     return layer;
 }
 
+/** Thang màu phân kỳ theo LRR (m/năm): đỏ = lùi bờ, xanh = bồi, xám nhạt = ổn định (kiểu DEA Coastlines). */
+export const RATE_STOPS = [
+    { max: -2, color: '#b2182b', label: '< −2' },
+    { max: -1, color: '#ef6c4d', label: '−2 … −1' },
+    { max: -0.3, color: '#f6b48e', label: '−1 … −0,3' },
+    { max: 0.3, color: '#d9d9d9', label: '−0,3 … +0,3' },
+    { max: 1, color: '#9ecae1', label: '+0,3 … +1' },
+    { max: 2, color: '#4a98c9', label: '+1 … +2' },
+    { max: Infinity, color: '#08519c', label: '> +2' },
+];
+export function rateColor(lrr) {
+    if (lrr === null || lrr === undefined || Number.isNaN(Number(lrr))) return '#9e9e9e';
+    return RATE_STOPS.find((s) => Number(lrr) < s.max)?.color ?? RATE_STOPS[RATE_STOPS.length - 1].color;
+}
+
+/** Từ zoom này mới hiện chấm từng transect; thu nhỏ hơn chỉ còn dải màu để không che đường bờ. */
+const DOT_MIN_ZOOM = 16;
+/** Hai transect liền kề cách nhau quá xa (đứt đoạn) thì không nối dải màu. */
+const MAX_LINK_M = 150;
+export const SHORELINE_PANE = 'shorelines';
+
+/**
+ * Lớp tốc độ biến động (kiểu DEA Coastlines): một DẢI MÀU chạy dọc bờ, mỗi đoạn tô theo LRR của hai transect kề nhau,
+ * nằm DƯỚI các đường bờ theo năm (pane riêng) nên không bao giờ che đường bờ. Phóng to (>= zoom 16) mới thêm chấm
+ * từng transect; chấm to, viền đậm khi có ý nghĩa thống kê.
+ */
+function ratePointsLayer(map) {
+    const ribbon = L.featureGroup();
+    const dots = L.featureGroup();
+    const group = L.featureGroup([ribbon]);
+    const click = (f) => (e) => {
+        L.DomEvent.stopPropagation(e);
+        handlers.onTransectClick?.(f, e.latlng);
+    };
+    const syncDots = () => {
+        const want = map.getZoom() >= DOT_MIN_ZOOM && group.hasLayer(ribbon);
+        if (want && !group.hasLayer(dots)) group.addLayer(dots);
+        if (!want && group.hasLayer(dots)) group.removeLayer(dots);
+    };
+    map.on('zoomend', syncDots);
+    const render = (fc) => {
+        const feats = [...fc.features].sort((a, b) => String(a.properties.transect_code).localeCompare(String(b.properties.transect_code)));
+        const renderer = L.canvas({ tolerance: 5 });
+        feats.forEach((f, i) => {
+            const [lng, lat] = f.geometry.coordinates;
+            const ll = L.latLng(lat, lng);
+            const sig = f.properties.is_significant;
+            const r = sig ? 5 + Math.min(Math.abs(f.properties.lrr_m_per_year ?? 0), 3) : 3.5;
+            L.circleMarker(ll, {
+                renderer, radius: r, fillColor: rateColor(f.properties.lrr_m_per_year), fillOpacity: sig ? 0.95 : 0.75,
+                color: '#fff', weight: sig ? 1.5 : 1, opacity: 1,
+            }).on('click', click(f)).addTo(dots);
+            const next = feats[i + 1];
+            if (!next) return;
+            const [lng2, lat2] = next.geometry.coordinates;
+            const ll2 = L.latLng(lat2, lng2);
+            if (ll.distanceTo(ll2) > MAX_LINK_M) return;
+            const lrr = ((f.properties.lrr_m_per_year ?? 0) + (next.properties.lrr_m_per_year ?? 0)) / 2;
+            // Viền trắng mờ bên dưới để dải màu tách khỏi nền ảnh vệ tinh.
+            L.polyline([ll, ll2], { renderer, color: '#fff', weight: 16, opacity: 0.55, lineCap: 'round', interactive: false }).addTo(ribbon);
+            L.polyline([ll, ll2], { renderer, color: rateColor(lrr), weight: 12, opacity: 0.95, lineCap: 'round', lineJoin: 'round' })
+                .on('click', click(f)).addTo(ribbon);
+        });
+        syncDots();
+    };
+    api.ratePoints().then(render).catch(() => setStatus(`Dữ liệu tốc độ biến động: ${UPDATING.toLowerCase()}.`));
+    // Phục vụ kiểm thử/áp độ trong suốt: gom các lớp con.
+    group.ribbon = ribbon;
+    group.dots = dots;
+    group.on('add', syncDots);
+    return group;
+}
+
 /** Trạng thái các lớp, để bật/tắt và để kiểm thử truy cập. */
 export const layers = {
     transects: null,
+    rates: null,
     /** CQL_FILTER đang áp cho lớp transect (dùng chung cho WMS GetMap và GetFeatureInfo). */
     transectFilter: null,
     hotspots: L.layerGroup(),
@@ -96,14 +171,24 @@ let mapRef = null;
 
 export function initLayers(map) {
     mapRef = map;
-    layers.transects = (USE_WMS ? warnOnTileError(wms('transects', { styles: '' })) : geoJsonTransects()).addTo(map);
+    // Đường bờ theo năm nằm trên dải màu tốc độ để luôn nhìn thấy, kể cả khi thu nhỏ.
+    map.createPane(SHORELINE_PANE).style.zIndex = 450;
+    // Transect dày đặc trông như mã vạch: mặc định tắt, thay bằng điểm tốc độ biến động trên đường bờ.
+    layers.transects = USE_WMS ? warnOnTileError(wms('transects', { styles: '' })) : geoJsonTransects();
+    layers.rates = ratePointsLayer(map).addTo(map);
     layers.hotspots.addTo(map);
 
     bindToggle('layer-transects', map, () => layers.transects);
+    bindToggle('layer-rates', map, () => layers.rates);
     bindSignificanceFilter();
     bindToggle('layer-hotspots', map, () => layers.hotspots);
     bindReference(map);
     initYearList(map);
+    // Mặc định hiện toàn bộ đường bờ các năm có dữ liệu để thấy ngay xu hướng dịch chuyển.
+    years.available.forEach((y) => {
+        const box = document.getElementById(`year-${y}`);
+        if (box) { box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
     initCompare(map);
     initHotspotFilter();
 }
