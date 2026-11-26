@@ -3,11 +3,14 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ErosionHotspotController;
 use App\Http\Controllers\Api\ExportController;
+use App\Http\Controllers\Api\LayerSettingController;
+use App\Http\Controllers\Api\RatePointController;
 use App\Http\Controllers\Api\ReferenceEventController;
 use App\Http\Controllers\Api\ShorelineController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\SummaryController;
 use App\Http\Controllers\Api\ThresholdConfigController;
+use App\Http\Controllers\Api\YearlyStatsController;
 use App\Http\Controllers\Api\TransectController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +20,7 @@ Route::get('/status', [StatusController::class, 'index'])
 
 // Ngưỡng cấu hình: không cache công khai (admin vừa sửa phải thấy ngay).
 Route::get('/config/thresholds', [ThresholdConfigController::class, 'index']);
+Route::get('/config/layers', [LayerSettingController::class, 'index']);
 
 // Dữ liệu chỉ đổi khi chạy lại pipeline: cho trình duyệt cache 1 phút, CDN (Vercel) 5 phút, kèm ETag để xác thực 304
 // và stale-while-revalidate để người dùng không phải chờ truy vấn PostGIS khi cache hết hạn.
@@ -26,6 +30,8 @@ Route::middleware('cache.headers:public;max_age=60;s_maxage=300;stale_while_reva
         ->whereIn('layer', ['transects', 'shorelines', 'hotspots', 'reference'])
         ->whereIn('format', ['geojson', 'csv']);
 
+    Route::get('/yearly-stats', [YearlyStatsController::class, 'index']);
+    Route::get('/rate-points', [RatePointController::class, 'index']);
     Route::get('/shorelines', [ShorelineController::class, 'index']);
 
     Route::get('/transects', [TransectController::class, 'index']);
@@ -40,4 +46,5 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('/admin/config/thresholds/{key}', [ThresholdConfigController::class, 'update']);
+    Route::put('/admin/config/layers/{key}', [LayerSettingController::class, 'update']);
 });
