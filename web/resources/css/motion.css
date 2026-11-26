@@ -37,9 +37,7 @@
     .kpis { animation: fade-in var(--dur-3) var(--ease-out) both; }
 
     /* thanh bên thu gọn/mở mượt */
-    .sidebar { transition: grid-template-columns var(--dur-2) var(--ease-out); }
-    .sidebar-body { transition: opacity var(--dur-2) var(--ease-out); }
-    .sidebar.collapsed .sidebar-body { opacity: 0; }
+    .sidebar { transition: width var(--dur-2) var(--ease-out); }
 
     /* chọn transect: vòng Vermilion lan ra rồi chốt lại */
     .select-ring { pointer-events: none; }
