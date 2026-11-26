@@ -49,3 +49,29 @@ export function renderHistoryChart(canvas, history) {
         },
     });
 }
+
+/**
+ * Cột Δ vị trí bờ trung bình so với năm trước (m): đỏ = lùi vào, xanh = tiến ra. Chỉ vẽ năm có dữ liệu liền kề.
+ */
+export function renderYearlyChart(canvas, stats) {
+    Chart.getChart(canvas)?.destroy();
+    const rows = stats.filter((r) => r.mean_delta_m !== null);
+    if (!rows.length) return null;
+    Chart.defaults.color = cssVar('--ink-3', '#566472');
+    return new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: rows.map((r) => r.year),
+            datasets: [{
+                label: 'Δ so với năm trước (m)',
+                data: rows.map((r) => r.mean_delta_m),
+                backgroundColor: rows.map((r) => (r.mean_delta_m < 0 ? '#d0312d' : '#2a7fb8')),
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.parsed.y > 0 ? '+' : ''}${c.parsed.y} m so với năm trước` } } },
+            scales: { y: { title: { display: true, text: 'Δ vị trí bờ (m)' }, grid: { color: cssVar('--chart-grid', '#e1e6eb') } }, x: { grid: { display: false } } },
+        },
+    });
+}
