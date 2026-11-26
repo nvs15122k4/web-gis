@@ -12,6 +12,7 @@ import { initSwipe } from './swipe';
 import { loadSummary } from './summary';
 import { initTabs } from './tabs';
 import { initTimeline } from './timeline';
+import { dismissPanel, revealPanel } from './motion';
 import { initToolbar } from './toolbar';
 import { initTransectPanel, showTransect, zoomToTransect } from './transect-panel';
 
@@ -137,13 +138,13 @@ function initAttrTable(map) {
         onSelect: (id) => showTransect(id).catch(() => {}),
     });
     const set = (open) => {
-        root.hidden = !open;
+        if (open) revealPanel(root); else dismissPanel(root);
         toggle.setAttribute('aria-pressed', String(open));
         document.getElementById('main-content').classList.toggle('has-attr', open);
         map.invalidateSize({ pan: false });
         if (open) table.render();
     };
-    toggle.addEventListener('click', () => set(root.hidden));
+    toggle.addEventListener('click', () => set(root.hidden || root.classList.contains('is-closing')));
     document.getElementById('attr-close')?.addEventListener('click', () => set(false));
     return table;
 }
