@@ -7,7 +7,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import config as C
-import s1_composite, s2_water, s3_shoreline, s4_transects, s5_stats, s6_reference
+import s1_composite, s2_water, s3_shoreline, s4_transects, s5_stats, s6_reference, s9_validate
 
 if __name__ == "__main__":
     if "--skip-download" not in sys.argv:
@@ -17,4 +17,5 @@ if __name__ == "__main__":
     s4_transects.main()
     s5_stats.main()
     s6_reference.main()
+    s9_validate.main()
     print(f"\nXong. Nạp vào web: cd ../web && php artisan webgis:import {C.OUTPUT}")
