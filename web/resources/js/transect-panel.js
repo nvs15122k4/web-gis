@@ -3,7 +3,7 @@ import L from 'leaflet';
 import colors from './colors.json';
 import { api } from './api';
 import { setStatus, UPDATING } from './status';
-import { fadeIn } from './motion';
+import { dismissPanel, fadeIn, revealPanel } from './motion';
 import { WMS_URL, TRANSECT_LAYER, USE_WMS, handlers, layers } from './layers';
 
 const CLASS_LABEL = {
@@ -72,14 +72,14 @@ export function initTransectPanel(map, link = null) {
 function openInspector() {
     const panel = document.getElementById('inspector');
     if (!panel) return;
-    panel.hidden = false;
+    revealPanel(panel);
     document.getElementById('main-content')?.classList.add('inspecting');
 }
 
 function closeInspector() {
     const panel = document.getElementById('inspector');
     if (!panel || panel.hidden) return;
-    panel.hidden = true;
+    dismissPanel(panel);
     document.getElementById('main-content')?.classList.remove('inspecting');
     highlight.clearLayers();
     permalink?.setTransect(null);

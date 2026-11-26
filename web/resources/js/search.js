@@ -1,5 +1,6 @@
 import L from 'leaflet';
 import { api } from './api';
+import { dismissPanel, revealPanel } from './motion';
 
 /** "10.54, 105.29" hoặc "10.54 105.29" → [vĩ độ, kinh độ]; null nếu không phải toạ độ nằm trong Việt Nam. */
 export function parseCoords(q) {
@@ -30,11 +31,11 @@ export function initSearch(map, onPick) {
     let marker = null;
     const load = () => (features ? Promise.resolve(features) : api.transects().then((fc) => (features = fc.features)).catch(() => (features = [])));
 
-    const close = () => { list.hidden = true; list.innerHTML = ''; };
+    const close = () => dismissPanel(list, () => { list.innerHTML = ''; });
     input.addEventListener('input', async () => {
         const fs = matchTransects(await load(), input.value);
         list.innerHTML = fs.map((f) => `<li><button type="button" data-id="${f.id}">${f.properties.transect_code}</button></li>`).join('');
-        list.hidden = !fs.length;
+        if (fs.length) revealPanel(list); else { list.hidden = true; }
     });
     list.addEventListener('click', (e) => {
         const b = e.target.closest('button[data-id]');
@@ -54,7 +55,7 @@ export function initSearch(map, onPick) {
             return;
         }
         const first = matchTransects(await load(), input.value, 1)[0];
-        if (first) { close(); onPick(first.id); } else { list.innerHTML = '<li class="none">Không tìm thấy trong dữ liệu.</li>'; list.hidden = false; }
+        if (first) { close(); onPick(first.id); } else { list.innerHTML = '<li class="none">Không tìm thấy trong dữ liệu.</li>'; revealPanel(list); }
     });
     document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
 }

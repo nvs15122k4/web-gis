@@ -43,3 +43,42 @@ export function fadeIn(el, { duration = 220, from = 8 } = {}) {
         { duration, easing: 'cubic-bezier(.16, 1, .3, 1)', fill: 'backwards' },
     );
 }
+
+const closing = new WeakMap();
+
+/** Mở bảng: huỷ lượt đóng đang dở (nếu có) rồi hiện; hoạt ảnh vào do CSS đảm nhiệm khi bỏ thuộc tính hidden. */
+export function revealPanel(el) {
+    if (!el) return;
+    closing.get(el)?.(false);
+    el.hidden = false;
+}
+
+/**
+ * Đóng bảng có hoạt ảnh thoát: gắn `.is-closing` để CSS chạy, xong mới đặt `hidden`.
+ * Giảm chuyển động hoặc đã ẩn thì ẩn ngay. Mở lại giữa chừng (revealPanel) sẽ huỷ lượt đóng.
+ */
+export function dismissPanel(el, done) {
+    if (!el) return;
+    if (el.hidden || closing.has(el)) return;
+    if (reducedMotion()) {
+        el.hidden = true;
+        done?.();
+        return;
+    }
+    let timer;
+    const finish = (commit) => {
+        clearTimeout(timer);
+        el.removeEventListener('animationend', onEnd);
+        el.classList.remove('is-closing');
+        closing.delete(el);
+        if (commit) {
+            el.hidden = true;
+            done?.();
+        }
+    };
+    const onEnd = (e) => { if (e.target === el) finish(true); };
+    closing.set(el, finish);
+    el.classList.add('is-closing');
+    el.addEventListener('animationend', onEnd);
+    timer = setTimeout(() => finish(true), 400); // phòng khi animationend không bắn (tab ẩn, hoạt ảnh bị tắt)
+}

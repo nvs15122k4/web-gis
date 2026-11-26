@@ -110,10 +110,8 @@
     position: absolute; z-index: 900; top: 0; right: 0; bottom: var(--timeline-h);
     width: var(--inspector-w); display: flex; flex-direction: column; overflow: hidden;
     background: var(--surface); color: var(--ink); border-left: 1px solid var(--ink);
-    animation: inspector-in .16s var(--ease);
 }
 .map-wrap:has(#timeline[hidden]) .inspector { bottom: 0; }
-@keyframes inspector-in { from { opacity: 0; } }
 .inspector-head { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 14px 8px 12px 20px; border-bottom: 1px solid var(--ink); }
 .inspector-head::after { content: ''; position: absolute; left: 20px; bottom: -1px; width: 40px; height: 2px; background: var(--mark); }
 .inspector-title { display: flex; align-items: center; gap: 10px; margin-top: 2px; font: 600 24px/1.1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
@@ -215,10 +213,8 @@
     .inspector {
         left: 0; right: 0; top: auto; bottom: var(--timeline-h); width: auto; max-height: 46dvh;
         z-index: 1250; border-left: 0; border-top: 1px solid var(--ink); box-shadow: 0 -4px 14px rgba(31, 28, 23, .22);
-        animation: sheet-in .18s var(--ease);
     }
     .map-wrap:has(#timeline[hidden]) .inspector { bottom: 0; }
-    @keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }
     .inspector::before { content: ''; position: absolute; z-index: 1; left: 50%; top: 5px; width: 36px; height: 3px; margin-left: -18px; background: var(--line-strong); }
     .inspector-head { padding-top: 16px; padding-left: 16px; }
     .inspector-head::after { left: 16px; }
