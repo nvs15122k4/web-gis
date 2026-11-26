@@ -39,11 +39,12 @@ class LayerSetting extends Model
         }
         $out = [];
         foreach (self::DEFAULTS as $key => $d) {
+            // Đọc qua getAttribute: trong lớp này `$row->visible` trúng thuộc tính `$visible` (mảng ẩn/hiện khi serialize) của Eloquent, luôn rỗng.
             $row = $saved->get($key);
             $out[] = [
                 'key' => $key,
                 'label' => $d['label'],
-                'visible' => $row ? (bool) $row->visible : $d['visible'],
+                'visible' => $row ? (bool) $row->getAttribute('visible') : $d['visible'],
                 'opacity' => $row ? (int) $row->opacity : $d['opacity'],
                 'sort_order' => $row ? (int) $row->sort_order : $d['sort_order'],
             ];
