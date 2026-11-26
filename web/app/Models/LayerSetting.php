@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Cấu hình hiển thị mặc định của các lớp chuyên đề trên bản đồ công khai (bật/tắt, độ trong suốt, thứ tự chồng lớp).
@@ -25,10 +27,16 @@ class LayerSetting extends Model
         return ['visible' => 'boolean'];
     }
 
-    /** Danh sách đầy đủ (mặc định ghi đè bởi dòng đã lưu), sắp theo sort_order. */
+    /** Danh sách đầy đủ (mặc định ghi đè bởi dòng đã lưu), sắp theo sort_order; lỗi đọc bảng thì dùng toàn bộ mặc định. */
     public static function resolved(): array
     {
-        $saved = static::query()->get()->keyBy('key');
+        try {
+            $saved = static::query()->get()->keyBy('key');
+        } catch (QueryException $e) {
+            // Bảng chưa được migrate (vd. production chậm một bước): bản đồ công khai vẫn chạy với giá trị mặc định.
+            Log::warning('layer_settings không đọc được, dùng giá trị mặc định: '.$e->getMessage());
+            $saved = collect();
+        }
         $out = [];
         foreach (self::DEFAULTS as $key => $d) {
             $row = $saved->get($key);
