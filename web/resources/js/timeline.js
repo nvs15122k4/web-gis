@@ -53,11 +53,34 @@ export function initTimeline(map = null) {
     const seq = years.all.filter((y) => available.has(y));
     let timer = null;
     let index = -1;
-    const show = (y) => seq.forEach((s) => set(s, s === y));
+    // Vạch Vermilion trượt tới năm đang phát; chỉ hiện khi đang phát.
+    const playhead = document.createElement('span');
+    playhead.className = 'timeline-playhead';
+    playhead.setAttribute('aria-hidden', 'true');
+    root.appendChild(playhead);
+    const movePlayhead = (y) => {
+        const b = buttons.find((x) => Number(x.dataset.year) === y);
+        if (!b) return;
+        const li = b.parentElement;
+        // đưa mốc vào vùng nhìn thấy bằng cách cuộn riêng thanh mốc (không cuộn cả khung bản đồ)
+        if (li.offsetLeft < ticksEl.scrollLeft || li.offsetLeft + li.offsetWidth > ticksEl.scrollLeft + ticksEl.clientWidth) {
+            ticksEl.scrollLeft = li.offsetLeft - (ticksEl.clientWidth - li.offsetWidth) / 2;
+        }
+        const rootBox = root.getBoundingClientRect();
+        const box = b.getBoundingClientRect();
+        playhead.style.width = `${box.width}px`;
+        playhead.style.transform = `translateX(${box.left - rootBox.left}px)`;
+        playhead.classList.add('is-active');
+    };
+    const show = (y) => {
+        seq.forEach((s) => set(s, s === y));
+        movePlayhead(y);
+    };
     function stop() {
         if (timer === null) return;
         clearInterval(timer);
         timer = null;
+        playhead.classList.remove('is-active');
         play?.setAttribute('aria-pressed', 'false');
         if (label) label.textContent = 'Phát';
     }
