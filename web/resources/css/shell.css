@@ -15,7 +15,7 @@
 .brand-mark svg { width: 24px; height: 24px; stroke-width: 1.6; }
 .brand-text { display: grid; line-height: 1.12; }
 .brand-text strong { font: 600 21px/1.1 var(--serif); letter-spacing: -.005em; }
-.brand-text small { margin-top: 2px; font: italic 400 var(--fs-sm) var(--serif); color: var(--ink-3); }
+.brand-text small { margin-top: 2px; font: 400 var(--fs-sm) var(--serif); color: var(--ink-3); }
 .topnav { display: flex; align-items: stretch; margin-left: auto; gap: 2px; }
 .topnav a, .topnav button {
     position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px;
