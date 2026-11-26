@@ -1,6 +1,6 @@
 import Chart from 'chart.js/auto';
 
-Chart.defaults.font.family = "'Public Sans', system-ui, sans-serif";
+Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif";
 Chart.defaults.font.size = 11;
 
 /** Lấy màu theo giao diện hiện tại từ biến CSS; dự phòng khi chưa có biến. */
