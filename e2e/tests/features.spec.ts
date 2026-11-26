@@ -16,11 +16,16 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
 
     test('13b tổng quan: tổng 4 lớp bằng số transect hiển thị và khớp /api/summary', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
-        const counts = await page.locator('#summary [data-class]').evaluateAll((els) =>
+        // Các số đếm lên dần (countUp): đợi hoạt ảnh xong rồi mới so tổng.
+        const read = () => page.locator('#summary [data-class]').evaluateAll((els) =>
             Object.fromEntries(els.map((e) => [(e as HTMLElement).dataset.class!, Number(e.textContent)])));
-        expect(Object.keys(counts).sort()).toEqual(['accretion', 'mild_erosion', 'severe_erosion', 'stable']);
+        await expect.poll(async () => {
+            const sum = Object.values(await read()).reduce((a, b) => a + b, 0);
+            return sum > 0 && String(sum) === (await page.locator('#kpi-transects').textContent());
+        }).toBe(true);
+        const counts = await read();
         const sum = Object.values(counts).reduce((a, b) => a + b, 0);
-        await expect(page.locator('#kpi-transects')).toHaveText(String(sum));
+        expect(Object.keys(counts).sort()).toEqual(['accretion', 'mild_erosion', 'severe_erosion', 'stable']);
 
         const res = await page.request.get('/api/summary');
         expect(res.ok()).toBeTruthy();
