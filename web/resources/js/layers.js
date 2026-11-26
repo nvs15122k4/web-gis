@@ -22,7 +22,8 @@ export function wms(name, params = {}) {
 export const WMS_URL = wmsUrl;
 export const TRANSECT_LAYER = USE_WMS ? `${geoserver.workspace}:transects` : null;
 
-const YEAR_COLORS = ['#6a3d9a', '#1f78b4', '#33a02c', '#e31a8c', '#ff7f00', '#a6761d', '#00838f', '#5c6bc0', '#546e7a'];
+// Thang màu tuần tự (plasma): năm càng gần đây càng sáng, như DEA Coastlines.
+const YEAR_COLORS = ['#0d0887', '#47039f', '#7301a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#e8b800'];
 const COMPARE_COLORS = { a: '#1f6feb', b: '#f0883e' };
 
 const hex = (c) => c.replace('#', '');
@@ -71,9 +72,46 @@ function geoJsonTransects() {
     return layer;
 }
 
+/** Thang màu phân kỳ theo LRR (m/năm): đỏ = lùi bờ, xanh = bồi, xám nhạt = ổn định (kiểu DEA Coastlines). */
+export const RATE_STOPS = [
+    { max: -2, color: '#b2182b', label: '< −2' },
+    { max: -1, color: '#ef6c4d', label: '−2 … −1' },
+    { max: -0.3, color: '#f6b48e', label: '−1 … −0,3' },
+    { max: 0.3, color: '#d9d9d9', label: '−0,3 … +0,3' },
+    { max: 1, color: '#9ecae1', label: '+0,3 … +1' },
+    { max: 2, color: '#4a98c9', label: '+1 … +2' },
+    { max: Infinity, color: '#08519c', label: '> +2' },
+];
+export function rateColor(lrr) {
+    if (lrr === null || lrr === undefined || Number.isNaN(Number(lrr))) return '#9e9e9e';
+    return RATE_STOPS.find((s) => Number(lrr) < s.max)?.color ?? RATE_STOPS[RATE_STOPS.length - 1].color;
+}
+
+/** Lớp điểm tốc độ biến động: mỗi transect một chấm đặt trên đường bờ năm mới nhất; chấm to khi có ý nghĩa thống kê. */
+function ratePointsLayer() {
+    const layer = L.geoJSON(null, {
+        renderer: L.canvas({ tolerance: 4 }),
+        pointToLayer: (f, ll) => {
+            const sig = f.properties.is_significant;
+            const r = sig ? 5 + Math.min(Math.abs(f.properties.lrr_m_per_year ?? 0), 4) : 3.5;
+            return L.circleMarker(ll, {
+                radius: r, fillColor: rateColor(f.properties.lrr_m_per_year), fillOpacity: sig ? 0.95 : 0.7,
+                color: sig ? '#222' : '#777', weight: sig ? 1 : 0.5, opacity: 0.9,
+            });
+        },
+        onEachFeature: (f, l) => l.on('click', (e) => {
+            L.DomEvent.stopPropagation(e);
+            handlers.onTransectClick?.(f, e.latlng);
+        }),
+    });
+    api.ratePoints().then((fc) => layer.addData(fc)).catch(() => setStatus(`Dữ liệu tốc độ biến động: ${UPDATING.toLowerCase()}.`));
+    return layer;
+}
+
 /** Trạng thái các lớp, để bật/tắt và để kiểm thử truy cập. */
 export const layers = {
     transects: null,
+    rates: null,
     /** CQL_FILTER đang áp cho lớp transect (dùng chung cho WMS GetMap và GetFeatureInfo). */
     transectFilter: null,
     hotspots: L.layerGroup(),
@@ -96,14 +134,22 @@ let mapRef = null;
 
 export function initLayers(map) {
     mapRef = map;
-    layers.transects = (USE_WMS ? warnOnTileError(wms('transects', { styles: '' })) : geoJsonTransects()).addTo(map);
+    // Transect dày đặc trông như mã vạch: mặc định tắt, thay bằng điểm tốc độ biến động trên đường bờ.
+    layers.transects = USE_WMS ? warnOnTileError(wms('transects', { styles: '' })) : geoJsonTransects();
+    layers.rates = ratePointsLayer().addTo(map);
     layers.hotspots.addTo(map);
 
     bindToggle('layer-transects', map, () => layers.transects);
+    bindToggle('layer-rates', map, () => layers.rates);
     bindSignificanceFilter();
     bindToggle('layer-hotspots', map, () => layers.hotspots);
     bindReference(map);
     initYearList(map);
+    // Mặc định hiện toàn bộ đường bờ các năm có dữ liệu để thấy ngay xu hướng dịch chuyển.
+    years.available.forEach((y) => {
+        const box = document.getElementById(`year-${y}`);
+        if (box) { box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
     initCompare(map);
     initHotspotFilter();
 }
