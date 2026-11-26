@@ -19,8 +19,9 @@ def test_uncertainty_components_frozen():
     assert C.U_PIXEL == 5.0
     assert C.U_GEOREF_95 == 12.0 and C.GEOREF_SIGMA_K == 2.0
     assert C.U_GEOREF == 6.0   # 12 m (95,5%) quy về 1σ
-    assert C.U_CLASSIFY == {2018: 15.1, 2022: 18.39, 2026: 19.99}
-    assert C.U_CLASSIFY_DEFAULT == 20.0
+    # Số đo từ ground truth cho đường bờ chính (QGIS), sau despike; xem evaluation.json (u_classify_basis).
+    assert C.U_CLASSIFY == {2018: 17.15, 2022: 17.82, 2026: 21.69}
+    assert C.U_CLASSIFY_DEFAULT == 21.7
 
 
 def test_water_index_settings_frozen():
