@@ -1,3 +1,5 @@
+import { showToast } from './toast.js';
+
 /**
  * Liên kết chia sẻ (như nút "Share" của USGS Coastal Change Hazards Portal):
  * trạng thái khung nhìn và transect đang chọn lưu trên URL hash dạng  #map=16/10.57800/105.20800&t=12
@@ -29,6 +31,7 @@ export function initPermalink(map) {
         try {
             await navigator.clipboard.writeText(location.href);
             msg.textContent = 'Đã sao chép liên kết.';
+            showToast('Đã sao chép liên kết.', { kind: 'ok' });
         } catch {
             msg.textContent = location.href; // không có quyền clipboard: hiện để người dùng tự chép
         }

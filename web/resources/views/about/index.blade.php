@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Giới thiệu &amp; phương pháp — WebGIS Sông Hậu</title>
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/steps.js'])
 </head>
 <body class="page">
 @include('partials.nav')
@@ -23,6 +23,7 @@
         </dl>
     </div>
 </header>
+@include('partials.giai-doan-anh')
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
     <p class="doc-toc-title">Mục lục</p>

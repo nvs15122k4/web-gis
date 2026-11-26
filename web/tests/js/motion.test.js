@@ -122,3 +122,20 @@ describe('motion.css', () => {
         }
     });
 });
+
+describe('motion.css (nút, toast)', () => {
+    const css = readFileSync('resources/css/motion.css', 'utf8');
+    const rm = css.indexOf('@media (prefers-reduced-motion: no-preference) {');
+
+    it('ripple, toast và banner chạy trong no-preference', () => {
+        for (const sel of ['.ripple {', '.toast {', '.toast.is-closing', '.banner:not([hidden])']) {
+            expect(css.indexOf(sel), sel).toBeGreaterThan(rm);
+        }
+    });
+
+    it('keyframes ripple/toast chỉ đổi opacity và transform', () => {
+        const ks = [...css.matchAll(/@keyframes (ripple|toast-in|toast-out|banner-in) \{[^\n]*\}/g)].map((m) => m[0]);
+        expect(ks).toHaveLength(4);
+        for (const k of ks) expect(k).not.toMatch(/\b(width|height|top|left|right|bottom|margin|padding)\s*:/);
+    });
+});
