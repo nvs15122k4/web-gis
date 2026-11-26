@@ -13,7 +13,7 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ## Tính năng
 
-Ứng dụng web (Laravel + Leaflet + Chart.js) gồm các trang sau; ảnh chụp từ bản chạy thật trên dữ liệu pipeline (267 transect).
+Ứng dụng web (Laravel + Leaflet + Chart.js) gồm các trang sau; ảnh chụp từ bản chạy thật trên dữ liệu pipeline (266 transect).
 
 | Đường dẫn | Quyền | Nội dung |
 |---|---|---|
@@ -29,7 +29,7 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ![Bản đồ tổng quan](docs/minh_chung/giao_dien_moi/01_ban_do_tong_quan.png)
 
-*Thẻ **Tổng quan** (cột biểu tượng bên trái): 267 transect tô màu theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), thống kê, hotspot, sạt lở tham chiếu,
+*Thẻ **Tổng quan** (cột biểu tượng bên trái): 266 transect tô màu theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), thống kê, hotspot, sạt lở tham chiếu,
 ranh giới khu vực nghiên cứu; chú giải nổi ở góc dưới trái, dải năm 2018–2026 ở đáy bản đồ (bấm một năm để bật/tắt đường bờ, nút **Phát** chạy lần lượt). Nền bản đồ tự phục vụ trên GeoServer.*
 
 | | |
@@ -221,19 +221,20 @@ Hai CSDL, theo các migration trong `web/database/migrations/`.
 
 Trích từ `pipeline/output/*.json` (bản demo, sinh bởi pipeline).
 
-**Tổng quan** (`summary.json`): 267 transect, chỉ số nước đang dùng `mndwi`, 13 quan sát bị khử đột biến, 1 hotspot.
+**Tổng quan** (`summary.json`): 266 transect, chỉ số nước đang dùng `mndwi`, 12 quan sát bị khử đột biến, 3 hotspot. Đường bờ chính do QGIS tự giải đoán từ ảnh (`config.SHORELINE_ENGINE = "qgis"`, `qgis_interpret.py`); bản Python cũ (contour dưới pixel) giữ ở `data/shoreline_python/` làm mốc đối chiếu.
 
 | Lớp biến động | Số transect |
 |---|---|
-| Bồi (`accretion`) | 81 |
-| Ổn định (`stable`) | 167 |
-| Lùi nhẹ (`mild_erosion`) | 18 |
-| Lùi mạnh (`severe_erosion`) | 1 |
+| Bồi (`accretion`) | 72 |
+| Ổn định (`stable`) | 179 |
+| Lùi nhẹ (`mild_erosion`) | 11 |
+| Lùi mạnh (`severe_erosion`) | 4 |
 
 Tiêu chí chốt trước khi chạy lại (không chỉnh theo kết quả): có ý nghĩa thống kê khi |LRR| > t(0,975; n − 2)·SE (n = 9 năm thì t = 2,365);
 lùi mạnh khi có ý nghĩa, LRR ≤ −2 m/năm và khoảng cách giảm liên tục ≥ 3 mốc năm liền nhau; R² &lt; 0,3 chỉ là cờ chất lượng.
 Trước đó dùng z = 1,96 và ngưỡng M − S = −1,804 m/năm (tính trên chính kết quả, hậu nghiệm): 124 transect có ý nghĩa, 3 lùi mạnh, 2 hotspot.
-Hotspot (`hotspots.json`, giai đoạn 2018–2026): 1 đoạn gồm T0094 (1 transect, ~50 m, LRR −2,56 m/năm).
+Hotspot (`hotspots.json`, giai đoạn 2018–2026): 3 đoạn — T0020 (1 transect, LRR −2,68 m/năm), T0094 (1 transect, −2,67 m/năm), T0200–T0201 (2 transect, ~100 m, −3,09 m/năm).
+So với bản Python cũ (267 transect, 1 lùi mạnh, 1 hotspot T0094), số lùi mạnh tăng do đường bờ QGIS đi theo cạnh pixel 10 m còn Python nội suy dưới pixel, nên các transect sát ngưỡng −2 m/năm đổi nhóm; LRR hai bản tương quan r = 0,95 (`output/qgis_interpret.json`). Đây là sai khác phương pháp cỡ một pixel, không phải thay đổi thực địa.
 Độ bất định đường bờ `u_shoreline` (1σ, U_georef quy từ 12 m ở 95,5% về 6 m) theo năm: 17,00 m (2018), 19,98 m (2022), 21,47 m (các năm còn lại).
 
 **Đánh giá so với ground truth số hoá** (`evaluation.json`, 5 ô mẫu mỗi năm, 18.000 pixel/chỉ số). Giá trị F1 / IoU:
@@ -281,7 +282,7 @@ Repo chứa sẵn đầu vào trung gian và kết quả nên có thể kiểm t
 | Kết quả: thống kê, hotspot, đánh giá, đối chiếu chéo | có | `pipeline/output/*.json` |
 | Ảnh composite Sentinel-2 (~300 MB), raster mặt nước | **không** (`.gitignore`) | sinh lại bằng `run.py` |
 
-Kiểm tra nhanh (vài giây, không cần mạng): `cd pipeline && .venv/bin/python -m pytest -q` (đối chiếu số liệu `output/*.json`, ngưỡng phân loại, công thức độ bất định), rồi `php artisan webgis:import ../pipeline/output` (267 transect, 1 hotspot).
+Kiểm tra nhanh (vài giây, không cần mạng): `cd pipeline && .venv/bin/python -m pytest -q` (đối chiếu số liệu `output/*.json`, ngưỡng phân loại, công thức độ bất định), rồi `php artisan webgis:import ../pipeline/output` (266 transect, 3 hotspot).
 
 Tái lập đầy đủ từ ảnh gốc (cần mạng, ~15 phút; kết quả có thể lệch nhẹ nếu Planetary Computer cập nhật ảnh):
 
@@ -297,7 +298,7 @@ Bảng kết quả (F1, IoU, RMSE, phân loại) ở mục [Kết quả thực n
 
 ## Đối chiếu với đề cương và yêu cầu
 
-Đối chiếu bản web đang chạy (chụp ngày 23/11/2026, dữ liệu 267 transect) với đề cương đồ án (mục 2.1, 2.5, 3.5–3.7) và
+Đối chiếu bản web đang chạy (chụp ngày 23/11/2026, dữ liệu 267 transect, trước khi chuyển sang đường bờ QGIS) với đề cương đồ án (mục 2.1, 2.5, 3.5–3.7) và
 `docs/tai-lieu/yeu-cau.txt`.
 
 **Đã đáp ứng:** nền bản đồ; đường bờ 2018–2026 bật/tắt và so sánh hai năm; transect và hotspot tô màu theo mức biến động;
@@ -314,7 +315,7 @@ API từ PostGIS; WMS/WFS qua GeoServer; MySQL lưu người dùng, ngưỡng, n
 | 4 | Bật/tắt "ranh giới AOI" trong bảng lớp (2.5) | AOI luôn hiển thị (nét đứt), có trong chú giải nhưng **không có công tắc** | |
 | 5 | WFS phục vụ chọn đối tượng và lọc (2.5) | Việc chọn transect và lọc đi qua REST API của Laravel; WFS được công bố và kiểm tra nhưng giao diện không gọi | |
 | 6 | API dùng `ST_Distance`, `ST_Intersection` để tính sẵn (2.5) | Chỉ truy vấn tổng hợp hotspot dùng hàm không gian; chỉ số do pipeline tính sẵn, Laravel không tính lại | Phù hợp nguyên tắc "web chỉ đọc" |
-| 7 | Sạt lở tham chiếu 2019–2020 làm dữ liệu kiểm chứng | 2 sự kiện, vị trí số hoá từ nguồn báo chí/UBND tỉnh, có vùng cảnh báo ~3,3 km; 0/2 sự kiện nằm trong 500 m của hotspot | Chưa có dữ liệu thật từ UBND xã hay Ban chỉ huy PCTT-TKCN An Giang (yêu cầu liên hệ) |
+| 7 | Sạt lở tham chiếu 2019–2020 làm dữ liệu kiểm chứng | 2 sự kiện, vị trí số hoá từ nguồn báo chí/UBND tỉnh, có vùng cảnh báo ~3,3 km; 2/2 sự kiện có hotspot trong 500 m (gần nhất 355 m; trước khi đổi sang đường bờ QGIS là 0/2). Vùng cảnh báo dài ~3,3 km và hotspot tăng từ 1 lên 3 nên khả năng "trúng" cũng tăng; kết quả này chưa phải bằng chứng độ chính xác tốt hơn | Chưa có dữ liệu thật từ UBND xã hay Ban chỉ huy PCTT-TKCN An Giang (yêu cầu liên hệ) |
 | 8 | Chọn chỉ số nước theo F1 trung bình, hoà thì xét RMSE | F1 tốt nhất là `awei` (0,9457), nhưng chỉ số mặc định đang dùng `mndwi` (0,9456); chưa có bước xét RMSE trong mã | Chênh không đáng kể |
 | 9 | (không có trong đề cương) | Có thêm `/gioi-thieu`, `/huong-dan`, `/bao-cao`, liên kết chia sẻ, xuất GeoJSON/CSV, nền tự phục vụ, giao diện di động | Bổ sung ngoài phạm vi |
 
