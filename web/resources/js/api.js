@@ -13,7 +13,10 @@ export const api = {
     hotspots: (minRate) => get('/erosion-hotspots', minRate != null && minRate !== '' ? { min_rate: minRate } : {}),
     referenceEvents: (bbox) => get('/reference-events', bbox ? { bbox } : {}),
     thresholds: () => get('/config/thresholds'),
+    layerSettings: () => get('/config/layers'),
     transects: () => get('/transects'),
+    yearlyStats: () => get('/yearly-stats'),
+    ratePoints: () => get('/rate-points'),
     summary: () => get('/summary'),
 };
 
