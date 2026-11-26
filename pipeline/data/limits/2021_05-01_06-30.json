@@ -1,0 +1,62 @@
+[
+ {
+  "date": "2021-05-05",
+  "masked_fraction": 0.219,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2021-05-10",
+  "masked_fraction": 0.533,
+  "used": false,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2021-05-15",
+  "masked_fraction": 0.676,
+  "used": false,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2021-05-20",
+  "masked_fraction": 0.202,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2021-05-30",
+  "masked_fraction": 0.212,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2021-06-04",
+  "masked_fraction": 0.14,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2021-06-14",
+  "masked_fraction": 0.09,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2021-06-19",
+  "masked_fraction": 0.456,
+  "used": false,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2021-06-24",
+  "masked_fraction": 0.286,
+  "used": true,
+  "processing_baseline": "03.00"
+ },
+ {
+  "date": "2021-06-29",
+  "masked_fraction": 0.16,
+  "used": true,
+  "processing_baseline": "03.00"
+ }
+]

@@ -1,0 +1,56 @@
+[
+ {
+  "date": "2020-01-01",
+  "masked_fraction": 0.005,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-01-06",
+  "masked_fraction": 0.008,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-01-16",
+  "masked_fraction": 0.003,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-01-21",
+  "masked_fraction": 0.001,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-01-26",
+  "masked_fraction": 0.261,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-02-05",
+  "masked_fraction": 0.029,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-02-15",
+  "masked_fraction": 0.042,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-02-20",
+  "masked_fraction": 0.015,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-02-25",
+  "masked_fraction": 0.003,
+  "used": true,
+  "processing_baseline": "02.12"
+ }
+]
