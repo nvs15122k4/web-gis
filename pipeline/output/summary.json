@@ -1,20 +1,20 @@
 {
- "transects": 267,
+ "transects": 266,
  "classes": {
-  "accretion": 81,
-  "stable": 167,
-  "mild_erosion": 18,
-  "severe_erosion": 1
+  "stable": 179,
+  "accretion": 72,
+  "severe_erosion": 4,
+  "mild_erosion": 11
  },
- "despiked_observations": 13,
- "M_lrr_erosion": -1.4609473684210523,
- "S_lrr_erosion": 0.4690833228144975,
+ "despiked_observations": 12,
+ "M_lrr_erosion": -1.9042000000000001,
+ "S_lrr_erosion": 0.7120178769826339,
  "severe_threshold_lrr": -2.0,
  "min_consecutive_decline": 3,
  "confidence": 0.95,
  "ci_distribution": "student_t_df_n_minus_2",
  "u_georef_sigma_m": 6.0,
- "hotspots": 1,
+ "hotspots": 3,
  "water_index": "mndwi",
  "u_shoreline_by_year": {
   "2018": 17.0,
