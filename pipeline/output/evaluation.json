@@ -52,17 +52,17 @@
    "main_shoreline_error": {
     "all": {
      "n_transects": 59,
-     "mean_m": -10.75,
-     "mean_abs_m": 25.44,
-     "rmse_m": 66.95
+     "mean_m": 3.69,
+     "mean_abs_m": 11.0,
+     "rmse_m": 16.73
     },
     "kept": {
-     "n_transects": 56,
-     "mean_m": 4.05,
-     "mean_abs_m": 11.42,
-     "rmse_m": 17.15
+     "n_transects": 59,
+     "mean_m": 3.69,
+     "mean_abs_m": 11.0,
+     "rmse_m": 16.73
     },
-    "n_excluded_by_despike": 3
+    "n_excluded_by_despike": 0
    }
   },
   "2022": {
@@ -210,10 +210,10 @@
  "selection_reason": "hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.45 m)",
  "best_index_by_mean_f1": "awei",
  "u_classify_suggestion": {
-  "2018": 17.15,
+  "2018": 16.73,
   "2022": 17.82,
   "2026": 21.69
  },
  "u_classify_basis": "đường bờ chính (qgis), các quan sát còn lại sau despike",
- "note": "Chỉ số được chọn: mndwi (hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.45 m)). Cần config.DEFAULT_INDEX = 'mndwi' và config.U_CLASSIFY = {2018: 17.15, 2022: 17.82, 2026: 21.69} (cơ sở: đường bờ chính (qgis), các quan sát còn lại sau despike). RMSE từng chỉ số (mean_rmse_m) dùng cách trích xuất Python thống nhất để so sánh chỉ số; sai số sản phẩm chính nằm ở by_year[năm].main_shoreline_error."
+ "note": "Chỉ số được chọn: mndwi (hoà F1 (chênh ≤ 0.005) giữa ['mndwi', 'awei']; chọn RMSE đường bờ thấp nhất (18.45 m)). Cần config.DEFAULT_INDEX = 'mndwi' và config.U_CLASSIFY = {2018: 16.73, 2022: 17.82, 2026: 21.69} (cơ sở: đường bờ chính (qgis), các quan sát còn lại sau despike). RMSE từng chỉ số (mean_rmse_m) dùng cách trích xuất Python thống nhất để so sánh chỉ số; sai số sản phẩm chính nằm ở by_year[năm].main_shoreline_error."
 }
