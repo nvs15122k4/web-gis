@@ -6,6 +6,7 @@ np = pytest.importorskip("numpy")
 gpd = pytest.importorskip("geopandas")
 from shapely.geometry import LineString, Point, box  # noqa: E402
 
+import config as C  # noqa: E402
 import s7_evaluate as E  # noqa: E402
 
 
@@ -73,3 +74,37 @@ def test_reference_shoreline_excludes_window_edge_and_keeps_true_bank():
     assert ref.intersects(Point(100, 50).buffer(0.1))
     assert not ref.intersects(Point(50, 20).buffer(0.1))   # đáy cửa sổ y=20 không thuộc bờ
     assert ref.length == pytest.approx(2 * (60 - 2 * 5), abs=1.0)
+
+
+def _rep(f1, rmse):
+    """report 1 năm: f1/rmse theo chỉ số."""
+    r = {i: {"f1": f1[i]} for i in f1}
+    r["shoreline_error"] = {i: ({"rmse_m": rmse[i]} if rmse.get(i) is not None else None) for i in f1}
+    return {2018: r}
+
+
+def test_select_index_clear_f1_winner_ignores_rmse():
+    idx, _, _, _ = E.select_index(_rep({"ndwi": 0.90, "mndwi": 0.95, "awei": 0.92}, {"ndwi": 1, "mndwi": 99, "awei": 1}))
+    assert idx == "mndwi"
+
+
+def test_select_index_tie_uses_lowest_rmse():
+    idx, why, _, _ = E.select_index(_rep({"ndwi": 0.90, "mndwi": 0.9456, "awei": 0.9457}, {"ndwi": 28, "mndwi": 17.8, "awei": 62.5}))
+    assert idx == "mndwi" and "RMSE" in why
+
+
+def test_select_index_tie_without_rmse_falls_back_to_f1():
+    idx, _, _, _ = E.select_index(_rep({"ndwi": 0.90, "mndwi": 0.9456, "awei": 0.9457}, {}))
+    assert idx == "awei"
+
+
+def test_select_index_boundary_of_tie_tolerance():
+    f1 = {"ndwi": 0.80, "mndwi": 0.9400, "awei": 0.9450}   # chênh đúng 0,005 -> vẫn hoà
+    rm = {"ndwi": 5, "mndwi": 10, "awei": 20}
+    assert E.select_index(_rep(f1, rm), tie_f1=0.005)[0] == "mndwi"
+    assert E.select_index(_rep(f1, rm), tie_f1=0.004)[0] == "awei"
+
+
+def test_evaluation_json_matches_config_selection(output_dir, load_json):
+    e = load_json(output_dir / "evaluation.json")
+    assert e["selected_index"] == C.DEFAULT_INDEX
