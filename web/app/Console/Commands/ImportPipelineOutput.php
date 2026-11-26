@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\DB;
  */
 class ImportPipelineOutput extends Command
 {
-    protected $signature = 'webgis:import {dir : Thư mục chứa output GeoJSON của pipeline} {--dry-run : Chỉ kiểm tra, không ghi} {--alt= : Thư mục dữ liệu đối chứng (chứa s2c1/shoreline và landsat/shoreline), nạp kèm bản đối chứng}';
+    protected $signature = 'webgis:import {dir : Thư mục chứa output GeoJSON của pipeline} {--dry-run : Chỉ kiểm tra, không ghi} {--alt= : Thư mục dữ liệu đối chứng (chứa s2c1/shoreline và landsat/shoreline), nạp kèm bản đối chứng} {--prune : Xoá transect không còn trong output mới (mặc định giữ lại)}';
 
     protected $description = 'Nạp output pipeline (GeoJSON) vào PostGIS bằng UPSERT';
 
@@ -58,6 +58,9 @@ class ImportPipelineOutput extends Command
                 'hotspots' => $this->replaceLayer($pg, $dir, 'hotspots', 'erosion_hotspots', ['severity', 'period_start_year', 'period_end_year', 'notes']),
                 'reference' => $this->replaceLayer($pg, $dir, 'reference', 'reference_landslide_events', ['event_date', 'description', 'source', 'danger_level', 'length_m', 'location']),
             ];
+            if ($this->option('prune')) {
+                $counts['pruned'] = $this->pruneTransects($pg, $dir);
+            }
             if ($alt !== null) {
                 $counts['alt_shorelines'] = $this->altShorelines($pg, rtrim($alt, '/'));
                 $counts['alt_lrr'] = $this->altLrr($pg, $dir);
@@ -132,6 +135,21 @@ class ImportPipelineOutput extends Command
         }
 
         return $n;
+    }
+
+    /**
+     * --prune: xoá transect có trong DB mà output mới không còn (vd. pipeline dựng lại transect từ đường bờ mới và bỏ bớt
+     * một transect). Khoá ngoại ON DELETE CASCADE nên khoảng cách, thống kê và LRR đối chứng của nó đi theo.
+     * Không bao giờ xoá khi output không có transect nào: file thiếu/rỗng không được coi là "xoá hết".
+     */
+    private function pruneTransects($pg, string $dir): int
+    {
+        $codes = array_values(array_filter(array_map(fn ($f) => $f['properties']['transect_code'] ?? null, $this->features($dir, 'transects'))));
+        if ($codes === []) {
+            return 0;
+        }
+
+        return $pg->table('transects')->whereNotIn('transect_code', $codes)->delete();
     }
 
     private function transects($pg, string $dir, int $baselineId): int
