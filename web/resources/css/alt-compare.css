@@ -1,0 +1,13 @@
+/* ---- Đường bờ đối chứng (S2 C1, Landsat 8/9) và bảng so sánh LRR ba nguồn ---- */
+.alt-source + .alt-source { margin-top: 10px; }
+.alt-source-title { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; font: 600 var(--fs-sm) var(--font); color: var(--ink); }
+.alt-source-title .line-key { flex: none; }
+.year-chip.is-low { background: var(--surface-2); }
+.year-chip .low-mark { margin-left: 2px; color: var(--c-mild-erosion); font-size: var(--fs-xs); }
+
+.alt-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.alt-table th, .alt-table td { padding: 5px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+.alt-table thead th { color: var(--ink-3); font-weight: 500; }
+.alt-table tbody th { font-weight: 500; white-space: nowrap; }
+.alt-table tbody th .line-key { margin-right: 6px; vertical-align: middle; }
+.alt-table td.num { text-align: right; }
