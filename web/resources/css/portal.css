@@ -7,11 +7,11 @@
     background: var(--float) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235a5446' stroke-width='1.7' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='m15 15 5 5'/%3E%3C/svg%3E") 10px 50% / 16px no-repeat;
     border: 1px solid var(--float-line); border-radius: 0; box-shadow: var(--float-shadow);
 }
-.map-search input::placeholder { font-family: var(--serif); font-style: italic; color: var(--ink-3); opacity: 1; }
+.map-search input::placeholder { font-family: var(--serif);  color: var(--ink-3); opacity: 1; }
 .map-search input:focus { border-color: var(--ink); }
 .search-results { margin: 0; padding: 0; list-style: none; max-height: 220px; overflow-y: auto; background: var(--float); border: 1px solid var(--float-line); border-top: 0; box-shadow: var(--float-shadow); }
 .search-results button, .search-results .none { display: block; width: 100%; padding: 7px 12px; text-align: left; font: var(--fs-md) var(--font); color: var(--ink); background: none; border: 0; border-bottom: 1px solid var(--line); cursor: pointer; }
-.search-results .none { color: var(--ink-3); font-family: var(--serif); font-style: italic; cursor: default; }
+.search-results .none { color: var(--ink-3); font-family: var(--serif);  cursor: default; }
 .search-results button:hover { background: var(--surface-3); }
 .map-actions { position: absolute; z-index: 1000; top: 62px; right: 10px; display: flex; flex-direction: column; gap: 8px; }
 .map-actions .tool-btn { width: 32px; height: 32px; display: grid; place-items: center; background: var(--float); border: 1px solid var(--float-line); box-shadow: var(--float-shadow); cursor: pointer; color: var(--ink); }
