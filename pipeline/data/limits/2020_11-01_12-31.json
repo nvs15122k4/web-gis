@@ -1,0 +1,38 @@
+[
+ {
+  "date": "2020-11-01",
+  "masked_fraction": 0.952,
+  "used": false,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-11-16",
+  "masked_fraction": 0.158,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-11-21",
+  "masked_fraction": 0.161,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-12-06",
+  "masked_fraction": 0.005,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-12-16",
+  "masked_fraction": 0.021,
+  "used": true,
+  "processing_baseline": "02.12"
+ },
+ {
+  "date": "2020-12-21",
+  "masked_fraction": 0.009,
+  "used": true,
+  "processing_baseline": "02.12"
+ }
+]
