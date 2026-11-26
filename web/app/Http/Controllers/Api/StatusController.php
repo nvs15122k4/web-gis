@@ -21,7 +21,7 @@ class StatusController extends Controller
     public function index(): JsonResponse
     {
         $data = [
-            'shorelines' => $this->count(fn () => Shoreline::count()),
+            'shorelines' => $this->count(fn () => Shoreline::main()->count()),
             'transects' => $this->count(fn () => Transect::count()),
             'hotspots' => $this->count(fn () => ErosionHotspot::count()),
             'reference_events' => $this->count(fn () => ReferenceLandslideEvent::count()),
