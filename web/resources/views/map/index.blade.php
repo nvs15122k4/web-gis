@@ -15,16 +15,16 @@
     <aside class="sidebar" id="sidebar" aria-label="Bảng điều khiển">
         <div class="rail tabs" role="tablist" aria-label="Chức năng" aria-orientation="vertical">
             <button type="button" role="tab" class="tab" id="tab-overview" data-tab="overview" aria-controls="panel-overview" aria-selected="true">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Tổng quan</span>
+                <span>Tổng quan</span>
             </button>
             <button type="button" role="tab" class="tab" id="tab-layers" data-tab="layers" aria-controls="panel-layers" aria-selected="false" tabindex="-1">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg><span>Lớp dữ liệu</span>
+                <span>Lớp dữ liệu</span>
             </button>
             <button type="button" role="tab" class="tab" id="tab-hotspots" data-tab="hotspots" aria-controls="panel-hotspots" aria-selected="false" tabindex="-1">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v5M12 17.5v.01"/></svg><span>Hotspot</span>
+                <span>Hotspot</span>
             </button>
             <button type="button" role="tab" class="tab" id="tab-share" data-tab="share" aria-controls="panel-share" aria-selected="false" tabindex="-1">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg><span>Chia sẻ</span>
+                <span>Chia sẻ</span>
             </button>
         </div>
 
