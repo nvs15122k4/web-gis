@@ -14,4 +14,9 @@ class ReferenceLandslideEvent extends Model
     protected $table = 'reference_landslide_events';
 
     public $timestamps = false;
+
+    public function geoPropertyColumns(): ?array
+    {
+        return ['id', 'event_date', 'description', 'source', 'danger_level', 'length_m', 'location'];
+    }
 }
