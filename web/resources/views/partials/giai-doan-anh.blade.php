@@ -319,7 +319,7 @@
                     </details>
                 </div>
                 <figure class="step-fig">
-                    <img src="{{ $img.$s['img'] }}" width="{{ $s['w'] }}" height="{{ $s['h'] }}" alt="{{ $s['alt'] }}" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" decoding="async">
+                    <img src="{{ $img.$s['img'] }}" width="{{ $s['w'] }}" height="{{ $s['h'] }}" alt="{{ $s['alt'] }}" @if ($i === 0) fetchpriority="high" @else fetchpriority="low" @endif decoding="async">
                     <figcaption>{{ $s['cap'] }}</figcaption>
                 </figure>
             </li>
