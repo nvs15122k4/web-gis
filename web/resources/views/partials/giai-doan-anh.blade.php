@@ -18,7 +18,7 @@
             'more' => [
                 'io' => 'Vào: truy vấn STAC <code>sentinel-2-l2a</code>, các kênh B03, B08, B11, B12 và SCL. Ra: <code>data/composite/scenes.json</code>, mỗi cảnh một dòng gồm ngày, <code>masked_fraction</code>, <code>used</code>, <code>processing_baseline</code>; mỗi năm thêm số cảnh dùng và <code>source_image_date</code> (ngày của cảnh dùng cuối cùng).',
                 'params' => 'Khung tải (EPSG:4326): 105,17–105,36 kinh Đông, 10,45–10,575 vĩ Bắc. Mùa 01/01–31/03 mỗi năm, 2018–2026. Lọc sơ <code>eo:cloud_cover</code> &lt; 80%. Lớp SCL bị che: 0, 1, 3, 8, 9, 10, 11 (không dữ liệu, bão hoà, bóng mây, mây trung bình, mây cao, mây ti, tuyết). Ngưỡng loại cảnh: tỉ lệ pixel bị che &gt; 0,30 trong vùng tải. Gộp các cảnh cùng ngày mặt trời (<code>groupby solar_day</code>).',
-                'method' => 'Tỉ lệ che của một cảnh = số pixel có SCL thuộc danh sách trên chia cho tổng pixel của vùng tải. Cảnh đạt ngưỡng đi tiếp sang bước tiền xử lý; cảnh bị loại vẫn được ghi trong <code>scenes.json</code> với <code>used = false</code> để truy vết.',
+                'method' => 'Tỉ lệ che tính theo công thức ở trên, với các lớp SCL bị che nêu trong mục Thông số. Cảnh đạt ngưỡng đi tiếp sang bước tiền xử lý; cảnh bị loại vẫn được ghi trong <code>scenes.json</code> với <code>used = false</code> để truy vết.',
                 'qa' => 'Trong các cảnh được dùng, tỉ lệ che cao nhất là 0,283 (2025), luôn dưới ngưỡng 0,30. Mỗi năm đều còn ít nhất 4 cảnh nên không năm nào bị bỏ trống. Số cảnh dùng chênh nhiều giữa các năm (4 đến 13), nghĩa là chất lượng composite không đồng đều.',
             ],
             'figs' => [],
@@ -35,7 +35,7 @@
             'more' => [
                 'io' => 'Vào: các cảnh đạt ở bước 1. Ra: <code>data/composite/&lt;năm&gt;.tif</code>, GeoTIFF nén deflate, 4 kênh (B03, B08, B11, B12) kiểu float32 trong khoảng 0–1, EPSG:32648, pixel 10 m. Ảnh 2026 rộng 2.081 × 1.385 pixel (khoảng 20,8 × 13,9 km).',
                 'params' => 'CRS: EPSG:32648. Độ phân giải: 10 m. SWIR (B11, B12) gốc 20 m được nội suy song tuyến lên 10 m; SCL dùng láng giềng gần nhất. Offset hiệu chỉnh: 1000 cho processing baseline từ 4,0 trở lên, 0 cho bản cũ. Trong danh sách cảnh, hai năm có cả hai nhóm baseline là 2019 (02.12 và 05.00) và 2022 (03.00, 04.00, 05.10); từ 2023 mọi cảnh đều từ 04.00 trở lên. Ranh giới xã lấy từ OSM relation 13646056; vùng phân tích là ranh giới này đệm 1.000 m.',
-                'method' => 'Phản xạ = (DN − offset) / 10000, pixel DN = 0 là không dữ liệu. Với mỗi pixel, composite = trung vị theo thời gian của các quan sát không bị che (<code>skipna</code>). Cắt vùng: ảnh giữ nguyên khung tải, còn các bước sau chỉ tính trong vùng phân tích.',
+                'method' => 'Pixel DN = 0 là không dữ liệu. Với mỗi pixel, composite lấy trung vị theo thời gian của các quan sát không bị che (<code>skipna</code>), tính theo hai công thức ở trên. Cắt vùng: ảnh giữ nguyên khung tải, còn các bước sau chỉ tính trong vùng phân tích.',
                 'qa' => 'Pixel mây còn sót vài điểm được xử lý ở bước làm sạch mặt nạ. Pipeline không có bước kiểm độc lập riêng cho việc trừ offset; chất lượng chung của composite chỉ được đo gián tiếp qua ground truth ở bước 9.',
             ],
             'figs' => [
@@ -55,7 +55,7 @@
             'more' => [
                 'io' => 'Vào: <code>composite/&lt;năm&gt;.tif</code>. Ra: <code>data/water/&lt;năm&gt;_&lt;chỉ số&gt;.tif</code> kiểu uint8 (1 nước, 0 đất, 255 không dữ liệu), cùng lưới 10 m, và <code>data/water/thresholds.json</code> (ngưỡng từng năm, từng chỉ số, làm tròn 4 chữ số).',
                 'params' => 'Ngưỡng Otsu MNDWI từng năm: 2018: 0,1633; 2019: 0,0673; 2020: 0,1349; 2021: 0,1211; 2022: 0,1207; 2023: 0,1289; 2024: 0,0404; 2025: 0,081; 2026: 0,1129. Vùng tính ngưỡng: ranh giới xã đệm 1.000 m; năm 2026 có 1.347.886 pixel hợp lệ, trong đó 9,82% là nước.',
-                'method' => 'NDWI = (B03 − B08) / (B03 + B08) (McFeeters 1996). MNDWI = (B03 − B11) / (B03 + B11) (Xu 2006). AWEI<sub>nsh</sub> = 4(B03 − B11) − (0,25·B08 + 2,75·B12) (Feyisa et al. 2014). Otsu chọn ngưỡng làm cực đại phương sai giữa hai lớp của histogram; histogram MNDWI 2026 có hai đỉnh rõ (đất quanh −0,4, nước quanh 0,7) nên ngưỡng nằm ở thung lũng giữa hai đỉnh.',
+                'method' => 'Ba chỉ số lấy từ McFeeters 1996 (NDWI), Xu 2006 (MNDWI) và Feyisa et al. 2014 (AWEI<sub>nsh</sub>), công thức ở trên. Otsu chọn ngưỡng làm cực đại phương sai giữa hai lớp của histogram; histogram MNDWI 2026 có hai đỉnh rõ (đất quanh −0,4, nước quanh 0,7) nên ngưỡng nằm ở thung lũng giữa hai đỉnh.',
                 'qa' => 'Ngưỡng 2026 trong <code>thresholds.json</code> được tính lại từ composite bằng đúng hàm của pipeline khi vẽ hình histogram, hai giá trị khớp nhau. Độ chính xác của từng chỉ số đo trên ground truth ở bước 9.',
             ],
             'figs' => [
@@ -93,7 +93,7 @@
             'more' => [
                 'io' => 'Vào: mặt nạ đã làm sạch, composite và ngưỡng Otsu của năm. Ra: <code>data/shoreline/&lt;năm&gt;.json</code>, GeoJSON một MultiLineString, EPSG:32648, kèm thuộc tính năm và chỉ số nước. Mỗi năm là một đoạn liên tục dài 14,85 đến 15,37 km (2018: 15,37 km; 2026: 14,92 km).',
                 'params' => 'Đơn giản hoá: 5 m (nửa pixel). Cắt theo ranh giới xã nới 100 m để không mất đoạn bờ sát ranh. Bỏ mảnh ngắn hơn 200 m. Cụm không dữ liệu lớn bị cắt kèm đệm 2 pixel (20 m). Hệ số eps = 0,001 dùng ở chỗ hình thái học đã sửa mặt nạ.',
-                'method' => 'Trường có dấu f = MNDWI − ngưỡng, giữ nguyên giá trị liên tục ở nơi mặt nạ sạch khớp ngưỡng, còn chỗ mặt nạ bị sửa thì rơi về ±eps. Đường bờ = contour f = 0 (<code>skimage.measure.find_contours</code>, nội suy tuyến tính dưới pixel) rồi nối mảnh, lọc mảnh ngắn, đơn giản hoá. Nếu thiếu composite hoặc ngưỡng, pipeline lùi về contour mức 0,5 trên mặt nạ nhị phân (độ phân giải nửa pixel).',
+                'method' => 'Trường có dấu f (công thức ở trên) giữ nguyên giá trị liên tục ở nơi mặt nạ sạch khớp ngưỡng, còn chỗ mặt nạ bị sửa thì rơi về ±eps. Đường bờ là contour f = 0 (<code>skimage.measure.find_contours</code>, nội suy tuyến tính dưới pixel) rồi nối mảnh, lọc mảnh ngắn, đơn giản hoá. Nếu thiếu composite hoặc ngưỡng, pipeline lùi về contour mức 0,5 trên mặt nạ nhị phân (độ phân giải nửa pixel).',
                 'qa' => 'Sai số đường bờ so với đường số hoá tay đo ở bước 9 (RMSE MNDWI 15,9 m năm 2018, 18,15 m năm 2022, 21,30 m năm 2026). Cả chín năm đều ra đúng một đường liên tục trong ranh giới xã, không bị đứt đoạn.',
             ],
             'figs' => [],
@@ -129,7 +129,7 @@
             'more' => [
                 'io' => 'Vào: <code>data/transects.json</code> và chín đường bờ. Ra: <code>output/transects.json</code> (EPSG:4326, mỗi transect có <code>distances</code> đã khử đột biến và khối <code>stats</code>), <code>output/summary.json</code>. Sau khử đột biến còn 2.385 trên 2.394 quan sát.',
                 'params' => 'Độ tin cậy 95%. Ngưỡng khử đột biến 50 m so với trung vị chuỗi. Tối thiểu 3 điểm để tính. Hệ số t hai phía với bậc tự do n − 2: n = 9 thì t = 2,365; transect thiếu năm dùng t tương ứng với n của nó. Z<sub>95</sub> = 1,959964 cho độ bất định EPR.',
-                'method' => 'NSM = d(năm cuối) − d(năm đầu). EPR = NSM / Δt. LRR = hệ số góc OLS của d theo năm; SE = √(Σ phần dư² / (n − 2) / Σ(t − t̄)²); R² = 1 − Σ phần dư² / Σ(d − d̄)². Nửa bề rộng khoảng tin cậy của LRR = t × SE. Độ bất định EPR = Z<sub>95</sub> × √(U<sub>đầu</sub>² + U<sub>cuối</sub>²) / Δt.',
+                'method' => 'LRR là hệ số góc hồi quy bình phương tối thiểu (OLS) của khoảng cách d theo năm t; phần dư e<sub>i</sub> = d<sub>i</sub> − (a + LRR·t<sub>i</sub>). Các đại lượng tính theo công thức ở trên; Z<sub>95</sub> = 1,96 và t là hệ số Student hai phía 95% với n − 2 bậc tự do.',
                 'qa' => 'T0094: NSM −21,23 m, EPR −2,654 m/năm, LRR −2,674 m/năm, SE 0,5108, t = 2,365, R² = 0,797, 5 giai đoạn giảm liên tục, không điểm nào bị khử. Trên toàn bộ 266 transect, 85 có LRR khác 0 có ý nghĩa thống kê; 140 transect có R² dưới 0,3 và bị gắn cờ cảnh báo (cờ chỉ để lưu ý, không đổi nhóm).',
             ],
             'figs' => [],
@@ -163,7 +163,7 @@
             'more' => [
                 'io' => 'Vào: <code>data/ground_truth/ground_truth.gpkg</code> (lớp <code>windows</code> và <code>water_&lt;năm&gt;</code>, trường <code>loai</code> = song | khac) và các mặt nạ nước ba chỉ số. Ra: <code>output/evaluation.json</code>. Đối chiếu chéo: <code>output/crosscheck.json</code>.',
                 'params' => 'Ngưỡng hoà F1 0,005. 5 ô mẫu (W1–W5), mỗi năm 18.000 pixel. Số transect so được: 59 mỗi năm (2018, 2022, 2026). U<sub>pixel</sub> = 5 m (nửa pixel), U<sub>georef</sub> = 12 m / 2 = 6 m (ESA, 95,5% quy về 1σ), U<sub>classify</sub> = RMSE sau khử đột biến nêu trên; năm không có ground truth lấy 21,7 m, giá trị lớn nhất đã đo làm tròn lên.',
-                'method' => 'Precision = TP/(TP + FP), Recall = TP/(TP + FN), F1 = 2PR/(P + R), IoU = TP/(TP + FP + FN). RMSE = √(trung bình (d<sub>tự động</sub> − d<sub>tham chiếu</sub>)²). Chọn chỉ số: F1 trung bình cao nhất, nếu chênh không quá 0,005 thì chọn RMSE thấp nhất. Độ bất định đường bờ: U<sub>shoreline</sub> = √(U<sub>pixel</sub>² + U<sub>georef</sub>² + U<sub>classify</sub>²), mọi thành phần cùng chuẩn 1σ.',
+                'method' => 'Các thước đo tính theo công thức ở trên (TP, FP, FN đếm pixel nước trên các ô mẫu). Chọn chỉ số: F1 trung bình cao nhất, nếu chênh không quá 0,005 thì chọn RMSE thấp nhất. Độ bất định đường bờ gộp từ ba thành phần ở công thức trên, mọi thành phần cùng chuẩn 1σ.',
                 'qa' => 'F1 trung bình: NDWI 0,9398; MNDWI 0,9456; AWEI 0,9457. RMSE đường bờ trung bình: NDWI 27,83 m; MNDWI 18,45 m; AWEI 60,01 m. U<sub>shoreline</sub>: 18,46 m (2018), 19,46 m (2022), 23,05 m (2026), 23,06 m ở các năm còn lại. Đối chiếu chéo với ESA WorldCover (2020–2021) và Impact Observatory (2018–2023): F1 trung bình MNDWI 0,8765, thấp hơn ground truth; theo ghi chú của pipeline, hai sản phẩm này là ảnh cả năm nên chỉ là kiểm tra thô, không dùng để chỉnh U.',
             ],
             'figs' => [
@@ -217,12 +217,65 @@
         'Mỗi năm chỉ một composite mùa khô, từ 4 đến 13 cảnh tuỳ năm, chưa hiệu chỉnh mực nước. Ngưỡng Otsu đổi theo năm từ 0,0404 (2024) đến 0,1633 (2018) nên một phần chênh lệch giữa các năm có thể do ngưỡng, không do bờ dịch chuyển. Chạy thử với ngưỡng cố định (dựng đường bờ bằng chuỗi Python), LRR tương quan 0,89 (ngưỡng 0,0) đến 0,94 (ngưỡng bằng trung vị Otsu) với kết quả chính, nhưng 55 đến 61 transect đổi nhóm và số transect lùi mạnh giảm từ 4 xuống 1 đến 2. Ngày ảnh hiển thị trên web là ngày của cảnh dùng cuối, không phải ngày của cả composite.',
         'Các quy ước do đồ án đặt: khử đột biến 50 m (9 quan sát bị loại), lùi mạnh khi LRR ≤ −2 m/năm và giảm liên tục từ 3 mốc năm. 140 trong 266 transect có R² dưới 0,3 (đều thuộc nhóm ổn định). Kênh rộng dưới khoảng 100 m không được theo dõi do bước làm sạch mặt nạ.',
     ];
+    /* Công thức: MathML gốc của trình duyệt (không cần JS hay thư viện). Mỗi mục = [tên, MathML, giải thích ký hiệu]. */
+    $i = fn ($x) => "<mi>$x</mi>";
+    $o = fn ($x) => "<mo>$x</mo>";
+    $n = fn ($x) => "<mn>$x</mn>";
+    $sb = fn ($a, $b) => "<msub><mi>$a</mi><mi mathvariant=\"normal\">$b</mi></msub>";
+    $fr = fn ($a, $b) => "<mfrac><mrow>$a</mrow><mrow>$b</mrow></mfrac>";
+    $rt = fn ($x) => "<msqrt><mrow>$x</mrow></msqrt>";
+    $pa = fn ($x) => "<mo>(</mo>$x<mo>)</mo>";
+    $sq = fn ($x) => "<msup>$x<mn>2</mn></msup>";
+    $bar = fn ($x) => "<mover><mi>$x</mi><mo>¯</mo></mover>";
+    $minus = '<mo>−</mo>';
+    $maths = [
+        0 => [
+            ['Tỉ lệ pixel bị che', $sb('m', 'cảnh').$o('=').$fr($sb('N', 'che'), $sb('N', 'tổng')),
+                'N<sub>che</sub>: số pixel của vùng tải có lớp SCL thuộc {0, 1, 3, 8, 9, 10, 11}; N<sub>tổng</sub>: tổng số pixel của vùng tải. Cảnh bị loại khi m<sub>cảnh</sub> &gt; 0,30.'],
+        ],
+        1 => [
+            ['Phản xạ bề mặt', $i('ρ').$o('=').$fr($pa($i('DN').$minus.$i('offset')), $n('10000')),
+                'DN: giá trị số của ảnh L2A; offset = 1000 với processing baseline từ 4,0 trở lên, 0 với bản cũ; DN = 0 là không dữ liệu.'],
+            ['Composite theo pixel', $sb('ρ', 'comp').$pa($i('x').$o(',').$i('y')).$o('=').'<munder><mi mathvariant="normal">median</mi><mi>t</mi></munder>'.$sb('ρ', 't').$pa($i('x').$o(',').$i('y')),
+                'ρ<sub>t</sub>: phản xạ của cảnh thứ t tại pixel (x, y); chỉ lấy các quan sát không bị che.'],
+        ],
+        2 => [
+            ['NDWI (McFeeters 1996)', $i('NDWI').$o('=').$fr($i('B03').$minus.$i('B08'), $i('B03').$o('+').$i('B08')), 'B03: kênh xanh lục; B08: cận hồng ngoại (NIR).'],
+            ['MNDWI (Xu 2006)', $i('MNDWI').$o('=').$fr($i('B03').$minus.$i('B11'), $i('B03').$o('+').$i('B11')), 'B11: hồng ngoại sóng ngắn 1 (SWIR1). Chỉ số được chọn cho đường bờ.'],
+            ['AWEI<sub>nsh</sub> (Feyisa et al. 2014)', $sb('AWEI', 'nsh').$o('=').$n('4').$pa($i('B03').$minus.$i('B11')).$minus.$pa($n('0,25').'<mo>·</mo>'.$i('B08').$o('+').$n('2,75').'<mo>·</mo>'.$i('B12')), 'B12: hồng ngoại sóng ngắn 2 (SWIR2).'],
+            ['Ngưỡng Otsu', $i('t').'<mo>*</mo>'.$o('=').'<munder><mi mathvariant="normal">arg max</mi><mi>t</mi></munder>'.'<mo>[</mo>'.$sb('ω', '0').$pa($i('t')).'<mo>·</mo>'.$sb('ω', '1').$pa($i('t')).'<mo>·</mo>'.$sq($pa($sb('μ', '0').$pa($i('t')).$minus.$sb('μ', '1').$pa($i('t')))).'<mo>]</mo>',
+                'ω<sub>0</sub>, ω<sub>1</sub>: tỉ lệ pixel ở hai lớp (đất, nước) khi cắt tại ngưỡng t; μ<sub>0</sub>, μ<sub>1</sub>: giá trị trung bình của hai lớp. Ngưỡng t* làm phương sai giữa hai lớp lớn nhất.'],
+        ],
+        4 => [
+            ['Trường có dấu', $i('f').$o('=').$i('MNDWI').$minus.$i('t'), 't: ngưỡng Otsu của năm đó. Đường bờ là tập điểm có f = 0 (nước ở phía f &gt; 0).'],
+        ],
+        6 => [
+            ['Dịch chuyển ròng (NSM)', $i('NSM').$o('=').$sb('d', 'cuối').$minus.$sb('d', 'đầu'), 'd: khoảng cách từ gốc transect đến đường bờ (m).'],
+            ['Tốc độ điểm cuối (EPR)', $i('EPR').$o('=').$fr($i('NSM'), '<mi mathvariant="normal">Δ</mi><mi>t</mi>'), 'Δt: số năm giữa mốc đầu và mốc cuối. Đơn vị m/năm.'],
+            ['Tốc độ hồi quy tuyến tính (LRR)', $i('LRR').$o('=').$fr('<mo>∑</mo>'.$pa($sb('t', 'i').$minus.$bar('t')).$pa($sb('d', 'i').$minus.$bar('d')), '<mo>∑</mo>'.$sq($pa($sb('t', 'i').$minus.$bar('t')))),
+                'LRR là hệ số góc OLS của d theo năm t, tính trên n mốc năm; t̄ và d̄ là giá trị trung bình.'],
+            ['Sai số chuẩn của LRR', $i('SE').$o('=').$rt($fr('<mo>∑</mo>'.$sq($sb('e', 'i')), $pa($i('n').$minus.$n('2')).'<mo>∑</mo>'.$sq($pa($sb('t', 'i').$minus.$bar('t'))))),
+                'e<sub>i</sub> = d<sub>i</sub> − (a + LRR·t<sub>i</sub>): phần dư của mốc thứ i.'],
+            ['Hệ số xác định', $sq($i('R')).$o('=').$n('1').$minus.$fr('<mo>∑</mo>'.$sq($sb('e', 'i')), '<mo>∑</mo>'.$sq($pa($sb('d', 'i').$minus.$bar('d')))), 'Không dùng làm ngưỡng loại trừ.'],
+            ['Nửa bề rộng khoảng tin cậy của LRR', $sb('CI', '95').$o('=').$i('t').'<mo>·</mo>'.$i('SE'), 't: hệ số Student hai phía 95% với n − 2 bậc tự do. Transect có ý nghĩa thống kê khi |LRR| &gt; CI<sub>95</sub>.'],
+            ['Độ bất định của EPR', $sb('U', 'EPR').$o('=').$fr($sb('Z', '95').'<mo>·</mo>'.$rt($sq($sb('U', 'đầu')).$o('+').$sq($sb('U', 'cuối'))), '<mi mathvariant="normal">Δ</mi><mi>t</mi>'), 'Z<sub>95</sub> = 1,96; U<sub>đầu</sub>, U<sub>cuối</sub>: độ bất định đường bờ ở hai mốc.'],
+        ],
+        8 => [
+            ['Precision', $i('P').$o('=').$fr($i('TP'), $i('TP').$o('+').$i('FP')), 'TP, FP, FN: số pixel nước đúng, nước thừa, nước thiếu so với ground truth.'],
+            ['Recall', $i('R').$o('=').$fr($i('TP'), $i('TP').$o('+').$i('FN')), ''],
+            ['F1', $n('F1').$o('=').$fr($n('2').$i('P').$i('R'), $i('P').$o('+').$i('R')), ''],
+            ['IoU', $i('IoU').$o('=').$fr($i('TP'), $i('TP').$o('+').$i('FP').$o('+').$i('FN')), ''],
+            ['Sai số đường bờ (RMSE)', $i('RMSE').$o('=').$rt($fr($n('1'), $i('n')).'<mo>∑</mo>'.$sq($pa($sb('d', 'tự động').$minus.$sb('d', 'tham chiếu')))), 'd: khoảng cách đo dọc transect; tham chiếu là đường bờ số hoá thủ công.'],
+            ['Độ bất định đường bờ', $sb('U', 'shoreline').$o('=').$rt($sq($sb('U', 'pixel')).$o('+').$sq($sb('U', 'georef')).$o('+').$sq($sb('U', 'classify'))),
+                'U<sub>pixel</sub> = 5 m (nửa pixel 10 m); U<sub>georef</sub> = 6 m (12 m ở 95,5% quy về 1σ); U<sub>classify</sub> = RMSE so với đường bờ số hoá.'],
+        ],
+    ];
 @endphp
 <section class="steps" id="giai-doan-anh" aria-labelledby="steps-title">
     <div class="steps-inner">
         <header class="steps-head">
             <p class="eyebrow">Quy trình giải đoán ảnh</p>
-            <h2 id="steps-title">Từ ảnh vệ tinh đến đường bờ và tốc độ biến động</h2>
+            <h2 id="steps-title">@include('partials.icon', ['name' => 'layers', 'class' => 'ico h-ico']) Từ ảnh vệ tinh đến đường bờ và tốc độ biến động</h2>
             <p class="lead">Mười một bước dưới đây đúng với những gì pipeline Python đã chạy trong repo, từ thu thập ảnh đến xuất lên GeoServer. Hình minh hoạ vẽ lại từ dữ liệu trung gian thật của pipeline, không phải ảnh mô phỏng. Mỗi bước có phần chi tiết kỹ thuật bấm để mở; cuối quy trình là các hạn chế chưa giải quyết được.</p>
         </header>
         <ol class="step-list">
@@ -241,7 +294,19 @@
                             <dl class="spec">
                                 <dt>Đầu vào và đầu ra</dt><dd>{!! $s['more']['io'] !!}</dd>
                                 <dt>Thông số</dt><dd>{!! $s['more']['params'] !!}</dd>
-                                <dt>Công thức, thuật toán</dt><dd>{!! $s['more']['method'] !!}</dd>
+                                @if (!empty($maths[$i]))
+                                <dt>Công thức áp dụng</dt>
+                                <dd>
+                                    @foreach ($maths[$i] as $m)
+                                    <div class="eq">
+                                        <p class="eq-name">{!! $m[0] !!}</p>
+                                        <math display="block" class="eq-math">{!! $m[1] !!}</math>
+                                        @if ($m[2] !== '')<p class="eq-where">{!! $m[2] !!}</p>@endif
+                                    </div>
+                                    @endforeach
+                                </dd>
+                                @endif
+                                <dt>Thuật toán</dt><dd>{!! $s['more']['method'] !!}</dd>
                                 <dt>Kiểm tra chất lượng</dt><dd>{!! $s['more']['qa'] !!}</dd>
                             </dl>
                             @foreach ($s['figs'] as $f)
@@ -261,7 +326,7 @@
             @endforeach
         </ol>
         <aside class="step-limits" id="han-che-giai-doan" aria-labelledby="step-limits-title">
-            <h3 id="step-limits-title">Hạn chế của quy trình</h3>
+            <h3 id="step-limits-title">@include('partials.icon', ['name' => 'alert', 'class' => 'ico h-ico']) Hạn chế của quy trình</h3>
             <p>Những chỗ kết quả không khớp kỳ vọng hoặc phụ thuộc vào lựa chọn của đồ án. Không chỗ nào được chỉnh thông số để cho đẹp.</p>
             <ul>
                 @foreach ($limits as $l)
