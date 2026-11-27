@@ -98,7 +98,7 @@ class SeederAndSchemaTest extends TestCase
     public function test_reseeding_resets_admin_password_and_role(): void
     {
         User::where('email', 'admin@webgis.test')->update(['role' => 'viewer']);
-        $this->seed(DatabaseSeeder::class);
+        $this->seed(E2eFixtureSeeder::class);
         $this->assertSame('admin', User::where('email', 'admin@webgis.test')->value('role'));
     }
 
@@ -176,7 +176,7 @@ class SeederAndSchemaTest extends TestCase
 
     public function test_seeders_do_not_use_raw_insert_on_mysql_models(): void
     {
-        foreach (['DatabaseSeeder', 'ThresholdConfigSeeder'] as $s) {
+        foreach (['DemoAccountsSeeder', 'ThresholdConfigSeeder'] as $s) {
             $src = file_get_contents(database_path("seeders/{$s}.php"));
             $this->assertStringNotContainsString('->insert(', $src);
             $this->assertStringContainsString('updateOrCreate', $src);
