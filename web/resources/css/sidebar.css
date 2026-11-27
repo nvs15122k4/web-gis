@@ -1,5 +1,29 @@
 /* Thanh bên trang bản đồ: tờ thông tin như lề bản đồ in, các mục kẻ ngang mảnh, tiêu đề mục bằng chữ serif. */
 
+/* Thanh bên tối (xám xanh) để tách hẳn khỏi bản đồ sáng: ghi đè token chỉ trong phạm vi .sidebar.
+   Chữ >= 4.5:1 trên nền; viền ô nhập >= 3:1. Hộp cảnh báo (--warn-*) giữ nền sáng riêng nên không đổi. */
+.sidebar {
+    --surface: #27303d;
+    --surface-2: #2f3947;
+    --surface-3: #3a4555;
+    --line: #424e60;
+    --line-strong: #66748a;
+    --control-line: #8d9ab0;
+    --ink: #f4f1e8;
+    --ink-2: #dcd8cc;
+    --ink-3: #b9c0cc;
+    --accent: #3f6ad8;
+    --accent-hover: #5a82ea;
+    --accent-soft: #34476b;
+    --accent-ink: #a9c3ff;
+    --focus: #a9c3ff;
+    color: var(--ink);
+    border-right-color: #11161d;
+}
+.sidebar .btn-primary { border-color: #a9c3ff; }
+.rail .tab[aria-selected=true] { border-bottom-color: #a9c3ff; }
+.sidebar .kpi.is-alert b, .sidebar .item-list .rate { color: #ff8a78; }
+
 /* ---- đầu bảng ---- */
 .sidebar-head { order: 0; flex: none; padding: 18px 20px 14px; }
 .sidebar-head .eyebrow { margin-bottom: 2px; }
@@ -11,11 +35,11 @@
 
 /* ---- thẻ chức năng: dải chữ, không biểu tượng ---- */
 .rail {
-    order: 1; flex: none; display: flex; gap: 16px; padding: 0 20px; overflow-x: auto; scrollbar-width: none; border-bottom: 3px solid var(--ink);
+    order: 1; flex: none; display: flex; gap: 16px; padding: 0 20px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--ink);
 }
 .rail .tab {
-    position: relative; display: inline-flex; align-items: center; margin-bottom: -3px; padding: 9px 0 8px;
-    border: 0; border-bottom: 3px solid transparent; background: none; cursor: pointer;
+    position: relative; display: inline-flex; align-items: center; margin-bottom: -1px; padding: 9px 0 8px;
+    border: 0; border-bottom: 2px solid transparent; background: none; cursor: pointer;
     color: var(--ink-3); font: 500 var(--fs-md) var(--font); white-space: nowrap;
 }
 .rail .tab svg { display: none; }
