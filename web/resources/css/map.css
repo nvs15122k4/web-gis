@@ -253,7 +253,7 @@
 .tool-btn:focus-visible { outline-offset: -2px; }
 .measure-readout {
     position: absolute; z-index: 820; left: 50%; top: 10px; transform: translateX(-50%); max-width: calc(100% - 120px);
-    padding: 5px 12px; font: 500 var(--fs-sm) var(--mono); font-variant-numeric: tabular-nums; color: var(--ink);
+    padding: 5px 12px; font: 500 var(--fs-sm) var(--font); font-variant-numeric: tabular-nums; color: var(--ink);
     background: var(--float); border: 1px solid var(--float-line); border-left: 3px solid var(--mark); box-shadow: var(--float-shadow);
 }
 /* khi đo: lớp vector không bắt chuột để nhấp không mở thẻ transect */
