@@ -6,6 +6,16 @@ use Tests\TestCase;
 
 class PagesExtendedTest extends TestCase
 {
+    /** /admin cần phiên admin; các trang còn lại công khai. */
+    private function openPage(string $url): \Illuminate\Testing\TestResponse
+    {
+        if ($url === '/admin') {
+            $this->actingAs(\App\Models\User::where('email', 'admin@webgis.test')->first());
+        }
+
+        return $this->get($url);
+    }
+
     public static function pages(): array
     {
         return [['/'], ['/gioi-thieu'], ['/admin']];
@@ -14,7 +24,7 @@ class PagesExtendedTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('pages')]
     public function test_page_is_html_utf8_with_vietnamese_lang(string $url): void
     {
-        $r = $this->get($url)->assertOk();
+        $r = $this->openPage($url)->assertOk();
         $this->assertStringContainsString('text/html', $r->headers->get('Content-Type'));
         $this->assertStringContainsString('charset=utf-8', strtolower($r->headers->get('Content-Type')));
         $r->assertSee('<html', false);
@@ -29,7 +39,7 @@ class PagesExtendedTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('pages')]
     public function test_page_has_title_and_navigation_links(string $url): void
     {
-        $r = $this->get($url)->assertOk()->assertSee('<title>', false);
+        $r = $this->openPage($url)->assertOk()->assertSee('<title>', false);
         $r->assertSee('gioi-thieu', false);
     }
 
@@ -81,10 +91,12 @@ class PagesExtendedTest extends TestCase
         }
     }
 
-    public function test_admin_page_has_login_form_fields(): void
+    public function test_admin_page_khong_con_form_dang_nhap_nhung(): void
     {
-        $this->get('/admin')->assertOk()->assertSee('id="login-form"', false)
-            ->assertSee('type="password"', false)->assertSee('type="email"', false);
+        $this->openPage('/admin')->assertOk()
+            ->assertDontSee('id="login-form"', false)
+            ->assertDontSee('type="password"', false)
+            ->assertSee('id="admin-panel"', false);
     }
 
     public function test_health_endpoint(): void
