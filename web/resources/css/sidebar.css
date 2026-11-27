@@ -1,29 +1,5 @@
 /* Thanh bên trang bản đồ: tờ thông tin như lề bản đồ in, các mục kẻ ngang mảnh, tiêu đề mục bằng chữ serif. */
 
-/* Thanh bên tối (xám xanh) để tách hẳn khỏi bản đồ sáng: ghi đè token chỉ trong phạm vi .sidebar.
-   Chữ >= 4.5:1 trên nền; viền ô nhập >= 3:1. Hộp cảnh báo (--warn-*) giữ nền sáng riêng nên không đổi. */
-.sidebar {
-    --surface: #27303d;
-    --surface-2: #2f3947;
-    --surface-3: #3a4555;
-    --line: #424e60;
-    --line-strong: #66748a;
-    --control-line: #8d9ab0;
-    --ink: #f4f1e8;
-    --ink-2: #dcd8cc;
-    --ink-3: #b9c0cc;
-    --accent: #3f6ad8;
-    --accent-hover: #5a82ea;
-    --accent-soft: #34476b;
-    --accent-ink: #a9c3ff;
-    --focus: #a9c3ff;
-    color: var(--ink);
-    border-right-color: #11161d;
-}
-.sidebar .btn-primary { border-color: #a9c3ff; }
-.rail .tab[aria-selected=true] { border-bottom-color: #a9c3ff; }
-.sidebar .kpi.is-alert b, .sidebar .item-list .rate { color: #ff8a78; }
-
 /* ---- đầu bảng ---- */
 .sidebar-head { order: 0; flex: none; padding: 18px 20px 14px; }
 .sidebar-head .eyebrow { margin-bottom: 2px; }
