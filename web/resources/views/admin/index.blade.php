@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Quản trị ngưỡng — WebGIS Sông Hậu</title>
+    @include('partials.head', ['title' => 'Quản trị ngưỡng — WebGIS Sông Hậu', 'description' => 'Quản trị ngưỡng hiển thị hotspot sạt lở.'])
     @vite(['resources/css/app.css', 'resources/js/admin.js', 'resources/js/admin-map.js'])
     <script>window.WEBGIS = @json(['geoserver' => $geoserver, 'years' => $years, 'vietmapKey' => $vietmapKey]);</script>
 </head>

@@ -137,3 +137,8 @@ body.page main.admin.admin-split { justify-items: stretch; align-content: stretc
 /* chú giải cuộn được khi nội dung dài, không đè thanh công cụ */
 .map-legend { max-height: calc(100% - var(--timeline-h) - var(--grat-b) - 250px); overflow-y: auto; }
 .map-wrap.inspecting .map-legend { display: none; }
+
+/* Gợi ý lần đầu trên bản đồ */
+.first-hint { position: absolute; z-index: 800; left: 50%; bottom: calc(var(--timeline-h, 0px) + 16px); transform: translateX(-50%); display: flex; align-items: center; gap: 12px; width: min(560px, calc(100% - 24px)); padding: 10px 14px; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); border-left: 4px solid var(--accent); box-shadow: 0 4px 16px rgba(0, 0, 0, .18); font-size: var(--fs-sm); }
+.first-hint[hidden] { display: none; }
+.first-hint p { margin: 0; flex: 1; }

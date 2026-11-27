@@ -1,4 +1,4 @@
-<details class="map-legend legend" id="legend" open>
+<details class="map-legend legend" id="legend">
     <summary>Chú giải</summary>
     <div class="legend-body">
         <h3>Tốc độ biến động đường bờ (LRR, m/năm)</h3>

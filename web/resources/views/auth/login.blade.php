@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Đăng nhập — WebGIS Sông Hậu</title>
+    @include('partials.head', ['title' => 'Đăng nhập — WebGIS Sông Hậu', 'description' => 'Đăng nhập khu vực quản trị WebGIS giám sát biến động bờ sông Hậu.'])
     @vite(['resources/css/app.css'])
 </head>
 <body class="page">
