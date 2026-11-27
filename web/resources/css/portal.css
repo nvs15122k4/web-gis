@@ -85,6 +85,13 @@ body.page main.admin.admin-split { justify-items: stretch; align-content: stretc
 #login-form { display: grid; gap: 14px; }
 .admin-side label { display: grid; gap: 5px; font-size: var(--fs-sm); font-weight: 600; color: var(--ink-2); }
 .admin-side label input { height: 38px; padding: 0 10px; font-size: var(--fs-md); font-weight: 400; }
+.admin-side label.switch-row { display: flex; gap: 12px; font-size: var(--fs-md); font-weight: 400; color: var(--ink); }
+.admin-side label.switch-row input.switch { width: 30px; height: 16px; padding: 0; }
+.admin-side label.layer-opts { display: flex; gap: 8px; font-weight: 400; color: var(--ink-3); }
+.admin-side label.layer-opts input[type=range] { height: auto; padding: 0; border: 0; }
+.admin-side .layer-admin { list-style: none; margin: 8px 0 0; padding: 0; }
+.admin-side .layer-admin > li { padding: 4px 0 10px; border-bottom: 1px solid var(--line); }
+.admin-side .layer-admin .order-btns { display: inline-flex; margin-left: 8px; }
 .admin-side h1 { margin: 0 0 4px; font-size: 30px; letter-spacing: -.01em; }
 .admin-side .lead { margin: 0 0 14px; font-size: var(--fs-md); line-height: 1.55; color: var(--ink-2); }
 .admin-side .section-title { margin: 22px 0 8px; padding-top: 10px; border-top: 1px solid var(--ink); }
