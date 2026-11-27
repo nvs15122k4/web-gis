@@ -17,13 +17,13 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 | Đường dẫn | Quyền | Nội dung |
 |---|---|---|
-| `/` | công khai | Bản đồ tương tác với 4 thẻ: Tổng quan, Lớp dữ liệu, Hotspot, Chia sẻ |
-| `/gioi-thieu` | công khai | Phương pháp (DSAS: NSM, EPR, LRR, R²), tiêu chí phân loại, độ bất định, hạn chế, liên kết WMS/WFS |
-| `/huong-dan` | công khai | Hướng dẫn sử dụng, đọc kết quả, hỏi đáp, hỗ trợ bàn phím |
-| `/dang-nhap` | công khai | Đăng nhập bằng phiên (khoá tạm sau 5 lần sai) |
-| `/admin` | `admin` | Sửa ngưỡng hiển thị hotspot `min_erosion_rate`; mọi thay đổi ghi `activity_logs` |
-| `/bao-cao` | `admin` | Báo cáo nội bộ: tiến độ theo đề cương, mốc thời gian, kiểm thử |
-| `/api/*` | công khai (trừ ghi) | REST trả GeoJSON/JSON EPSG:4326; xem bảng bên dưới |
+| `/` | công khai | Bản đồ tương tác với 4 thẻ: **Tổng quan** (thống kê, chú giải, dải năm), **Lớp dữ liệu** (bật/tắt lớp, đường bờ từng năm, so sánh hai năm), **Hotspot** (lọc theo tốc độ lùi bờ), **Chia sẻ** (liên kết, tải GeoJSON/CSV); bấm một transect để xem NSM, EPR, LRR, R², khoảng tin cậy và biểu đồ lịch sử |
+| `/gioi-thieu` | công khai | Mục tiêu, nguồn dữ liệu, phương pháp DSAS (NSM, EPR, LRR, R²), tiêu chí phân loại 4 mức, công thức độ bất định, sạt lở tham chiếu, hạn chế khi sử dụng, liên kết WMS/WFS và tài liệu tham khảo |
+| `/huong-dan` | công khai | Hướng dẫn từng bước: bắt đầu, dùng từng thẻ, xem chi tiết transect, so sánh hai năm, chia sẻ/tải dữ liệu, cách đọc kết quả cho đúng, phím tắt và hỗ trợ tiếp cận, hỏi đáp |
+| `/dang-nhap` | công khai | Đăng nhập bằng phiên (khoá tạm 60 giây sau 5 lần sai theo email hoặc IP, trả HTTP 429) |
+| `/admin` | `admin` | Sửa ngưỡng hiển thị hotspot `min_erosion_rate` (m/năm); mọi thay đổi ghi vào `activity_logs` kèm người sửa và địa chỉ IP |
+| `/bao-cao` | `admin` | Báo cáo nội bộ: số liệu chung, tiến độ theo đề cương, mốc thời gian, kết quả kiểm thử |
+| `/api/*` | công khai (trừ ghi) | REST trả GeoJSON/JSON hệ toạ độ EPSG:4326; ghi dữ liệu cần token Sanctum của `admin`; xem bảng bên dưới |
 
 ### Bản đồ
 
@@ -44,12 +44,29 @@ ranh giới khu vực nghiên cứu; chú giải nổi ở góc dưới trái, d
 
 ### Các trang còn lại
 
-| | |
+Ba trang dài nên mỗi ảnh chụp được cắt thành hai nửa (trên – dưới), đặt cạnh nhau.
+
+**`/gioi-thieu` — phương pháp và hạn chế.** Nửa trên: mục tiêu, dữ liệu Sentinel-2, chuỗi phân tích DSAS (NSM, EPR, LRR, R²) và tiêu chí phân loại. Nửa dưới: độ bất định, sạt lở tham chiếu, hạn chế, liên kết WMS/WFS, tài liệu tham khảo.
+
+| Nửa trên | Nửa dưới |
 |---|---|
-| ![Phương pháp](docs/minh_chung/giao_dien_moi/07_gioi_thieu.png) | ![Hướng dẫn](docs/minh_chung/giao_dien_moi/08_huong_dan.png) |
-| `/gioi-thieu` — phương pháp và hạn chế | `/huong-dan` — hướng dẫn sử dụng |
-| ![Quản trị ngưỡng](docs/minh_chung/giao_dien_moi/12_quan_tri_nguong.png) | ![Báo cáo](docs/minh_chung/giao_dien_moi/11_bao_cao.png) |
-| `/admin` — chỉnh ngưỡng hiển thị (cần quyền `admin`) | `/bao-cao` — báo cáo nội bộ (cần quyền `admin`) |
+| ![Giới thiệu – nửa trên](docs/minh_chung/giao_dien_moi/07_gioi_thieu_a.png) | ![Giới thiệu – nửa dưới](docs/minh_chung/giao_dien_moi/07_gioi_thieu_b.png) |
+
+**`/huong-dan` — hướng dẫn sử dụng.** Nửa trên: bắt đầu nhanh, thẻ Tổng quan, Lớp dữ liệu, xem chi tiết transect. Nửa dưới: Hotspot, so sánh hai năm, chia sẻ/tải dữ liệu, đọc kết quả, phím tắt, hỏi đáp.
+
+| Nửa trên | Nửa dưới |
+|---|---|
+| ![Hướng dẫn – nửa trên](docs/minh_chung/giao_dien_moi/08_huong_dan_a.png) | ![Hướng dẫn – nửa dưới](docs/minh_chung/giao_dien_moi/08_huong_dan_b.png) |
+
+**`/bao-cao` — báo cáo nội bộ (cần quyền `admin`).** Đối chiếu công việc đã làm với đề cương, số liệu chung và kết quả kiểm thử.
+
+| Nửa trên | Nửa dưới |
+|---|---|
+| ![Báo cáo – nửa trên](docs/minh_chung/giao_dien_moi/11_bao_cao_a.png) | ![Báo cáo – nửa dưới](docs/minh_chung/giao_dien_moi/11_bao_cao_b.png) |
+
+**`/admin` — quản trị ngưỡng (cần quyền `admin`).** Đổi `min_erosion_rate` (m/năm); ngưỡng này chỉ lọc hotspot hiển thị, không đổi phân loại của pipeline. Tài khoản `viewer` bị từ chối (HTTP 403).
+
+![Quản trị ngưỡng](docs/minh_chung/giao_dien_moi/12_quan_tri_nguong.png)
 
 ### REST API
 
@@ -140,7 +157,7 @@ npm run build && php artisan serve                 # http://127.0.0.1:8000
 > Docker compose chiếm cổng 5432 và 8080; nếu máy đã chạy sẵn PostgreSQL/GeoServer, hãy dừng chúng hoặc đổi cổng trong `docker-compose.yml` và `.env`.
 
 Chỉ cần xem giao diện, không dùng GeoServer: bỏ hai lệnh `build_basemap.py` / `provision.sh`, để trống `GEOSERVER_URL` — bản đồ vẽ GeoJSON từ `/api/*`.
-Sau khi chạy, đăng nhập `admin@webgis.test` / `password` tại `/dang-nhap` (xem mục [Tài khoản kiểm thử](#tài-khoản-kiểm-thử)).
+Muốn có sẵn tài khoản demo, điền `DEMO_*` trong `.env` trước khi `db:seed` rồi đăng nhập tại `/dang-nhap` (xem mục [Tài khoản kiểm thử](#tài-khoản-kiểm-thử)).
 
 Chạy lại pipeline từ ảnh gốc: xem [`pipeline/README.md`](pipeline/README.md) và mục [Tái lập kết quả thực nghiệm](#tái-lập-kết-quả-thực-nghiệm).
 
@@ -180,12 +197,21 @@ CI trên GitHub Actions chạy PHPUnit (MySQL + PostGIS), build front-end và ki
 
 ## Tài khoản kiểm thử
 
-Tạo bởi seeder trong `web/database/seeders/` (mật khẩu chỉ dùng cho môi trường phát triển, đổi khi triển khai thật):
+Mật khẩu **không** ghi trong repo công khai. Hai tài khoản demo do `DemoAccountsSeeder` (gọi từ `DatabaseSeeder`) tạo từ biến môi trường trong `web/.env` (đã `.gitignore`); thiếu biến nào thì bỏ qua tài khoản đó:
 
-| Email | Mật khẩu | Vai trò | Nguồn | Ghi chú |
-|---|---|---|---|---|
-| `admin@webgis.test` | `password` | `admin` | `php artisan db:seed` (`DatabaseSeeder`) | Vào trang quản trị `/admin` để sửa ngưỡng hiển thị |
-| `viewer@webgis.test` | `password` | `viewer` | `E2eFixtureSeeder` | Chỉ có trong CSDL kiểm thử/E2E, dùng cho kịch bản từ chối quyền |
+| Vai trò | Biến môi trường | Quyền |
+|---|---|---|
+| `admin` | `DEMO_ADMIN_EMAIL`, `DEMO_ADMIN_PASSWORD` | Xem bản đồ, vào `/admin` sửa ngưỡng, xem `/bao-cao`, gọi API ghi |
+| `viewer` | `DEMO_USER_EMAIL`, `DEMO_USER_PASSWORD` | Đăng nhập được nhưng bị từ chối ở `/admin`, `/bao-cao` và API ghi (HTTP 403) |
+
+```bash
+# điền 4 biến DEMO_* trong web/.env (mẫu ở .env.example), rồi:
+php artisan db:seed --class=DemoAccountsSeeder    # chạy lại an toàn (updateOrCreate theo email)
+```
+
+Cần cấp mật khẩu cho giảng viên/người xem thì gửi riêng, không đưa vào repo hay README. Nếu nghi ngờ mật khẩu đã lộ, đổi giá trị trong `.env` và chạy lại lệnh trên.
+
+Tài khoản cố định của bộ kiểm thử tự động (`admin@webgis.test`, `viewer@webgis.test`) chỉ tồn tại trong CSDL phát triển/kiểm thử cục bộ qua `DatabaseSeeder`/`E2eFixtureSeeder`; `DatabaseSeeder` tự bỏ qua tài khoản `admin@webgis.test` khi `APP_ENV=production`.
 
 `ThresholdConfigSeeder` nạp ngưỡng mặc định `min_erosion_rate = 1.0` (m/năm). `E2eFixtureSeeder` dựng dữ liệu tổng hợp cố định (10 transect T01–T10, 2018–2026, thiếu năm 2022) cho Playwright/PHPUnit, không dùng chung CSDL phát triển.
 Đăng nhập sai 5 lần theo email hoặc IP sẽ bị khoá tạm (HTTP 429); token Sanctum hết hạn sau 480 phút (`SANCTUM_TOKEN_EXPIRATION`).
