@@ -232,4 +232,4 @@ main.admin { min-height: calc(100vh - var(--appbar-h)); background: var(--canvas
     .doc .downloads li { flex-direction: column; align-items: flex-start; gap: 4px; }
     .index-list .idx-desc { display: none; }
 }
-.doc .eq-math { display: block; margin: 8px 0; overflow-x: auto; overflow-y: hidden; font-size: 1.2em; }
+.doc .eq-math { display: block math; margin: 8px 0; overflow-x: auto; overflow-y: hidden; font-size: 1.2em; }

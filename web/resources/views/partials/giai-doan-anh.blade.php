@@ -225,7 +225,7 @@
     $fr = fn ($a, $b) => "<mfrac><mrow>$a</mrow><mrow>$b</mrow></mfrac>";
     $rt = fn ($x) => "<msqrt><mrow>$x</mrow></msqrt>";
     $pa = fn ($x) => "<mo>(</mo>$x<mo>)</mo>";
-    $sq = fn ($x) => "<msup>$x<mn>2</mn></msup>";
+    $sq = fn ($x) => "<msup><mrow>$x</mrow><mn>2</mn></msup>";
     $bar = fn ($x) => "<mover><mi>$x</mi><mo>¯</mo></mover>";
     $minus = '<mo>−</mo>';
     $maths = [
@@ -236,14 +236,14 @@
         1 => [
             ['Phản xạ bề mặt', $i('ρ').$o('=').$fr($pa($i('DN').$minus.$i('offset')), $n('10000')),
                 'DN: giá trị số của ảnh L2A; offset = 1000 với processing baseline từ 4,0 trở lên, 0 với bản cũ; DN = 0 là không dữ liệu.'],
-            ['Composite theo pixel', $sb('ρ', 'comp').$pa($i('x').$o(',').$i('y')).$o('=').'<munder><mi mathvariant="normal">median</mi><mi>t</mi></munder>'.$sb('ρ', 't').$pa($i('x').$o(',').$i('y')),
+            ['Composite theo pixel', $sb('ρ', 'comp').$pa($i('x').$o(',').$i('y')).$o('=').'<munder><mi mathvariant="normal">median</mi><mi>t</mi></munder><mspace width="0.25em"></mspace>'.$sb('ρ', 't').$pa($i('x').$o(',').$i('y')),
                 'ρ<sub>t</sub>: phản xạ của cảnh thứ t tại pixel (x, y); chỉ lấy các quan sát không bị che.'],
         ],
         2 => [
             ['NDWI (McFeeters 1996)', $i('NDWI').$o('=').$fr($i('B03').$minus.$i('B08'), $i('B03').$o('+').$i('B08')), 'B03: kênh xanh lục; B08: cận hồng ngoại (NIR).'],
             ['MNDWI (Xu 2006)', $i('MNDWI').$o('=').$fr($i('B03').$minus.$i('B11'), $i('B03').$o('+').$i('B11')), 'B11: hồng ngoại sóng ngắn 1 (SWIR1). Chỉ số được chọn cho đường bờ.'],
             ['AWEI<sub>nsh</sub> (Feyisa et al. 2014)', $sb('AWEI', 'nsh').$o('=').$n('4').$pa($i('B03').$minus.$i('B11')).$minus.$pa($n('0,25').'<mo>·</mo>'.$i('B08').$o('+').$n('2,75').'<mo>·</mo>'.$i('B12')), 'B12: hồng ngoại sóng ngắn 2 (SWIR2).'],
-            ['Ngưỡng Otsu', $i('t').'<mo>*</mo>'.$o('=').'<munder><mi mathvariant="normal">arg max</mi><mi>t</mi></munder>'.'<mo>[</mo>'.$sb('ω', '0').$pa($i('t')).'<mo>·</mo>'.$sb('ω', '1').$pa($i('t')).'<mo>·</mo>'.$sq($pa($sb('μ', '0').$pa($i('t')).$minus.$sb('μ', '1').$pa($i('t')))).'<mo>]</mo>',
+            ['Ngưỡng Otsu', "<msup><mi>t</mi><mo>*</mo></msup>".$o('=').'<munder><mi mathvariant="normal">arg max</mi><mi>t</mi></munder>'.'<mo>[</mo>'.$sb('ω', '0').$pa($i('t')).'<mo>·</mo>'.$sb('ω', '1').$pa($i('t')).'<mo>·</mo>'.$sq($pa($sb('μ', '0').$pa($i('t')).$minus.$sb('μ', '1').$pa($i('t')))).'<mo>]</mo>',
                 'ω<sub>0</sub>, ω<sub>1</sub>: tỉ lệ pixel ở hai lớp (đất, nước) khi cắt tại ngưỡng t; μ<sub>0</sub>, μ<sub>1</sub>: giá trị trung bình của hai lớp. Ngưỡng t* làm phương sai giữa hai lớp lớn nhất.'],
         ],
         4 => [

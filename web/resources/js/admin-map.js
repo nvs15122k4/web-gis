@@ -44,6 +44,7 @@ export function initAdminMap() {
 
     const table = createAttrTable({ map, root: document.getElementById('attr-table'), onSelect: () => {} });
     document.getElementById('attr-table').hidden = false;
+    table.render(); // bảng luôn hiện ở trang này nên nạp danh sách transect ngay
     renderStatus();
     return { map, table };
 }
