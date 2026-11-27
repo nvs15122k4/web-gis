@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { openMap, openTab } from './helpers';
 import { collectErrors, apiLogin } from './helpers-extra';
+import { loginViaForm } from './helpers-journey';
 
 test.describe('Điều hướng & trang tĩnh', () => {
-    test('N01 menu: Bản đồ -> Phương pháp -> Quản trị, mục hiện tại có aria-current', { tag: ['@smoke', '@happy'] }, async ({ page }) => {
+    test('N01 menu: Bản đồ -> Phương pháp -> Hướng dẫn, mục hiện tại có aria-current', { tag: ['@smoke', '@happy'] }, async ({ page }) => {
         await page.goto('/');
         const nav = page.getByRole('navigation', { name: 'Điều hướng chính' });
         await expect(nav.getByRole('link', { name: 'Bản đồ' })).toHaveAttribute('aria-current', 'page');
@@ -11,9 +12,8 @@ test.describe('Điều hướng & trang tĩnh', () => {
         await expect(page).toHaveURL(/\/gioi-thieu$/);
         await expect(page.getByRole('heading', { level: 1 })).toContainText('Giới thiệu');
         await expect(nav.getByRole('link', { name: 'Phương pháp' })).toHaveAttribute('aria-current', 'page');
-        await nav.getByRole('link', { name: 'Quản trị' }).click();
-        await expect(page).toHaveURL(/\/admin$/);
-        await expect(page.getByRole('heading', { level: 1 })).toHaveText('Quản trị ngưỡng hiển thị');
+        await nav.getByRole('link', { name: 'Hướng dẫn' }).click();
+        await expect(page).toHaveURL(/\/huong-dan$/);
         await nav.getByRole('link', { name: 'Bản đồ' }).click();
         await expect(page).toHaveURL(/\/(#.*)?$/);
         await expect(page.locator('#map')).toBeVisible();
@@ -41,6 +41,7 @@ test.describe('Điều hướng & trang tĩnh', () => {
     for (const path of ['/', '/gioi-thieu', '/admin']) {
         test(`N05 ${path}: có <title>, lang=vi và không có lỗi console`, { tag: ['@smoke'] }, async ({ page }) => {
             const errs = collectErrors(page);
+            if (path === '/admin') await loginViaForm(page);
             await page.goto(path);
             await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
             await expect(page).toHaveTitle(/\S{3,}.*(WebGIS|Quản trị|Giới thiệu|Phương pháp)|(WebGIS|Quản trị|Giới thiệu|Phương pháp).*\S{3,}/);
@@ -287,69 +288,62 @@ test.describe('API từ giao diện', () => {
 });
 
 test.describe('Đăng nhập & phân quyền', () => {
-    test('P01 form đăng nhập: đúng nhãn, trường bắt buộc, panel admin ẩn lúc đầu', { tag: ['@smoke'] }, async ({ page }) => {
+    test('P01 form đăng nhập phiên: trường bắt buộc, /admin không còn form nhúng', { tag: ['@smoke'] }, async ({ page }) => {
+        await page.goto('/dang-nhap');
+        await expect(page.locator('#session-login-form [name=email]')).toHaveAttribute('required', '');
+        await expect(page.locator('#session-login-form [name=password]')).toHaveAttribute('type', 'password');
         await page.goto('/admin');
-        await expect(page.locator('#login-form [name=email]')).toHaveAttribute('required', '');
-        await expect(page.locator('#login-form [name=password]')).toHaveAttribute('type', 'password');
-        await expect(page.locator('#admin-panel')).toBeHidden();
+        await expect(page).toHaveURL(/\/dang-nhap$/);
+        await expect(page.locator('#login-form')).toHaveCount(0);
+        await expect(page.locator('#admin-panel')).toHaveCount(0);
     });
 
-    test('P02 để trống mật khẩu: trình duyệt chặn gửi, không gọi API', { tag: ['@negative'] }, async ({ page }) => {
-        await page.goto('/admin');
+    test('P02 để trống mật khẩu: trình duyệt chặn gửi, không gọi máy chủ', { tag: ['@negative'] }, async ({ page }) => {
+        await page.goto('/dang-nhap');
         let called = false;
-        page.on('request', (r) => { if (r.url().includes('/api/auth/login')) called = true; });
-        await page.fill('#login-form [name=email]', 'admin@webgis.test');
-        await page.click('#login-form button[type=submit]');
-        await expect(page.locator('#login-form [name=password]')).toHaveJSProperty('validity.valueMissing', true);
+        page.on('request', (r) => { if (r.method() === 'POST') called = true; });
+        await page.fill('#session-login-form [name=email]', 'admin@webgis.test');
+        await page.click('#session-login-form button[type=submit]');
+        await expect(page.locator('#session-login-form [name=password]')).toHaveJSProperty('validity.valueMissing', true);
         expect(called).toBe(false);
-        await expect(page.locator('#admin-panel')).toBeHidden();
     });
 
     test('P03 email sai định dạng: bị chặn ở form', { tag: ['@negative'] }, async ({ page }) => {
-        await page.goto('/admin');
-        await page.fill('#login-form [name=email]', 'khong-phai-email');
-        await page.fill('#login-form [name=password]', 'x');
-        await page.click('#login-form button[type=submit]');
-        await expect(page.locator('#login-form [name=email]')).toHaveJSProperty('validity.typeMismatch', true);
-        await expect(page.locator('#admin-panel')).toBeHidden();
+        await page.goto('/dang-nhap');
+        await page.fill('#session-login-form [name=email]', 'khong-phai-email');
+        await page.fill('#session-login-form [name=password]', 'x');
+        await page.click('#session-login-form button[type=submit]');
+        await expect(page.locator('#session-login-form [name=email]')).toHaveJSProperty('validity.typeMismatch', true);
     });
 
-    test('P04 email không tồn tại: báo lỗi, không lưu token', { tag: ['@negative'] }, async ({ page }) => {
+    test('P04 email không tồn tại: báo lỗi, vẫn không vào được /admin', { tag: ['@negative'] }, async ({ page }) => {
+        await page.goto('/dang-nhap');
+        await page.fill('#session-login-form [name=email]', 'khongco@webgis.test');
+        await page.fill('#session-login-form [name=password]', 'password');
+        await page.click('#session-login-form button[type=submit]');
+        await expect(page.locator('#session-login-form .field-error')).toContainText('Sai email hoặc mật khẩu');
         await page.goto('/admin');
-        await page.fill('#login-form [name=email]', 'khongco@webgis.test');
-        await page.fill('#login-form [name=password]', 'password');
-        await page.click('#login-form button[type=submit]');
-        await expect(page.locator('#admin-message')).toContainText('Sai email hoặc mật khẩu');
-        await expect(page.locator('#admin-panel')).toBeHidden();
+        await expect(page).toHaveURL(/\/dang-nhap$/);
         expect(await page.evaluate(() => sessionStorage.getItem('webgis_admin_token'))).toBeNull();
     });
 
-    test('P05 đăng nhập admin: hiện email+vai trò, danh sách ngưỡng, rồi đăng xuất quay về form', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
-        await page.goto('/admin');
-        await page.fill('#login-form [name=email]', 'admin@webgis.test');
-        await page.fill('#login-form [name=password]', 'password');
-        await page.click('#login-form button[type=submit]');
-        await expect(page.locator('#admin-message')).toContainText('Đăng nhập thành công');
+    test('P05 đăng nhập admin: /admin hiện email+vai trò, danh sách ngưỡng, rồi đăng xuất ở menu', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
+        await loginViaForm(page);
         await expect(page.locator('#admin-user')).toContainText('admin@webgis.test');
-        await expect(page.locator('#login-form')).toBeHidden();
         await expect(page.locator('.threshold-form').first()).toBeVisible();
-        expect(await page.evaluate(() => sessionStorage.getItem('webgis_admin_token'))).toBeTruthy();
-        await page.click('#logout');
-        await expect(page.locator('#login-form')).toBeVisible();
-        await expect(page.locator('#admin-panel')).toBeHidden();
         expect(await page.evaluate(() => sessionStorage.getItem('webgis_admin_token'))).toBeNull();
+        await page.click('.nav-logout button');
+        await page.goto('/admin');
+        await expect(page).toHaveURL(/\/dang-nhap$/);
     });
 
-    test('P06 phiên không giữ qua tab mới (token ở sessionStorage)', { tag: ['@negative'] }, async ({ page, context }) => {
-        await page.goto('/admin');
-        await page.fill('#login-form [name=email]', 'admin@webgis.test');
-        await page.fill('#login-form [name=password]', 'password');
-        await page.click('#login-form button[type=submit]');
-        await expect(page.locator('#admin-panel')).toBeVisible();
-        const p2 = await context.newPage();
+    test('P06 phiên chỉ nằm trong cookie của trình duyệt: ngữ cảnh mới không vào được /admin', { tag: ['@negative'] }, async ({ page, browser }) => {
+        await loginViaForm(page);
+        const other = await browser.newContext({ baseURL: page.url().replace(/\/admin.*$/, '') });
+        const p2 = await other.newPage();
         await p2.goto('/admin');
-        await expect(p2.locator('#login-form')).toBeVisible();
-        await expect(p2.locator('#admin-panel')).toBeHidden();
+        await expect(p2).toHaveURL(/\/dang-nhap$/);
+        await other.close();
     });
 
     test('P07 API: đăng nhập sai 401, thiếu trường 422, đúng trả token + vai trò', { tag: ['@negative'] }, async ({ page }) => {
@@ -396,6 +390,7 @@ test.describe('Đăng nhập & phân quyền', () => {
 test.describe('Responsive & giao diện', () => {
     test('R01 mobile 375px: không tràn ngang ở cả 3 trang', { tag: ['@responsive'] }, async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 700 });
+        await loginViaForm(page);
         for (const p of ['/', '/gioi-thieu', '/admin']) {
             await page.goto(p);
             await page.waitForLoadState('domcontentloaded');
@@ -414,12 +409,9 @@ test.describe('Responsive & giao diện', () => {
         await expect(btn).toHaveAttribute('aria-expanded', 'false');
     });
 
-    test('R03 mobile: form đăng nhập admin dùng được ở 375px', { tag: ['@responsive'] }, async ({ page }) => {
+    test('R03 mobile: đăng nhập rồi vào trang quản trị dùng được ở 375px', { tag: ['@responsive'] }, async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 700 });
-        await page.goto('/admin');
-        await page.fill('#login-form [name=email]', 'admin@webgis.test');
-        await page.fill('#login-form [name=password]', 'password');
-        await page.click('#login-form button[type=submit]');
+        await loginViaForm(page);
         await expect(page.locator('#admin-panel')).toBeVisible();
     });
 
