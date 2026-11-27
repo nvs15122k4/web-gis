@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import colors from './colors.json';
-import { api } from './api';
+import { api, prefetchShorelines } from './api';
 import { setStatus, UPDATING } from './status';
 
 const { geoserver, years } = window.WEBGIS;
@@ -185,6 +185,8 @@ export function initLayers(map) {
     bindReference(map);
     initYearList(map);
     // Mặc định hiện toàn bộ đường bờ các năm có dữ liệu để thấy ngay xu hướng dịch chuyển.
+    // Chế độ GeoJSON: gom mọi năm vào một yêu cầu thay vì mỗi năm một chuyến tới PostGIS.
+    if (!USE_WMS) prefetchShorelines(years.available);
     years.available.forEach((y) => {
         const box = document.getElementById(`year-${y}`);
         if (box) { box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true })); }
@@ -289,8 +291,9 @@ function initCompare(map) {
 
 /* ---- Hotspot (GeoJSON từ API, lọc theo ngưỡng) ---- */
 
-export async function loadHotspots(minRate) {
+export async function loadHotspots(minRate, isCurrent = () => true) {
     const fc = await api.hotspots(minRate);
+    if (!isCurrent()) return fc;
     layers.hotspots.clearLayers();
     const drawn = [];
     L.geoJSON(fc, {
@@ -331,12 +334,26 @@ async function initHotspotFilter() {
     } catch {
         input.placeholder = UPDATING;
     }
-    const apply = () => loadHotspots(input.value === '' ? undefined : input.value).catch(() => {
-        layers.hotspots.clearLayers();
-        document.getElementById('hotspot-count').textContent = `Dữ liệu hotspot: ${UPDATING.toLowerCase()}.`;
-        document.getElementById('hotspot-list').innerHTML = '';
-    });
-    document.getElementById('apply-filter').addEventListener('click', apply);
+    const button = document.getElementById('apply-filter');
+    let seq = 0;
+    const apply = () => {
+        const mine = ++seq;
+        // Hiện trạng thái ngay khi bấm (không chờ mạng) và bỏ kết quả của lần bấm cũ nếu có lần mới hơn.
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        document.getElementById('hotspot-count').textContent = 'Đang tải…';
+        return loadHotspots(input.value === '' ? undefined : input.value, () => mine === seq).catch(() => {
+            if (mine !== seq) return;
+            layers.hotspots.clearLayers();
+            document.getElementById('hotspot-count').textContent = `Dữ liệu hotspot: ${UPDATING.toLowerCase()}.`;
+            document.getElementById('hotspot-list').innerHTML = '';
+        }).finally(() => {
+            if (mine !== seq) return;
+            button.disabled = false;
+            button.removeAttribute('aria-busy');
+        });
+    };
+    button.addEventListener('click', apply);
     input.addEventListener('keydown', (e) => e.key === 'Enter' && apply());
     apply();
 }
