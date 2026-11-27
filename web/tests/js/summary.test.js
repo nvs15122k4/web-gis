@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadSummary } from '../../resources/js/summary';
 import { UPDATING } from '../../resources/js/status';
+import { clearApiCache } from '../../resources/js/api';
 
 const summary = (over = {}) => ({
     transects: {
@@ -18,12 +19,16 @@ const summary = (over = {}) => ({
 });
 
 const mockFetch = (body) => {
+    clearApiCache(); // dữ liệu giả đổi thì api không được trả bản đã nhớ
     globalThis.fetch = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => body });
 };
 const body = () => document.getElementById('summary-body');
 
 describe('loadSummary', () => {
-    beforeEach(() => { document.body.innerHTML = '<div id="summary-body"></div>'; });
+    beforeEach(() => {
+        clearApiCache(); // api nhớ kết quả 60 s: mỗi ca kiểm thử phải bắt đầu từ bộ nhớ trống
+        document.body.innerHTML = '<div id="summary-body"></div>';
+    });
     afterEach(() => { delete globalThis.fetch; });
 
     it('không có #summary-body thì không gọi API', async () => {
