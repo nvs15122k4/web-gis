@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WebGIS giám sát bờ sông Hậu — xã Bình Mỹ</title>
+    @include('partials.head', ['title' => 'Bản đồ biến động bờ sông Hậu — xã Bình Mỹ | WebGIS Sông Hậu'])
     <link rel="preload" href="/data/aoi.json" as="fetch" crossorigin="anonymous">
     @if (! empty($geoserver['url']))
         <link rel="preconnect" href="{{ $geoserver['url'] }}" crossorigin>
@@ -81,6 +79,7 @@
         <p id="measure-readout" class="measure-readout" role="status" hidden></p>
         @include('partials.transect-panel')
         @include('partials.legend')
+        @include('partials.first-hint')
         @include('partials.attr-table')
         @include('partials.timeline')
     </main>
