@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { api, get } from '../../resources/js/api';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { api, clearApiCache, get, prefetchShorelines } from '../../resources/js/api';
 
 const ok = (body) => ({ ok: true, status: 200, json: async () => body });
 
@@ -8,6 +8,7 @@ const echo = async (url, init) => ({ ok: true, status: 200, json: async () => ({
 
 describe('api wrapper', () => {
     beforeEach(() => {
+        clearApiCache();
         globalThis.fetch = echo;
     });
     afterEach(() => {
@@ -60,5 +61,63 @@ describe('api wrapper', () => {
             '/api/transects',
             '/api/summary',
         ]);
+    });
+
+    it('các yêu cầu giống hệt nhau đang bay dùng chung một lần fetch', async () => {
+        const fetchMock = vi.fn(echo);
+        globalThis.fetch = fetchMock;
+        const [a, b] = await Promise.all([api.transects(), api.transects()]);
+        expect(a).toBe(b);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('dữ liệu pipeline được nhớ, lần gọi lại không tốn fetch; hết hạn hoặc xoá cache thì tải lại', async () => {
+        const fetchMock = vi.fn(echo);
+        globalThis.fetch = fetchMock;
+        await api.shorelines(2020);
+        await api.shorelines(2020);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        clearApiCache();
+        await api.shorelines(2020);
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('cấu hình admin vừa sửa (thresholds, layers) và sạt lở theo bbox không bị nhớ', async () => {
+        const fetchMock = vi.fn(echo);
+        globalThis.fetch = fetchMock;
+        await api.thresholds();
+        await api.thresholds();
+        await api.layerSettings();
+        await api.layerSettings();
+        expect(fetchMock).toHaveBeenCalledTimes(4);
+    });
+
+    it('lỗi HTTP không bị nhớ: lần sau gọi lại được', async () => {
+        globalThis.fetch = async () => ({ ok: false, status: 500, json: async () => ({}) });
+        await expect(api.summary()).rejects.toThrow('500');
+        const fetchMock = vi.fn(echo);
+        globalThis.fetch = fetchMock;
+        await api.summary();
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('prefetchShorelines: một yêu cầu year[] cho nhiều năm, rồi api.shorelines(năm) lấy từ đó', async () => {
+        const fc = { features: [{ properties: { year: 2018 } }, { properties: { year: 2019 } }, { properties: { year: 2019 } }] };
+        const fetchMock = vi.fn(async () => ({ ok: true, status: 200, json: async () => fc }));
+        globalThis.fetch = fetchMock;
+        const done = prefetchShorelines([2018, 2019]);
+        const [y18, y19] = await Promise.all([api.shorelines(2018), api.shorelines(2019)]);
+        await done;
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(decodeURIComponent(fetchMock.mock.calls[0][0])).toBe('/api/shorelines?year[]=2018&year[]=2019');
+        expect(y18.features).toHaveLength(1);
+        expect(y19.features).toHaveLength(2);
+    });
+
+    it('prefetchShorelines: chỉ một năm thì không gộp (để api.shorelines tự gọi)', async () => {
+        const fetchMock = vi.fn(echo);
+        globalThis.fetch = fetchMock;
+        await prefetchShorelines([2018]);
+        expect(fetchMock).not.toHaveBeenCalled();
     });
 });

@@ -66,14 +66,20 @@ describe('layers: chế độ GeoJSON (không có GeoServer)', () => {
         expect(mod.handlers.onTransectClick.mock.calls[0][0].id).toBe(1);
     });
 
-    it('bật đường bờ một năm thì tải /api/shorelines?year=', async () => {
+    it('bật đường bờ nhiều năm lúc khởi động chỉ tốn MỘT yêu cầu /api/shorelines (gộp year[])', async () => {
         const { mod, map } = await setup({ url: null, workspace: 'songhau' });
         mod.initLayers(map);
         const box = document.getElementById('year-2018');
         box.checked = true;
         box.dispatchEvent(new Event('change'));
         await vi.waitFor(() => expect(mod.layers.years.get(2018).getLayers()).toHaveLength(1));
-        expect(globalThis.fetch.mock.calls.some(([u]) => String(u).includes('/api/shorelines?year=2018'))).toBe(true);
+        const calls = globalThis.fetch.mock.calls.map(([u]) => String(u)).filter((u) => u.includes('/api/shorelines'));
+        expect(calls).toHaveLength(1);
+        expect(decodeURIComponent(calls[0])).toBe('/api/shorelines?year[]=2018&year[]=2019');
+        // mỗi năm chỉ nhận đúng đối tượng của năm đó
+        expect(mod.layers.years.get(2018).getLayers()).toHaveLength(1);
+        await vi.waitFor(() => expect(mod.layers.years.get(2019)).toBeDefined());
+        expect(mod.layers.years.get(2019).getLayers()).toHaveLength(0);
     });
 });
 

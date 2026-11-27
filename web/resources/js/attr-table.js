@@ -110,8 +110,18 @@ export function createAttrTable({ map, root, onSelect = () => {}, highlightStyle
             hl.addData(row);
             if (zoom) map.fitBounds(hl.getBounds(), { maxZoom: 17, padding: [60, 60] });
         }
-        render();
-        body.querySelector(`tr[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest' });
+        // Chỉ đổi dấu chọn trên các dòng đã vẽ, không dựng lại cả bảng (bấm một dòng phải phản hồi ngay).
+        if (!root.hidden && state.rows.length) {
+            let target = null;
+            for (const tr of body.rows) {
+                const on = Number(tr.dataset.id) === id;
+                tr.classList.toggle('is-selected', on);
+                tr.setAttribute('aria-selected', String(on));
+                if (on) target = tr;
+            }
+            if (target) target.scrollIntoView({ block: 'nearest' });
+            else render(); // dòng đang bị lọc/ngoài khung nhìn: vẽ lại theo bộ lọc hiện tại
+        }
         if (fromTable) onSelect(id);
     };
 
@@ -134,7 +144,12 @@ export function createAttrTable({ map, root, onSelect = () => {}, highlightStyle
         render();
     });
     viewport?.addEventListener('change', render);
-    text?.addEventListener('input', render);
+    // Gõ tìm kiếm: gộp các phím liên tiếp, chỉ vẽ lại một lần sau khi ngừng gõ 120 ms.
+    let typing = null;
+    text?.addEventListener('input', () => {
+        clearTimeout(typing);
+        typing = setTimeout(render, 120);
+    });
     let timer = null;
     map.on('moveend', () => {
         if (!viewport?.checked) return;
@@ -151,11 +166,25 @@ export function createAttrTable({ map, root, onSelect = () => {}, highlightStyle
         if (e.detail?.id !== state.selected) select(e.detail.id);
     });
 
-    const ready = api.transects().then((fc) => {
+    // Danh sách transect chỉ tải khi bảng được mở lần đầu: người chưa mở bảng không phải trả giá cho lượt tải này.
+    let loading = null;
+    const load = () => (loading ??= api.transects().then((fc) => {
         state.rows = fc.features;
         render();
     }).catch(() => {
+        loading = null;
         count.textContent = `Dữ liệu transect: ${UPDATING.toLowerCase()}.`;
-    });
-    return { select, render, ready, state };
+    }));
+    return {
+        select,
+        render: () => {
+            if (state.rows.length) render();
+            else {
+                count.textContent = 'Đang tải…';
+                load();
+            }
+        },
+        get ready() { return load(); },
+        state,
+    };
 }

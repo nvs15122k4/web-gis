@@ -100,7 +100,18 @@ function initSidebarToggle(map) {
     toggle.addEventListener('click', () => setCollapsed(!sidebar.classList.contains('collapsed')));
     map.invalidateSize();
     // Thanh bên trượt mượt nên kích thước bản đồ đổi liên tục: báo cho Leaflet để lớp nền không bị lệch.
-    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => map.invalidateSize({ pan: false })).observe(map.getContainer());
+    // Gộp vào một lần mỗi khung hình: thanh bên trượt phát ra hàng chục lần đổi kích thước, mỗi lần invalidateSize đều ép bố cục lại.
+    if (typeof ResizeObserver !== 'undefined') {
+        let queued = false;
+        new ResizeObserver(() => {
+            if (queued) return;
+            queued = true;
+            requestAnimationFrame(() => {
+                queued = false;
+                map.invalidateSize({ pan: false });
+            });
+        }).observe(map.getContainer());
+    }
     return {
         collapseOnMobile: () => mobile.matches && setCollapsed(true),
     };
