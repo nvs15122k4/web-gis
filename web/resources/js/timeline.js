@@ -96,21 +96,6 @@ export function initTimeline(map = null) {
         step();
         timer = setInterval(step, STEP_MS);
     }
-    // Thanh trượt năm: kéo để xem lần lượt từng năm có dữ liệu (mỗi lúc một năm).
-    const slider = document.getElementById('timeline-slider');
-    const sliderYear = document.getElementById('timeline-slider-year');
-    if (slider && seq.length) {
-        slider.min = 0;
-        slider.max = seq.length - 1;
-        slider.value = seq.length - 1;
-        slider.addEventListener('input', () => {
-            stop();
-            const y = seq[Number(slider.value)];
-            if (sliderYear) sliderYear.textContent = y;
-            show(y);
-        });
-        if (sliderYear) sliderYear.textContent = seq[seq.length - 1];
-    } else if (slider) slider.disabled = true;
     play?.addEventListener('click', () => (timer === null ? start() : stop()));
     if (!seq.length && play) play.disabled = true;
 
