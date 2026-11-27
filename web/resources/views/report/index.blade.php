@@ -22,9 +22,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Báo cáo công việc đã làm — WebGIS Sông Hậu</title>
+    @include('partials.head', ['title' => 'Báo cáo công việc đã làm — WebGIS Sông Hậu', 'description' => 'Báo cáo công việc của đề tài WebGIS giám sát biến động bờ sông Hậu (nội bộ).'])
     @vite(['resources/css/app.css'])
 </head>
 <body class="page">
