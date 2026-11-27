@@ -131,4 +131,12 @@ class ThresholdUpdateTest extends TestCase
         $this->actingAs($v, 'sanctum')->putJson('/api/admin/config/thresholds/min_erosion_rate', ['value' => 5])->assertForbidden();
         $this->assertSame(0, ActivityLog::count());
     }
+
+    public function test_admin_session_cookie_can_update_threshold_without_token(): void
+    {
+        $this->actingAs($this->admin, 'web')
+            ->putJson('/api/admin/config/thresholds/min_erosion_rate', ['value' => 4])
+            ->assertOk()->assertJsonPath('value', '4');
+        $this->assertSame(0, \Laravel\Sanctum\PersonalAccessToken::count());
+    }
 }
