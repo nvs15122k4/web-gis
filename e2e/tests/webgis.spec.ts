@@ -19,10 +19,10 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await openMap(page);
         await openTab(page, 'layers');
         const req = page.waitForRequest((r) => /shorelines/.test(r.url()) && /year%3D2020|year=2020/i.test(r.url()));
-        await page.locator('#year-2020').check();
+        await page.locator('.tick[data-year="2020"]').click();
         await req;
         expect(await page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.years.get(2020)); })).toBe(true);
-        await page.locator('#year-2020').uncheck();
+        await page.locator('.tick[data-year="2020"]').click();
         expect(await page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.years.get(2020)); })).toBe(false);
         // lớp transect cũng bật/tắt theo checkbox
         await page.locator('#layer-transects').uncheck();
@@ -105,7 +105,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
     test('08 biên: năm không có composite → báo không có dữ liệu, không crash', { tag: ['@edge'] }, async ({ page }) => {
         const errors = await openMap(page);
         await openTab(page, 'layers');
-        await page.locator('#year-2022').click(); // ứng dụng tự bỏ chọn nên không dùng check()
+        await page.locator('.tick[data-year="2022"]').click(); // ứng dụng tự bỏ chọn nên không dùng check()
         await expect(page.locator('#status')).toContainText('Không có dữ liệu');
         await expect(page.locator('#year-2022')).not.toBeChecked();
         await page.selectOption('#compare-a', '2022');
@@ -149,7 +149,7 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         await page.click('#sidebar-toggle');
         await expect(page.locator('#sidebar')).not.toHaveClass(/collapsed/);
         await openTab(page, 'layers');
-        await page.locator('#year-2020').check();
+        await page.locator('.tick[data-year="2020"]').click();
         await expect(page.locator('#year-2020')).toBeChecked();
     });
 
