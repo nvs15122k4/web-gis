@@ -23,7 +23,7 @@ export const WMS_URL = wmsUrl;
 export const TRANSECT_LAYER = USE_WMS ? `${geoserver.workspace}:transects` : null;
 
 // Thang màu tuần tự (plasma): năm càng gần đây càng sáng, như DEA Coastlines.
-const YEAR_COLORS = ['#0d0887', '#47039f', '#7301a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#e8b800'];
+export const YEAR_COLORS = ['#0d0887', '#47039f', '#7301a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#e8b800'];
 const COMPARE_COLORS = { a: '#1f6feb', b: '#f0883e' };
 
 const hex = (c) => c.replace('#', '');
@@ -162,6 +162,8 @@ export const layers = {
     transectFilter: null,
     hotspots: L.layerGroup(),
     reference: L.layerGroup(),
+    /** Chế độ WMS: MỘT lớp chung cho mọi năm đang bật (style shoreline_by_year). */
+    shorelines: null,
     years: new Map(),
     compare: { a: null, b: null },
 };
@@ -198,8 +200,11 @@ export function initLayers(map) {
     if (!USE_WMS) prefetchShorelines(years.available);
     years.available.forEach((y) => {
         const box = document.getElementById(`year-${y}`);
-        if (box) { box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true })); }
+        if (!box) return;
+        box.checked = true;
+        if (!USE_WMS) box.dispatchEvent(new Event('change', { bubbles: true }));
     });
+    if (USE_WMS) syncWmsYears(map);
     initCompare(map);
     initHotspotFilter();
 }
@@ -229,6 +234,25 @@ function hasData(year) {
     return years.available.includes(year);
 }
 
+/**
+ * Chế độ WMS: mọi năm đang bật dùng CHUNG một lớp (style tô màu theo năm), lọc bằng CQL `year IN (...)`.
+ * Nhờ vậy lúc mở trang chỉ có một chuỗi tile thay vì mỗi năm một chuỗi (~9 lần ít yêu cầu hơn).
+ */
+function syncWmsYears(map) {
+    const on = years.all.filter((y) => document.getElementById(`year-${y}`)?.checked && hasData(y));
+    if (!on.length) {
+        if (layers.shorelines) map.removeLayer(layers.shorelines);
+        return;
+    }
+    const cql = `year IN (${on.join(',')})`;
+    if (!layers.shorelines) {
+        layers.shorelines = warnOnTileError(wms('shorelines', { styles: 'shoreline_by_year', cql_filter: cql, pane: SHORELINE_PANE }));
+    } else if (layers.shorelines.wmsParams.cql_filter !== cql) {
+        layers.shorelines.setParams({ cql_filter: cql });
+    }
+    if (!map.hasLayer(layers.shorelines)) layers.shorelines.addTo(map);
+}
+
 function initYearList(map) {
     const list = document.getElementById('year-list');
     years.all.forEach((year, i) => {
@@ -242,6 +266,11 @@ function initYearList(map) {
         list.appendChild(label);
         label.querySelector('input').addEventListener('change', (e) => {
             if (!e.target.checked) {
+                if (USE_WMS) {
+                    syncWmsYears(map);
+                    setStatus('');
+                    return;
+                }
                 const layer = layers.years.get(year);
                 if (layer) map.removeLayer(layer);
                 setStatus('');
@@ -253,6 +282,10 @@ function initYearList(map) {
                 return;
             }
             setStatus('');
+            if (USE_WMS) {
+                syncWmsYears(map);
+                return;
+            }
             if (!layers.years.has(year)) layers.years.set(year, warnOnTileError(shorelineLayer(year, YEAR_COLORS[i % YEAR_COLORS.length])));
             layers.years.get(year).addTo(map);
         });
