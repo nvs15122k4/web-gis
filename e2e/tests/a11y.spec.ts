@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { openMap, openTab } from './helpers';
+import { loginViaForm } from './helpers-journey';
 
 test.describe('Trợ năng (a11y)', () => {
     for (const path of ['/', '/gioi-thieu', '/admin']) {
         test(`Y01 ${path}: landmark chính, h1/h2 có nội dung, mọi nút/ liên kết có tên`, { tag: ['@a11y'] }, async ({ page }) => {
+            if (path === '/admin') await loginViaForm(page);
             await page.goto(path);
             await expect(page.locator('header.appbar')).toBeVisible();
             await expect(page.getByRole('navigation', { name: 'Điều hướng chính' })).toBeVisible();
@@ -92,10 +94,11 @@ test.describe('Trợ năng (a11y)', () => {
         await expect(page.locator('#hotspot-count')).toHaveAttribute('role', 'status');
     });
 
-    test('Y09 form đăng nhập: nhãn gắn với ô, thông báo role=status, autocomplete đúng', { tag: ['@a11y'] }, async ({ page }) => {
-        await page.goto('/admin');
+    test('Y09 form đăng nhập: nhãn gắn với ô, autocomplete đúng; trang admin có thông báo role=status', { tag: ['@a11y'] }, async ({ page }) => {
+        await page.goto('/dang-nhap');
         await expect(page.getByLabel('Email')).toHaveAttribute('autocomplete', 'username');
         await expect(page.getByLabel('Mật khẩu')).toHaveAttribute('autocomplete', 'current-password');
+        await loginViaForm(page);
         await expect(page.locator('#admin-message')).toHaveAttribute('role', 'status');
     });
 
@@ -105,20 +108,21 @@ test.describe('Trợ năng (a11y)', () => {
         await expect(page.locator('#inspector')).toHaveAttribute('aria-labelledby', 'inspector-title');
     });
 
-    test('Y11 tab order trong trang admin: email -> mật khẩu -> Đăng nhập', { tag: ['@a11y'] }, async ({ page }) => {
-        await page.goto('/admin');
-        await page.focus('#login-form [name=email]');
+    test('Y11 tab order trong form đăng nhập: email -> mật khẩu -> Đăng nhập', { tag: ['@a11y'] }, async ({ page }) => {
+        await page.goto('/dang-nhap');
+        await page.focus('#session-login-form [name=email]');
         await page.keyboard.press('Tab');
-        await expect(page.locator('#login-form [name=password]')).toBeFocused();
+        await expect(page.locator('#session-login-form [name=password]')).toBeFocused();
         await page.keyboard.press('Tab');
-        await expect(page.getByRole('button', { name: 'Đăng nhập' })).toBeFocused();
+        await expect(page.locator('#session-login-form').getByRole('button', { name: 'Đăng nhập' })).toBeFocused();
     });
 
     test('Y12 Enter trong form đăng nhập gửi biểu mẫu', { tag: ['@a11y'] }, async ({ page }) => {
+        await page.goto('/dang-nhap');
+        await page.fill('#session-login-form [name=email]', 'admin@webgis.test');
+        await page.fill('#session-login-form [name=password]', 'password');
+        await page.press('#session-login-form [name=password]', 'Enter');
         await page.goto('/admin');
-        await page.fill('#login-form [name=email]', 'admin@webgis.test');
-        await page.fill('#login-form [name=password]', 'password');
-        await page.press('#login-form [name=password]', 'Enter');
         await expect(page.locator('#admin-panel')).toBeVisible();
     });
 
