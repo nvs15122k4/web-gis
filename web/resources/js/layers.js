@@ -65,10 +65,19 @@ function geoJsonTransects() {
         significantOnly = flag;
         redraw();
     };
-    api.transects().then((fc) => {
-        all = fc;
-        redraw();
-    }).catch(() => setStatus(`Dữ liệu transect: ${UPDATING.toLowerCase()}.`));
+    // Lớp mặc định tắt: chỉ tải /api/transects (payload lớn nhất) khi người dùng bật lớp lần đầu.
+    let started = false;
+    layer.on('add', () => {
+        if (started) return;
+        started = true;
+        api.transects().then((fc) => {
+            all = fc;
+            redraw();
+        }).catch(() => {
+            started = false;
+            setStatus(`Dữ liệu transect: ${UPDATING.toLowerCase()}.`);
+        });
+    });
     return layer;
 }
 
