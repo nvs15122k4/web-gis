@@ -57,7 +57,7 @@ echo "→ PostGIS store ($DB)"
 store "$STORE" public
 
 echo "→ styles"
-for sld in change_class shoreline hotspot reference; do style "$sld"; done
+for sld in change_class shoreline shoreline_by_year hotspot reference; do style "$sld"; done
 
 # layer:bảng nguồn:style mặc định
 echo "→ publish layers"
