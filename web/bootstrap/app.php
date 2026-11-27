@@ -22,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Sau proxy/CDN của Vercel: chỉ tin X-Forwarded-Proto (không tin X-Forwarded-For để IP không bị giả).
         $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_PROTO);
         $middleware->redirectGuestsTo('/dang-nhap');
+        // Trang /admin gọi API bằng phiên đăng nhập hiện có (cookie + CSRF), không cần token.
+        $middleware->statefulApi();
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
         ]);
