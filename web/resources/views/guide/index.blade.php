@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     @include('partials.head', ['title' => 'Hướng dẫn sử dụng — WebGIS Sông Hậu', 'description' => 'Cách xem bản đồ, chọn năm, đọc tốc độ biến động và hotspot sạt lở trên WebGIS Sông Hậu.'])
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/back-to-top.js'])
 </head>
 <body class="page">
 @include('partials.nav')
@@ -37,7 +37,7 @@
 <article class="doc">
 
     <section id="bat-dau">
-        <h2>@include('partials.icon', ['name' => 'compass', 'class' => 'ico h-ico']) Bắt đầu</h2>
+        <h2>Bắt đầu</h2>
         <ol class="steps" role="list">
             <li>Mở trang <a href="/">Bản đồ</a>. Bản đồ tự căn khung vào đoạn sông Hậu thuộc xã Bình Mỹ; bạn vẫn kéo và thu phóng tự do.</li>
             <li>Bảng điều khiển bên trái có bốn thẻ: <strong>Tổng quan</strong>, <strong>Lớp dữ liệu</strong>, <strong>Hotspot</strong>
@@ -48,13 +48,13 @@
     </section>
 
     <section id="tong-quan">
-        <h2>@include('partials.icon', ['name' => 'chart', 'class' => 'ico h-ico']) Thẻ Tổng quan</h2>
+        <h2>Thẻ Tổng quan</h2>
         <p>Tóm tắt số lượng transect theo từng mức biến động (bồi, ổn định, lùi nhẹ, lùi mạnh) và các chỉ số chung của toàn đoạn bờ.
             Khi dữ liệu chưa sẵn sàng, mục tương ứng ghi <em>Đang cập nhật</em> thay vì hiện số giả.</p>
     </section>
 
     <section id="lop-du-lieu">
-        <h2>@include('partials.icon', ['name' => 'layers', 'class' => 'ico h-ico']) Thẻ Lớp dữ liệu</h2>
+        <h2>Thẻ Lớp dữ liệu</h2>
         <ul>
             <li><strong>Transect</strong> — các mặt cắt vuông góc với bờ, tô màu theo mức biến động. Bật <em>Chỉ transect có ý nghĩa thống kê (95%)</em> để ẩn những mặt cắt chưa đủ cơ sở kết luận.</li>
             <li><strong>Hotspot lùi bờ mạnh</strong> — đoạn bờ gộp từ các transect lùi mạnh liên tiếp.</li>
@@ -64,7 +64,7 @@
     </section>
 
     <section id="transect">
-        <h2>@include('partials.icon', ['name' => 'ruler', 'class' => 'ico h-ico']) Xem chi tiết một transect</h2>
+        <h2>Xem chi tiết một transect</h2>
         <ol class="steps" role="list">
             <li>Phóng to bản đồ rồi bấm vào một transect.</li>
             <li>Thẻ chi tiết hiện các chỉ số <strong>NSM</strong>, <strong>EPR</strong>, <strong>LRR</strong>, <strong>R²</strong>, độ bất định,
@@ -76,19 +76,19 @@
     </section>
 
     <section id="hotspot">
-        <h2>@include('partials.icon', ['name' => 'alert', 'class' => 'ico h-ico']) Thẻ Hotspot</h2>
+        <h2>Thẻ Hotspot</h2>
         <p>Nhập tốc độ lùi tối thiểu (m/năm) rồi bấm <strong>Lọc</strong> để chỉ giữ các đoạn bờ lùi nhanh hơn ngưỡng đó. Bấm một đoạn
             trong danh sách để bản đồ phóng tới đoạn ấy. Ngưỡng mặc định do quản trị viên đặt.</p>
     </section>
 
     <section id="so-sanh">
-        <h2>@include('partials.icon', ['name' => 'layers', 'class' => 'ico h-ico']) So sánh hai năm</h2>
+        <h2>So sánh hai năm</h2>
         <p>Trong thẻ Lớp dữ liệu, chọn <strong>Năm A</strong> và <strong>Năm B</strong> rồi bấm <strong>So sánh</strong>; hai đường bờ được vẽ
             bằng hai màu khác nhau. Bấm <strong>Bỏ so sánh</strong> để quay lại.</p>
     </section>
 
     <section id="chia-se">
-        <h2>@include('partials.icon', ['name' => 'link', 'class' => 'ico h-ico']) Chia sẻ và tải dữ liệu</h2>
+        <h2>Chia sẻ và tải dữ liệu</h2>
         <ul>
             <li><strong>Sao chép liên kết</strong> (thẻ Chia sẻ) giữ nguyên vị trí, mức phóng và transect đang chọn; gửi liên kết cho người khác là họ thấy đúng khung nhìn của bạn.</li>
             <li>Mục <strong>Tải dữ liệu</strong> cho phép tải bốn lớp (transect, đường bờ, hotspot, sạt lở tham chiếu) dạng GeoJSON hoặc CSV, hệ toạ độ EPSG:4326.</li>
@@ -96,7 +96,7 @@
     </section>
 
     <section id="doc-ket-qua">
-        <h2>@include('partials.icon', ['name' => 'check', 'class' => 'ico h-ico']) Đọc kết quả cho đúng</h2>
+        <h2>Đọc kết quả cho đúng</h2>
         <div class="table-wrap"><table>
             <tr><th>Màu / mức</th><th>Ý nghĩa</th></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-accretion)"></span> Bồi</td><td>Bờ tiến ra sông, có ý nghĩa thống kê.</td></tr>
@@ -109,7 +109,7 @@
     </section>
 
     <section id="ban-phim">
-        <h2>@include('partials.icon', ['name' => 'keyboard', 'class' => 'ico h-ico']) Bàn phím và hỗ trợ tiếp cận</h2>
+        <h2>Bàn phím và hỗ trợ tiếp cận</h2>
         <ul>
             <li>Bấm <kbd>Tab</kbd> ngay khi mở trang để hiện liên kết <em>Bỏ qua điều hướng, đến nội dung chính</em>.</li>
             <li>Các thẻ trong bảng điều khiển chuyển bằng phím mũi tên trái/phải.</li>
@@ -118,7 +118,7 @@
     </section>
 
     <section id="hoi-dap">
-        <h2>@include('partials.icon', ['name' => 'help', 'class' => 'ico h-ico']) Hỏi đáp</h2>
+        <h2>Hỏi đáp</h2>
         <dl class="defs">
             <dt>Vì sao một số năm bị mờ?</dt><dd>Năm đó không có ảnh vệ tinh hợp lệ (mây, thiếu cảnh), nên không có đường bờ.</dd>
             <dt>Vì sao hiện “Đang cập nhật”?</dt><dd>Dữ liệu lớp đó chưa được nạp hoặc dịch vụ chưa sẵn sàng; hãy thử lại sau.</dd>
@@ -143,5 +143,6 @@
         byId.forEach((_, id) => document.getElementById(id) && io.observe(document.getElementById(id)));
     })();
 </script>
+@include('partials.back-to-top')
 </body>
 </html>
