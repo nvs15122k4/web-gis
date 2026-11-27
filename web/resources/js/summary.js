@@ -75,6 +75,27 @@ export async function loadSummary(onSelectTransect) {
     }));
 }
 
+/**
+ * Biểu đồ nằm dưới màn hình đầu của bảng tổng quan: chỉ tải chart.js (~200 KB) khi nó sắp hiện ra,
+ * để không tranh băng thông với bản đồ lúc mở trang. Không có IntersectionObserver thì vẽ ngay như trước.
+ */
+function renderChartWhenVisible(canvas, stats) {
+    const draw = async () => {
+        const { renderYearlyChart } = await import('./chart');
+        renderYearlyChart(canvas, stats);
+    };
+    if (!canvas || typeof IntersectionObserver === 'undefined') {
+        draw();
+        return;
+    }
+    const io = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        draw();
+    }, { rootMargin: '200px' });
+    io.observe(canvas);
+}
+
 /** Biểu đồ + bảng thống kê theo năm (tổng hợp từ khoảng cách baseline → bờ của từng transect). */
 async function loadYearly(body) {
     let stats;
@@ -85,8 +106,7 @@ async function loadYearly(body) {
         body.querySelector('#yearly-table').innerHTML = `<p class="updating">Thống kê theo năm: ${UPDATING.toLowerCase()}.</p>`;
         return;
     }
-    const { renderYearlyChart } = await import('./chart');
-    renderYearlyChart(body.querySelector('#yearly-chart'), stats);
+    renderChartWhenVisible(body.querySelector('#yearly-chart'), stats);
     const sign = (v) => (v === null ? '—' : `${v > 0 ? '+' : ''}${v.toFixed(1)}`);
     body.querySelector('#yearly-table').innerHTML = `<table class="mini-table"><thead><tr><th>Năm</th><th>Δ năm (m)</th><th>Tích luỹ (m)</th><th>Lùi</th><th>Bồi</th></tr></thead><tbody>${stats
         .map((r) => `<tr><td>${r.year}</td><td class="num">${sign(r.mean_delta_m)}</td><td class="num">${sign(r.cumulative_m)}</td><td class="num">${r.mean_delta_m === null ? '—' : r.eroding}</td><td class="num">${r.mean_delta_m === null ? '—' : r.accreting}</td></tr>`)
