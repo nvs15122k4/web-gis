@@ -71,7 +71,7 @@
 /* ---- popup thuộc tính ---- */
 .feature-popup table { border-collapse: collapse; margin: 4px 0; font-size: var(--fs-sm); }
 .feature-popup th { text-align: left; font-weight: 500; color: var(--ink-3); padding: 1px 12px 1px 0; }
-.feature-popup td { font-family: var(--mono); }
+.feature-popup td { font-variant-numeric: tabular-nums; }
 .feature-popup small { color: var(--ink-3); }
 
 /* ---- quản trị: bản đồ + bảng liên kết ---- */
@@ -98,7 +98,7 @@ body.page main.admin.admin-split { justify-items: stretch; align-content: stretc
 .status-grid dt, .status-grid dd { padding: 6px 0; border-bottom: 1px solid var(--line); }
 .status-grid dt:nth-last-of-type(1), .status-grid dd:last-of-type { border-bottom: 0; }
 .status-grid dt { padding-right: 12px; color: var(--ink-3); }
-.status-grid dd { margin: 0; font-family: var(--mono); text-align: right; }
+.status-grid dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
 @media (max-width: 860px) {
     body.page main.admin.admin-split { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 70vh; height: auto; }
     .admin-side { border-right: 0; border-bottom: 1px solid var(--ink); }
