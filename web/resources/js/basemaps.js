@@ -104,8 +104,9 @@ function vectorVietnam() {
         + '&copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>' };
     group.detail = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, pane: DETAIL_PANE });
     const load = (url) => fetch(url).then((r) => r.json());
+    // Chỉ tải ~750 KB GeoJSON khi nền này thật sự được bật lần đầu (không tải khi người dùng đang dùng nền khác).
     // Tải đồng thời rồi thêm theo thứ tự: nước -> tỉnh -> sông/hồ -> nhãn, để lớp sau luôn nằm trên lớp trước.
-    Promise.all([
+    const start = () => Promise.all([
         load('/data/basemap_vn.geojson'),
         load('/data/tinh_vn.geojson').catch(() => null),
         load('/data/ho_vn.geojson').catch(() => null),
@@ -129,6 +130,7 @@ function vectorVietnam() {
             group.syncDetail();
         })
         .catch((e) => console.warn('Không tải được nền vector Việt Nam.', e));
+    group.once('add', start);
     return group;
 }
 
