@@ -11,11 +11,11 @@
 
 /* ---- thẻ chức năng: dải chữ, không biểu tượng ---- */
 .rail {
-    order: 1; flex: none; display: flex; gap: 16px; padding: 0 20px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--ink);
+    order: 1; flex: none; display: flex; gap: 16px; padding: 0 20px; overflow-x: auto; scrollbar-width: none; border-bottom: 3px solid var(--ink);
 }
 .rail .tab {
-    position: relative; display: inline-flex; align-items: center; margin-bottom: -1px; padding: 9px 0 8px;
-    border: 0; border-bottom: 2px solid transparent; background: none; cursor: pointer;
+    position: relative; display: inline-flex; align-items: center; margin-bottom: -3px; padding: 9px 0 8px;
+    border: 0; border-bottom: 3px solid transparent; background: none; cursor: pointer;
     color: var(--ink-3); font: 500 var(--fs-md) var(--font); white-space: nowrap;
 }
 .rail .tab svg { display: none; }
