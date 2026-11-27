@@ -15,14 +15,8 @@
         <p class="lead">Web chỉ đọc: kết quả do pipeline tính sẵn. Tài khoản admin chỉ chỉnh ngưỡng hiển thị hotspot.</p>
         <p id="admin-message" role="status"></p>
 
-        <form id="login-form">
-            <label>Email <input type="email" name="email" autocomplete="username" required></label>
-            <label>Mật khẩu <input type="password" name="password" autocomplete="current-password" required></label>
-            <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
-        </form>
-
-        <section id="admin-panel" hidden>
-            <div class="admin-user"><span>Đăng nhập: <strong id="admin-user"></strong></span> <button type="button" class="btn btn-ghost" id="logout">Đăng xuất</button></div>
+        <section id="admin-panel">
+            <div class="admin-user"><span>Đăng nhập: <strong id="admin-user">{{ auth()->user()->email }} ({{ auth()->user()->role }})</strong></span></div>
             <h2 class="section-title">Ngưỡng hiển thị</h2>
             <div id="thresholds"></div>
             <h2 class="section-title">Quản lý lớp bản đồ</h2>

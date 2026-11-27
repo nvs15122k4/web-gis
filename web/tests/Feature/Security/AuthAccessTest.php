@@ -297,4 +297,16 @@ class AuthAccessTest extends TestCase
         $this->withToken($t)->getJson('/api/admin/config/thresholds/min_erosion_rate')->assertStatus(405);
         $this->withToken($t)->getJson('/api/admin/users')->assertNotFound();
     }
+
+    public function test_session_admin_can_update_via_api_after_real_web_login(): void
+    {
+        $this->post('/dang-nhap', ['email' => 'admin@webgis.test', 'password' => 'password'])->assertRedirect();
+        // Trang /admin gọi API bằng cookie phiên (Sanctum stateful), không dùng token.
+        $this->putJson(self::URL, ['value' => 2], ['Referer' => 'http://localhost:8000/admin'])->assertOk();
+    }
+
+    public function test_session_viewer_is_forbidden_on_admin_api(): void
+    {
+        $this->actingAs(User::where('email', 'viewer@webgis.test')->first(), 'web')->putJson(self::URL, ['value' => 2])->assertForbidden();
+    }
 }

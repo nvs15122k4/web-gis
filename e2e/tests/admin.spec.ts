@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { ADMIN, VIEWER, THRESHOLD_KEY, loginViaForm, putThreshold, readThreshold } from './helpers-journey';
+import { ADMIN, VIEWER, THRESHOLD_KEY, loginViaForm, sessionLogin, putThreshold, readThreshold } from './helpers-journey';
 import { openMap, openTab } from './helpers';
 
 // Mỗi test sửa ngưỡng đều khôi phục về giá trị gốc đã đọc trước đó, kể cả khi test fail.
@@ -26,8 +26,8 @@ test.describe('Quản trị ngưỡng', () => {
         await page.click(`.threshold-form[data-key=${THRESHOLD_KEY}] button`);
         await expect(page.locator('#admin-message')).toHaveText(`Đã cập nhật ${THRESHOLD_KEY} = 3.5.`);
         expect(Number(await readThreshold(request))).toBe(3.5);
-        await page.reload(); // token ở sessionStorage nhưng form hiện lại -> đăng nhập lại
-        await loginViaForm(page);
+        await page.reload(); // phiên đăng nhập còn nguyên: panel hiện lại, không phải đăng nhập lại
+        await expect(page.locator('#admin-panel')).toBeVisible();
         await expect(page.locator(`.threshold-form[data-key=${THRESHOLD_KEY}] input[name=value]`)).toHaveValue('3.5');
     });
 
@@ -104,11 +104,41 @@ test.describe('Quản trị ngưỡng', () => {
         expect(errors.filter((e) => !/arcgisonline|ERR_|Failed to load resource/i.test(e))).toEqual([]);
     });
 
-    test('AD11 đăng xuất xoá token, tải lại /admin hiện lại form đăng nhập', { tag: ['@happy'] }, async ({ page }) => {
+    test('AD11 đăng xuất bằng nút ở menu: /admin chuyển về /dang-nhap, không còn form hay token nhúng', { tag: ['@happy'] }, async ({ page }) => {
         await loginViaForm(page);
-        await page.click('#logout');
-        await expect(page.locator('#login-form')).toBeVisible();
+        await expect(page.locator('#login-form')).toHaveCount(0);
+        await expect(page.locator('#logout')).toHaveCount(0);
+        await page.click('.nav-logout button');
+        await page.goto('/admin');
+        await expect(page).toHaveURL(/\/dang-nhap$/);
         expect(await page.evaluate(() => sessionStorage.getItem('webgis_admin_token'))).toBeNull();
+    });
+
+    test('AD16 khách vào /admin bị chuyển tới /dang-nhap, menu không có "Quản trị"', { tag: ['@negative', '@security'] }, async ({ page }) => {
+        await page.goto('/admin');
+        await expect(page).toHaveURL(/\/dang-nhap$/);
+        await expect(page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Quản trị' })).toHaveCount(0);
+    });
+
+    test('AD17 viewer vào /admin bị 403 và menu không có "Quản trị"', { tag: ['@negative', '@security'] }, async ({ page }) => {
+        await sessionLogin(page, VIEWER);
+        const res = await page.goto('/admin');
+        expect(res!.status()).toBe(403);
+        await page.goto('/');
+        await expect(page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Quản trị' })).toHaveCount(0);
+    });
+
+    test('AD18 admin đăng nhập: menu có "Quản trị", sửa ngưỡng bằng phiên (cookie + CSRF), không gửi Bearer', { tag: ['@happy', '@security'] }, async ({ page }) => {
+        await sessionLogin(page);
+        await expect(page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Quản trị' })).toBeVisible();
+        await page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Quản trị' }).click();
+        const put = page.waitForRequest((r) => r.method() === 'PUT' && r.url().includes('/api/admin/config/thresholds/'));
+        await page.locator(`.threshold-form[data-key=${THRESHOLD_KEY}] input[name=value]`).fill('2.5');
+        await page.click(`.threshold-form[data-key=${THRESHOLD_KEY}] button`);
+        const headers = (await put).headers();
+        expect(headers['x-xsrf-token']).toBeTruthy();
+        expect(headers['authorization']).toBeUndefined();
+        await expect(page.locator('#admin-message')).toHaveText(`Đã cập nhật ${THRESHOLD_KEY} = 2.5.`);
     });
 
     test('AD12 token đã đăng xuất / giả không sửa được ngưỡng (401)', { tag: ['@negative', '@security'] }, async ({ request }) => {

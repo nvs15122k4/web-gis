@@ -13,7 +13,10 @@ class PagesTest extends TestCase
 
     public function test_admin_page_renders(): void
     {
-        $this->get('/admin')->assertOk()->assertSee('id="login-form"', false);
+        $admin = \App\Models\User::where('email', 'admin@webgis.test')->first();
+        $this->actingAs($admin)->get('/admin')->assertOk()
+            ->assertSee('id="admin-panel"', false)
+            ->assertSee('admin@webgis.test (admin)', false);
     }
 
     public function test_about_page_renders_methodology(): void

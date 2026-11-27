@@ -1,20 +1,27 @@
 import { get } from './api';
 
-const TOKEN_KEY = 'webgis_admin_token';
 const $ = (id) => document.getElementById(id);
 const message = (text, ok = false) => {
     $('admin-message').textContent = text;
     $('admin-message').className = ok ? 'msg-ok' : 'msg-error';
 };
 
+/** Sanctum stateful: CSRF token nằm trong cookie XSRF-TOKEN (đã mã hoá URL), gửi lại qua header. */
+const readCookie = (name) => {
+    const m = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return m ? decodeURIComponent(m[1]) : null;
+};
+
 async function request(path, options = {}) {
-    const token = sessionStorage.getItem(TOKEN_KEY);
+    const xsrf = readCookie('XSRF-TOKEN');
     const res = await fetch(`/api${path}`, {
+        credentials: 'same-origin',
         ...options,
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            'X-Requested-With': 'XMLHttpRequest',
+            ...(xsrf ? { 'X-XSRF-TOKEN': xsrf } : {}),
         },
     });
     return { res, body: await res.json().catch(() => ({})) };
@@ -96,28 +103,6 @@ async function renderLayers() {
     });
 }
 
-function showPanel(user) {
-    $('login-form').hidden = true;
-    $('admin-panel').hidden = false;
-    $('admin-user').textContent = `${user.email} (${user.role})`;
-    renderThresholds();
-    renderLayers();
-}
-
-$('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.target));
-    const { res, body } = await request('/auth/login', { method: 'POST', body: JSON.stringify(data) });
-    if (!res.ok) {
-        message(body.message ?? 'Đăng nhập thất bại.');
-        return;
-    }
-    sessionStorage.setItem(TOKEN_KEY, body.token);
-    message('Đăng nhập thành công.', true);
-    showPanel(body.user);
-});
-
-$('logout').addEventListener('click', () => {
-    sessionStorage.removeItem(TOKEN_KEY);
-    location.reload();
-});
+// Trang chỉ vào được khi đã đăng nhập bằng phiên với quyền admin: nạp cấu hình ngay.
+renderThresholds();
+renderLayers();

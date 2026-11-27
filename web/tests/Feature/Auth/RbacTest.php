@@ -89,4 +89,42 @@ class RbacTest extends TestCase
         $this->getJson(self::URL, $h)->assertStatus(405);
         $this->deleteJson(self::URL, [], $h)->assertStatus(405);
     }
+
+    public function test_admin_page_guest_redirects_to_login(): void
+    {
+        $this->get('/admin')->assertRedirect('/dang-nhap');
+    }
+
+    public function test_admin_page_viewer_gets_403(): void
+    {
+        $viewer = User::where('email', 'viewer@webgis.test')->first();
+        $this->actingAs($viewer)->get('/admin')->assertForbidden();
+    }
+
+    public function test_admin_page_admin_gets_200_without_embedded_login_form(): void
+    {
+        $admin = User::where('email', 'admin@webgis.test')->first();
+        $this->actingAs($admin)->get('/admin')->assertOk()
+            ->assertDontSee('id="login-form"', false)
+            ->assertDontSee('id="logout"', false);
+    }
+
+    public function test_bearer_token_does_not_open_admin_page(): void
+    {
+        $this->get('/admin', $this->bearer('admin@webgis.test'))->assertRedirect('/dang-nhap');
+    }
+
+    public function test_session_login_then_back_to_admin_page(): void
+    {
+        $this->get('/admin')->assertRedirect('/dang-nhap');
+        $this->post('/dang-nhap', ['email' => 'admin@webgis.test', 'password' => 'password'])->assertRedirect('/admin');
+        $this->get('/admin')->assertOk();
+    }
+
+    public function test_nav_shows_admin_link_only_for_admin(): void
+    {
+        $this->get('/')->assertDontSee('href="/admin"', false);
+        $this->actingAs(User::where('email', 'viewer@webgis.test')->first())->get('/')->assertDontSee('href="/admin"', false);
+        $this->actingAs(User::where('email', 'admin@webgis.test')->first())->get('/')->assertSee('href="/admin"', false);
+    }
 }
