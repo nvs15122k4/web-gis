@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { pickActive, initSteps } from '../../resources/js/steps.js';
+import { pickActive, initSteps, initZoom } from '../../resources/js/steps.js';
 
 function mk(rects) {
     document.body.innerHTML = '<ol class="step-list">' + rects.map(() => '<li class="step"></li>').join('') + '</ol>';
@@ -33,5 +33,19 @@ describe('steps', () => {
         document.body.innerHTML = '';
         expect(typeof initSteps(document)).toBe('function');
         expect(document.documentElement.classList.contains('steps-js')).toBe(false);
+    });
+
+    it('initZoom: bấm ảnh mở hộp thoại với ảnh và chú thích, bấm nền thì đóng', () => {
+        document.body.innerHTML = '<figure class="step-fig"><img src="/a.webp" alt="Mô tả"><figcaption>Chú thích</figcaption></figure>';
+        const off = initZoom(document);
+        document.querySelector('.step-fig img').click();
+        const dlg = document.querySelector('dialog.img-zoom');
+        expect(dlg.hasAttribute('open')).toBe(true);
+        expect(dlg.querySelector('img').getAttribute('alt')).toBe('Mô tả');
+        expect(dlg.querySelector('.img-zoom-cap').textContent).toBe('Chú thích');
+        dlg.click();
+        expect(dlg.hasAttribute('open')).toBe(false);
+        off();
+        expect(document.querySelector('dialog.img-zoom')).toBeNull();
     });
 });

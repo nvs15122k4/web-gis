@@ -14,10 +14,14 @@ a { color: var(--accent-ink); text-underline-offset: 2px; }
 a:hover { color: var(--accent-hover); }
 code, kbd { font: 12px var(--mono); padding: 0 3px; background: var(--surface-2); border-bottom: 1px solid var(--line-strong); }
 /* chỉ áp cho icon giao diện, không đụng tới SVG vẽ lớp vector của Leaflet */
-:where(.appbar, .sidebar, .inspector, .legend, .timeline, .page-nav, .btn) svg {
+:where(.appbar, .sidebar, .inspector, .legend, .timeline, .page-nav, .btn, .ico) svg,
+svg.ico {
     width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75;
     stroke-linecap: round; stroke-linejoin: round; flex: none;
 }
+/* icon cạnh tiêu đề mục và mục danh sách ở các trang ngoài bản đồ */
+svg.h-ico { width: .8em; height: .8em; margin-right: .4em; vertical-align: -.06em; color: var(--accent-ink); }
+svg.idx-ico { width: 18px; height: 18px; margin-right: 8px; vertical-align: -3px; color: var(--accent-ink); }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 [hidden] { display: none !important; }
 .skip-link {

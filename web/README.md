@@ -42,7 +42,7 @@ Khung nhìn neo vào phạm vi đề tài (đoạn sông Hậu – xã Bình M�
 
 ```bash
 php artisan migrate            # bảng ứng dụng + 7 bảng PostGIS + view transects_styled (MySQL nếu DB_CONNECTION=mysql, ngược lại cùng Postgres)
-php artisan db:seed            # admin@webgis.test / password + ngưỡng mặc định (đổi mật khẩu khi triển khai thật)
+php artisan db:seed            # ngưỡng mặc định + tài khoản demo từ DEMO_* trong .env (xem README gốc, mục Tài khoản kiểm thử)
 ```
 
 Nạp output pipeline (thư mục GeoJSON: `baseline`, `shorelines`, `transects`, `hotspots`, `reference` — định dạng
@@ -111,7 +111,7 @@ Sản phẩm chạy với **một** CSDL Supabase Postgres + PostGIS (kết nố
 **Supabase**
 1. Tạo project, vào *Database > Extensions* bật `postgis` (hoặc để migration tự `CREATE EXTENSION`).
 2. *Project Settings > Database > Connection pooling*: lấy host/user của pooler **Transaction**, cổng **6543** (`DB_PGSQL_HOST`, `DB_PGSQL_USERNAME` dạng `postgres.<ref>`, `DB_PGSQL_PASSWORD`).
-3. Migrate/seed một lần từ máy cá nhân với `.env` trỏ tới Supabase: `php artisan migrate --force && php artisan db:seed --force`, rồi `php artisan webgis:import ../pipeline/output`. Đổi mật khẩu `admin@webgis.test` ngay sau khi seed.
+3. Migrate/seed một lần từ máy cá nhân với `.env` trỏ tới Supabase: `php artisan migrate --force && php artisan db:seed --force`, rồi `php artisan webgis:import ../pipeline/output`. Trên môi trường thật, chỉ đặt `DEMO_*` trong `.env` khi cần tài khoản demo và dùng mật khẩu mạnh; `DatabaseSeeder` không tạo `admin@webgis.test` khi `APP_ENV=production`.
 4. Khác biệt so với MySQL: tìm email/khóa ngưỡng phân biệt hoa thường.
 
 **Vercel** (import repo GitHub, *Root Directory* = `web`, nhánh production = `main`). Build dùng `npm run build`; runtime PHP là `vercel-php` (khai trong `vercel.json`); session/cache/log đã đặt `cookie`/`array`/`stderr`. Biến môi trường cần nhập (*Settings > Environment Variables*):

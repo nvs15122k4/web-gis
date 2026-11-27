@@ -88,7 +88,7 @@ class AboutStepsTest extends TestCase
         $this->assertSame(11, substr_count($html, '<summary>Chi tiết kỹ thuật</summary>'));
         // đóng sẵn (không có thuộc tính open) và không ẩn bằng hidden/display: nội dung có trong HTML thuần
         $this->assertStringNotContainsString('<details class="step-more" open', $html);
-        foreach (['Đầu vào và đầu ra', 'Thông số', 'Công thức, thuật toán', 'Kiểm tra chất lượng'] as $label) {
+        foreach (['Đầu vào và đầu ra', 'Thông số', 'Thuật toán', 'Kiểm tra chất lượng'] as $label) {
             $this->assertSame(11, substr_count($html, '<dt>'.$label.'</dt>'), $label);
         }
         $this->assertStringNotContainsString('role="button"', $html);
@@ -207,9 +207,12 @@ class AboutStepsTest extends TestCase
         $this->assertStringContainsString('(g - nir) / (g + nir)', $s2);
         $this->assertStringContainsString('(g - sw1) / (g + sw1)', $s2);
         $this->assertStringContainsString('4 * (g - sw1) - (0.25 * nir + 2.75 * sw2)', $s2);
-        $this->assertStringContainsString('NDWI = (B03 − B08) / (B03 + B08)', $text);
-        $this->assertStringContainsString('MNDWI = (B03 − B11) / (B03 + B11)', $text);
-        $this->assertStringContainsString('4(B03 − B11) − (0,25·B08 + 2,75·B12)', $text);
+        // công thức trình bày bằng MathML: phân số có tử và mẫu riêng, không viết một dòng dùng dấu /
+        $html = $this->page();
+        $this->assertStringContainsString('<mi>NDWI</mi><mo>=</mo><mfrac><mrow><mi>B03</mi><mo>−</mo><mi>B08</mi></mrow><mrow><mi>B03</mi><mo>+</mo><mi>B08</mi></mrow></mfrac>', $html);
+        $this->assertStringContainsString('<mi>MNDWI</mi><mo>=</mo><mfrac><mrow><mi>B03</mi><mo>−</mo><mi>B11</mi></mrow><mrow><mi>B03</mi><mo>+</mo><mi>B11</mi></mrow></mfrac>', $html);
+        $this->assertStringContainsString('<mn>4</mn><mo>(</mo><mi>B03</mi><mo>−</mo><mi>B11</mi><mo>)</mo><mo>−</mo><mo>(</mo><mn>0,25</mn><mo>·</mo><mi>B08</mi><mo>+</mo><mn>2,75</mn><mo>·</mo><mi>B12</mi><mo>)</mo>', $html);
+        $this->assertStringNotContainsString('(B03 − B08) / (B03 + B08)', $text);
         $this->assertStringContainsString('ANALYSIS_BUFFER = 1000', $s2);
         $this->assertStringContainsString('đệm 1.000 m', $text);
     }

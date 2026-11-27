@@ -9,12 +9,15 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Tài khoản admin mặc định cho môi trường phát triển — đổi mật khẩu khi triển khai thật.
-        User::updateOrCreate(
-            ['email' => 'admin@webgis.test'],
-            ['name' => 'Admin', 'password' => 'password', 'role' => 'admin']
-        );
+        // Admin mật khẩu mặc định chỉ để chạy test/E2E và máy phát triển; môi trường production không tạo.
+        if (! app()->isProduction()) {
+            User::updateOrCreate(
+                ['email' => 'admin@webgis.test'],
+                ['name' => 'Admin', 'password' => 'password', 'role' => 'admin']
+            );
+        }
 
+        $this->call(DemoAccountsSeeder::class);
         $this->call(ThresholdConfigSeeder::class);
     }
 }

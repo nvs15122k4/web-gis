@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Giới thiệu &amp; phương pháp — WebGIS Sông Hậu</title>
+    @include('partials.head', ['title' => 'Giới thiệu & phương pháp — WebGIS Sông Hậu', 'description' => 'Phương pháp DSAS và nguồn ảnh Sentinel-2 dùng để giám sát biến động bờ sông Hậu, xã Bình Mỹ.'])
     @vite(['resources/css/app.css', 'resources/js/steps.js'])
 </head>
 <body class="page">
@@ -42,14 +40,14 @@
 
 
     <section id="muc-tieu">
-        <h2>Mục tiêu</h2>
+        <h2>@include('partials.icon', ['name' => 'target', 'class' => 'ico h-ico']) Mục tiêu</h2>
         <p>Xác định các đoạn bờ có xu hướng lùi bờ mạnh kèm độ bất định, và đối chiếu với các sự kiện sạt lở đã công bố tại
             Bình Mỹ giai đoạn 2019–2020 (ảnh hưởng tuyến Quốc lộ 91). Hệ thống hỗ trợ khoanh vùng ưu tiên khảo sát thực địa,
             không thay thế khảo sát thực địa.</p>
     </section>
 
     <section id="du-lieu">
-        <h2>Dữ liệu</h2>
+        <h2>@include('partials.icon', ['name' => 'database', 'class' => 'ico h-ico']) Dữ liệu</h2>
         <div class="table-wrap"><table>
             <tr><th>Lớp</th><th>Nội dung</th><th>Trạng thái</th></tr>
             <tr><td>Ảnh vệ tinh</td><td>Composite Sentinel-2 L2A mùa khô (tháng 1–3) mỗi năm, lọc mây theo lớp SCL; xử lý trong pipeline, không phát lên web</td><td>Đã xử lý (pipeline)</td></tr>
@@ -62,7 +60,7 @@
     </section>
 
     <section id="phuong-phap">
-        <h2>Phương pháp phân tích biến động (kiểu DSAS)</h2>
+        <h2>@include('partials.icon', ['name' => 'ruler', 'class' => 'ico h-ico']) Phương pháp phân tích biến động (kiểu DSAS)</h2>
         <ol>
             <li>Dựng một <strong>baseline</strong> song song xu hướng bờ sông và sinh các <strong>transect</strong> vuông góc, cách đều.</li>
             <li>Tại mỗi transect, đo <strong>khoảng cách baseline → đường bờ</strong> cho từng năm. Năm không có composite hợp lệ
@@ -80,7 +78,7 @@
     </section>
 
     <section id="phan-loai">
-        <h2>Tiêu chí phân loại mức biến động (Mục 2.5 đề cương)</h2>
+        <h2>@include('partials.icon', ['name' => 'list', 'class' => 'ico h-ico']) Tiêu chí phân loại mức biến động (Mục 2.5 đề cương)</h2>
         <p>Các tiêu chí dưới đây được chốt trước khi chạy lại pipeline và không điều chỉnh theo kết quả. Transect có xu hướng biến động thực sự khi <strong>|LRR| &gt; t × SE(LRR)</strong>, với t là hệ số phân phối Student (hai phía, độ tin cậy 95%, bậc tự do n − 2 của từng transect; chuỗi 9 năm có t = 2,365), tức khoảng tin cậy 95% của LRR không chứa 0.</p>
         <div class="table-wrap"><table>
             <tr><th>Mức</th><th>Điều kiện</th></tr>
@@ -95,18 +93,26 @@
     </section>
 
     <section id="bat-dinh">
-        <h2>Độ bất định</h2>
-        <p class="formula">U<sub>shoreline</sub> = √(U<sub>pixel</sub>² + U<sub>georef</sub>² + U<sub>classify</sub>²), với U<sub>pixel</sub> = 5 m
+        <h2>@include('partials.icon', ['name' => 'chart', 'class' => 'ico h-ico']) Độ bất định</h2>
+        <math display="block" class="eq-math">
+            <msub><mi>U</mi><mi mathvariant="normal">shoreline</mi></msub><mo>=</mo>
+            <msqrt><msup><msub><mi>U</mi><mi mathvariant="normal">pixel</mi></msub><mn>2</mn></msup><mo>+</mo><msup><msub><mi>U</mi><mi mathvariant="normal">georef</mi></msub><mn>2</mn></msup><mo>+</mo><msup><msub><mi>U</mi><mi mathvariant="normal">classify</mi></msub><mn>2</mn></msup></msqrt>
+        </math>
+        <math display="block" class="eq-math">
+            <msub><mi>U</mi><mi mathvariant="normal">EPR</mi></msub><mo>=</mo>
+            <mfrac><mrow><mn>1,96</mn><mo>·</mo><msqrt><msup><mrow><mi>U</mi><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mrow><mi>U</mi><mo>(</mo><msub><mi>t</mi><mn>2</mn></msub><mo>)</mo></mrow><mn>2</mn></msup></msqrt></mrow><mrow><mo>|</mo><msub><mi>t</mi><mn>2</mn></msub><mo>−</mo><msub><mi>t</mi><mn>1</mn></msub><mo>|</mo></mrow></mfrac>
+        </math>
+        <p class="formula">Trong đó U<sub>pixel</sub> = 5 m
             (nửa pixel 10 m), U<sub>georef</sub> theo thông số ESA, U<sub>classify</sub> = RMSE so với đường bờ số hóa thủ công.
             Mọi thành phần quy về cùng chuẩn 1σ: U<sub>georef</sub> = 12 m ở độ tin cậy 95,5% (2σ) nên dùng 6 m (1σ).
-            Độ bất định LRR (95%) = t × SE(LRR); độ bất định EPR (95%) = 1,96 × √(U(t1)² + U(t2)²) / |t2 − t1|.
+            Độ bất định LRR (95%) = t × SE(LRR); độ bất định EPR (95%) là công thức thứ hai ở trên.
             Năm không có ground truth dùng U<sub>classify</sub> lớn nhất đã đo (20 m); 
             U<sub>pixel</sub> lấy theo nửa pixel (Vos và cs. 2019), U<sub>georef</sub> theo đặc tả định vị của ESA và Clerc và cs.; công thức gộp từng đường bờ,
             phép quy 12 m (95,5%) về 6 m (1σ) và ngưỡng khử đột biến 50 m là suy luận/giả định của đồ án, không gán cho nguồn. Cách lan truyền sang EPR và khoảng tin cậy của LRR theo DSAS (Himmelstoss và cs. 2021).</p>
     </section>
 
     <section id="sat-lo">
-        <h2>Sạt lở tham chiếu</h2>
+        <h2>@include('partials.icon', ['name' => 'alert', 'class' => 'ico h-ico']) Sạt lở tham chiếu</h2>
         <p>Mức độ sạt lở hiển thị theo cách phân loại của Quyết định 01/2011/QĐ-TTg (Quy chế xử lý sạt lở bờ sông, bờ biển), cũng là
             cách bản đồ sạt lở ĐBSCL của Tổng cục Phòng chống thiên tai sử dụng:</p>
         <ul class="levels">
@@ -125,7 +131,7 @@
     </section>
 
     <section id="han-che">
-        <h2>Hạn chế &amp; lưu ý khi sử dụng</h2>
+        <h2>@include('partials.icon', ['name' => 'info', 'class' => 'ico h-ico']) Hạn chế &amp; lưu ý khi sử dụng</h2>
         <ul>
             <li>Kết quả cho biết <strong>có biến động</strong>, không cho biết <strong>nguyên nhân</strong> (dòng chảy, khai thác cát, san lấp, kè…).</li>
             <li>Mỗi năm chỉ có một đường bờ mùa khô, nên không phản ánh biến động theo mùa, triều hay lũ, hoặc sạt lở đột ngột giữa hai năm.</li>
@@ -139,7 +145,7 @@
     </section>
 
     <section id="tai-du-lieu">
-        <h2>Tải dữ liệu</h2>
+        <h2>@include('partials.icon', ['name' => 'download', 'class' => 'ico h-ico']) Tải dữ liệu</h2>
         @include('partials.downloads')
         @if (config('services.geoserver.url'))
         @php
@@ -162,7 +168,7 @@
     </section>
 
     <section id="tham-khao">
-        <h2>Tham khảo &amp; hệ thống tương tự</h2>
+        <h2>@include('partials.icon', ['name' => 'book', 'class' => 'ico h-ico']) Tham khảo &amp; hệ thống tương tự</h2>
         <ul>
             <li><a href="https://knowledge.dea.ga.gov.au/data/product/dea-coastlines/" rel="noopener">Digital Earth Australia Coastlines</a> — đường bờ hằng năm, điểm tốc độ biến động có kiểm định ý nghĩa, biểu đồ theo điểm.</li>
             <li><a href="https://marine.usgs.gov/coastalchangehazardsportal/" rel="noopener">USGS Coastal Change Hazards Portal</a> — tốc độ biến động theo transect (DSAS), tải dữ liệu, chia sẻ liên kết.</li>

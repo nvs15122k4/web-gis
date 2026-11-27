@@ -16,9 +16,9 @@
             <h1>Không tìm thấy trang</h1>
             <p class="lead">Địa chỉ này không tồn tại hoặc đã được chuyển đi. Các trang hiện có được liệt kê dưới đây.</p>
             <ul class="index-list">
-                <li><a href="/"><span class="idx-name">Về bản đồ</span><span class="idx-desc">đường bờ, transect, hotspot</span><span class="idx-lead" aria-hidden="true"></span><span class="idx-path">/</span></a></li>
-                <li><a href="/gioi-thieu"><span class="idx-name">Phương pháp</span><span class="idx-desc">dữ liệu, cách tính, hạn chế</span><span class="idx-lead" aria-hidden="true"></span><span class="idx-path">/gioi-thieu</span></a></li>
-                <li><a href="/huong-dan"><span class="idx-name">Hướng dẫn</span><span class="idx-desc">cách đọc và dùng bản đồ</span><span class="idx-lead" aria-hidden="true"></span><span class="idx-path">/huong-dan</span></a></li>
+                <li><a href="/"><span class="idx-name">@include('partials.icon', ['name' => 'map', 'class' => 'ico idx-ico']) Về bản đồ</span><span class="idx-desc">đường bờ, transect, hotspot</span><span class="idx-lead" aria-hidden="true"></span><span class="idx-path">/</span></a></li>
+                <li><a href="/gioi-thieu"><span class="idx-name">@include('partials.icon', ['name' => 'book', 'class' => 'ico idx-ico']) Phương pháp</span><span class="idx-desc">dữ liệu, cách tính, hạn chế</span><span class="idx-lead" aria-hidden="true"></span><span class="idx-path">/gioi-thieu</span></a></li>
+                <li><a href="/huong-dan"><span class="idx-name">@include('partials.icon', ['name' => 'compass', 'class' => 'ico idx-ico']) Hướng dẫn</span><span class="idx-desc">cách đọc và dùng bản đồ</span><span class="idx-lead" aria-hidden="true"></span><span class="idx-path">/huong-dan</span></a></li>
             </ul>
             <p class="hint">WebGIS giám sát biến động bờ sông Hậu, xã Bình Mỹ, An Giang.</p>
         </div>
