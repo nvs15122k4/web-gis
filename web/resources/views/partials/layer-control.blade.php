@@ -51,7 +51,7 @@
     </details>
 </section>
 
-<section id="years" class="card tree">
+<section id="years" class="card tree" hidden>
     <h2 class="section-title">Đường bờ theo năm</h2>
     <p class="hint">Bật nhiều năm để xem dịch chuyển; năm mờ là chưa có ảnh hợp lệ.</p>
     <div id="year-list" class="year-grid"></div>
@@ -64,19 +64,10 @@
         <span class="compare-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         <label class="field"><span><i class="line-key" data-compare="b"></i>Năm B</span><select id="compare-b" aria-label="Năm B"></select></label>
     </div>
+    <p class="hint">«So sánh» vẽ cả hai đường bờ lên bản đồ; «Vuốt» chia đôi bản đồ bằng thanh kéo: năm A bên trái, năm B bên phải.</p>
     <div class="btn-row">
         <button type="button" class="btn btn-primary" id="compare-apply">So sánh</button>
+        <button type="button" class="btn btn-primary" id="swipe-toggle" aria-pressed="false">Vuốt</button>
         <button type="button" class="btn btn-ghost" id="compare-clear">Bỏ so sánh</button>
     </div>
-</section>
-
-<section id="swipe-card" class="card">
-    <h2 class="section-title">So sánh vuốt (swipe)</h2>
-    <p class="hint">Kéo thanh dọc trên bản đồ: đường bờ năm A bên trái, năm B bên phải.</p>
-    <div class="compare-row">
-        <label class="field"><span><i class="line-key" style="background:#1f6feb"></i>Năm A</span><select id="swipe-a" aria-label="Năm A (bên trái)"></select></label>
-        <span class="compare-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        <label class="field"><span><i class="line-key" style="background:#f0883e"></i>Năm B</span><select id="swipe-b" aria-label="Năm B (bên phải)"></select></label>
-    </div>
-    <div class="btn-row"><button type="button" class="btn btn-primary" id="swipe-toggle" aria-pressed="false">Bật/tắt vuốt</button></div>
 </section>
