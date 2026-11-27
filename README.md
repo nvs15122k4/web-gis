@@ -18,7 +18,7 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 | Đường dẫn | Quyền | Nội dung |
 |---|---|---|
 | `/` | công khai | Bản đồ tương tác với 4 thẻ: **Tổng quan** (thống kê, chú giải, dải năm), **Lớp dữ liệu** (bật/tắt lớp, đường bờ từng năm, so sánh hai năm), **Hotspot** (lọc theo tốc độ lùi bờ), **Chia sẻ** (liên kết, tải GeoJSON/CSV); bấm một transect để xem NSM, EPR, LRR, R², khoảng tin cậy và biểu đồ lịch sử |
-| `/gioi-thieu` | công khai | Mục tiêu, nguồn dữ liệu, phương pháp DSAS (NSM, EPR, LRR, R²), tiêu chí phân loại 4 mức, công thức độ bất định, sạt lở tham chiếu, hạn chế khi sử dụng, liên kết WMS/WFS và tài liệu tham khảo |
+| `/gioi-thieu` | công khai | Mục tiêu, quy trình xử lý ảnh từng bước, nguồn dữ liệu, phương pháp DSAS (NSM, EPR, LRR, R²), tiêu chí phân loại 4 mức, công thức độ bất định, sạt lở tham chiếu, hạn chế khi sử dụng, liên kết WMS/WFS và tài liệu tham khảo |
 | `/huong-dan` | công khai | Hướng dẫn từng bước: bắt đầu, dùng từng thẻ, xem chi tiết transect, so sánh hai năm, chia sẻ/tải dữ liệu, cách đọc kết quả cho đúng, phím tắt và hỗ trợ tiếp cận, hỏi đáp |
 | `/dang-nhap` | công khai | Đăng nhập bằng phiên (khoá tạm 60 giây sau 5 lần sai theo email hoặc IP, trả HTTP 429) |
 | `/admin` | `admin` | Sửa ngưỡng hiển thị hotspot `min_erosion_rate` (m/năm); mọi thay đổi ghi vào `activity_logs` kèm người sửa và địa chỉ IP |
@@ -27,46 +27,53 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ### Bản đồ
 
-![Bản đồ tổng quan](docs/minh_chung/giao_dien_moi/01_ban_do_tong_quan.png)
+Ảnh chụp giao diện **v3** (thư mục `docs/minh_chung/giao_dien_moi_v3/`).
 
-*Thẻ **Tổng quan** (cột biểu tượng bên trái): 266 transect tô màu theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), thống kê, hotspot, sạt lở tham chiếu,
-ranh giới khu vực nghiên cứu; chú giải nổi ở góc dưới trái, dải năm 2018–2026 ở đáy bản đồ (bấm một năm để bật/tắt đường bờ, nút **Phát** chạy lần lượt). Nền bản đồ tự phục vụ trên GeoServer.*
+![Bản đồ tổng quan](docs/minh_chung/giao_dien_moi_v3/01_ban_do_tong_quan.png)
+
+*Thẻ **Tổng quan** (cột bên trái): 266 transect theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), tỉ lệ đang lùi bờ, LRR trung bình, số transect có ý nghĩa thống kê,
+transect lùi/bồi mạnh nhất (bấm mã để phóng tới), hotspot, sạt lở tham chiếu và biểu đồ dịch chuyển bờ trung bình theo năm. Trên bản đồ: ô tìm mã transect hoặc toạ độ,
+thanh công cụ (phóng to/thu nhỏ, định vị, toàn khung, chọn, đo đường, đo diện tích, xoá), nút lớp nền, **in bản đồ** và **bảng thuộc tính**, chú giải thu gọn ở góc dưới phải, dải năm 2018–2026 ở đáy
+(bấm một năm để bật/tắt đường bờ, nút **Phát** chạy lần lượt). Lần đầu vào có hộp gợi ý ngắn. Nền bản đồ tự phục vụ trên GeoServer.*
 
 | | |
 |---|---|
-| ![Thẻ Lớp dữ liệu](docs/minh_chung/giao_dien_moi/02_tab_lop.png) | ![Thẻ Hotspot](docs/minh_chung/giao_dien_moi/03_tab_diem_nong.png) |
-| **Lớp dữ liệu**: bật/tắt transect, hotspot, sạt lở tham chiếu; đường bờ từng năm 2018–2026; so sánh hai năm | **Hotspot**: lọc đoạn lùi bờ theo tốc độ tối thiểu (m/năm), bấm một đoạn để phóng tới |
-| ![Chi tiết transect](docs/minh_chung/giao_dien_moi/05_chi_tiet_transect.png) | ![So sánh hai năm](docs/minh_chung/giao_dien_moi/06_so_sanh_nam.png) |
-| **Chi tiết transect T0094**: NSM, EPR, LRR, R², khoảng tin cậy 95%, độ bất định, biểu đồ lịch sử vị trí đường bờ | **So sánh hai năm** (2018 – 2026): chồng hai đường bờ để xem dịch chuyển |
+| ![Thẻ Lớp dữ liệu](docs/minh_chung/giao_dien_moi_v3/02_tab_lop.png) | ![Thẻ Hotspot](docs/minh_chung/giao_dien_moi_v3/03_tab_diem_nong.png) |
+| **Lớp dữ liệu**: cây lớp chia nhóm (Biến động đường bờ, Cảnh báo sạt lở); mỗi lớp có công tắc, độ mờ và nút đưa lên/xuống; lớp *điểm tốc độ biến động (LRR)* bật sẵn, *transect* bật khi cần (có lọc "chỉ transect có ý nghĩa thống kê 95%") | **Hotspot**: lọc đoạn lùi bờ theo tốc độ tối thiểu (m/năm), bấm một đoạn để phóng tới |
+| ![Chi tiết transect](docs/minh_chung/giao_dien_moi_v3/05_chi_tiet_transect.png) | ![So sánh hai năm](docs/minh_chung/giao_dien_moi_v3/06_so_sanh_nam.png) |
+| **Chi tiết transect T0094** (mở bằng tìm kiếm hoặc bấm trên bản đồ): NSM, EPR, LRR, R², khoảng tin cậy 95%, ý nghĩa thống kê, độ bất định, số giai đoạn lùi liên tiếp, biểu đồ lịch sử vị trí đường bờ | **So sánh hai năm** (2018 – 2026): chồng hai đường bờ; ngoài ra có **so sánh vuốt (swipe)** kéo thanh dọc để xem năm A bên trái, năm B bên phải |
 
-- **Chia sẻ & xuất dữ liệu** — liên kết chia sẻ lưu khung nhìn, lớp, năm trong URL (`#map=…`); tải từng lớp dạng GeoJSON/CSV tại `/api/export/{lớp}.{geojson|csv}`.
-- **Giao diện di động** — bảng điều khiển và chi tiết transect thành ngăn kéo phía dưới, thanh điều hướng chia đều một hàng, xem [ảnh](docs/minh_chung/giao_dien_moi/13_di_dong.png).
+- **Chia sẻ & xuất dữ liệu** — thẻ **Chia sẻ**: liên kết lưu khung nhìn, lớp, năm trong URL (`#map=…`); tải từng lớp dạng GeoJSON/CSV tại `/api/export/{lớp}.{geojson|csv}`; ảnh ở `04_tab_chia_se.png`.
+- **Giao diện di động** — bảng điều khiển và chi tiết transect thành ngăn kéo phía dưới, thanh điều hướng chia đều một hàng, xem [ảnh](docs/minh_chung/giao_dien_moi_v3/13_di_dong.png).
+- **Thanh điều hướng** — *Bản đồ*, *Phương pháp* (`/gioi-thieu`), *Hướng dẫn*, *Đăng nhập*; trang phụ và trang lỗi 403/404 có icon, đăng nhập qua tài khoản demo cấu hình bằng biến môi trường `DEMO_*`.
+- **Tốc độ tải** — các năm dùng chung một lớp WMS, Chart.js chỉ tải khi biểu đồ hiện ra.
 
 ### Các trang còn lại
 
-Ba trang dài nên mỗi ảnh chụp được cắt thành hai nửa (trên – dưới), đặt cạnh nhau.
+Ba trang dài nên mỗi ảnh chụp được cắt thành các phần theo thứ tự từ trên xuống.
 
-**`/gioi-thieu` — phương pháp và hạn chế.** Nửa trên: mục tiêu, dữ liệu Sentinel-2, chuỗi phân tích DSAS (NSM, EPR, LRR, R²) và tiêu chí phân loại. Nửa dưới: độ bất định, sạt lở tham chiếu, hạn chế, liên kết WMS/WFS, tài liệu tham khảo.
+**`/gioi-thieu` — phương pháp và hạn chế.** Mục lục bên trái; mục tiêu, dữ liệu Sentinel-2; mục **Từ ảnh vệ tinh đến đường bờ và tốc độ biến động** gồm các bước quy trình đánh số (thu thập và lọc cảnh, composite, làm nổi mặt nước bằng chỉ số, hình thái học, …), mỗi bước có ảnh minh hoạ từ dữ liệu thật của pipeline và nút *Chi tiết kỹ thuật*; sau đó là chuỗi phân tích DSAS (NSM, EPR, LRR, R²), tiêu chí phân loại, độ bất định, sạt lở tham chiếu, hạn chế, liên kết WMS/WFS và tài liệu tham khảo.
 
-| Nửa trên | Nửa dưới |
+| Phần 1 | Phần 2 |
 |---|---|
-| ![Giới thiệu – nửa trên](docs/minh_chung/giao_dien_moi/07_gioi_thieu_a.png) | ![Giới thiệu – nửa dưới](docs/minh_chung/giao_dien_moi/07_gioi_thieu_b.png) |
+| ![Giới thiệu – phần 1](docs/minh_chung/giao_dien_moi_v3/07_gioi_thieu_a.png) | ![Giới thiệu – phần 2](docs/minh_chung/giao_dien_moi_v3/07_gioi_thieu_b.png) |
+| ![Giới thiệu – phần 3](docs/minh_chung/giao_dien_moi_v3/07_gioi_thieu_c.png) | ![Giới thiệu – phần 4](docs/minh_chung/giao_dien_moi_v3/07_gioi_thieu_d.png) |
 
 **`/huong-dan` — hướng dẫn sử dụng.** Nửa trên: bắt đầu nhanh, thẻ Tổng quan, Lớp dữ liệu, xem chi tiết transect. Nửa dưới: Hotspot, so sánh hai năm, chia sẻ/tải dữ liệu, đọc kết quả, phím tắt, hỏi đáp.
 
 | Nửa trên | Nửa dưới |
 |---|---|
-| ![Hướng dẫn – nửa trên](docs/minh_chung/giao_dien_moi/08_huong_dan_a.png) | ![Hướng dẫn – nửa dưới](docs/minh_chung/giao_dien_moi/08_huong_dan_b.png) |
+| ![Hướng dẫn – nửa trên](docs/minh_chung/giao_dien_moi_v3/08_huong_dan_a.png) | ![Hướng dẫn – nửa dưới](docs/minh_chung/giao_dien_moi_v3/08_huong_dan_b.png) |
 
 **`/bao-cao` — báo cáo nội bộ (cần quyền `admin`).** Đối chiếu công việc đã làm với đề cương, số liệu chung và kết quả kiểm thử.
 
 | Nửa trên | Nửa dưới |
 |---|---|
-| ![Báo cáo – nửa trên](docs/minh_chung/giao_dien_moi/11_bao_cao_a.png) | ![Báo cáo – nửa dưới](docs/minh_chung/giao_dien_moi/11_bao_cao_b.png) |
+| ![Báo cáo – nửa trên](docs/minh_chung/giao_dien_moi_v3/11_bao_cao_a.png) | ![Báo cáo – nửa dưới](docs/minh_chung/giao_dien_moi_v3/11_bao_cao_b.png) |
 
 **`/admin` — quản trị ngưỡng (cần quyền `admin`).** Đổi `min_erosion_rate` (m/năm); ngưỡng này chỉ lọc hotspot hiển thị, không đổi phân loại của pipeline. Tài khoản `viewer` bị từ chối (HTTP 403).
 
-![Quản trị ngưỡng](docs/minh_chung/giao_dien_moi/12_quan_tri_nguong.png)
+![Quản trị ngưỡng](docs/minh_chung/giao_dien_moi_v3/12_quan_tri_nguong.png)
 
 ### REST API
 
