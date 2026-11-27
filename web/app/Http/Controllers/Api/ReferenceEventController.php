@@ -14,7 +14,7 @@ class ReferenceEventController extends Controller
     {
         $bbox = $request->filled('bbox') && is_string($request->query('bbox')) ? array_map('floatval', explode(',', $request->query('bbox'))) : null;
 
-        $events = ReferenceLandslideEvent::withGeoJson()
+        $events = ReferenceLandslideEvent::withGeoJsonLean()
             ->when($bbox && count($bbox) === 4, fn ($q) => $q->whereRaw(
                 'reference_landslide_events.geom && ST_MakeEnvelope(?, ?, ?, ?, 4326)', $bbox
             ))
