@@ -58,3 +58,17 @@
     .step-fig { position: static; }
     .steps-head h2 { font-size: 26px; }
 }
+
+.zoomable { cursor: zoom-in; }
+.zoomable:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; }
+.img-zoom { max-width: 96vw; max-height: 96vh; padding: 12px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-3); overflow: auto; }
+.img-zoom::backdrop { background: rgb(0 0 0 / 0.75); }
+.img-zoom img { display: block; max-width: 92vw; max-height: 80vh; width: auto; height: auto; margin: 0 auto; background: var(--surface-2); }
+.img-zoom-cap { margin: 8px 0 0; font: 400 var(--fs-md)/1.45 var(--font); }
+.img-zoom-close { position: absolute; top: 4px; right: 8px; border: 0; background: none; font-size: 28px; line-height: 1; color: inherit; cursor: pointer; }
+
+/* công thức dạng toán: MathML, phân số có vạch ngang, tự cuộn ngang khi hẹp */
+.eq { margin: 10px 0 0; padding: 8px 12px; background: var(--surface-2); border-left: 3px solid var(--line-strong); }
+.eq-name { margin: 0; font: 600 var(--fs-sm) var(--mono); letter-spacing: .02em; color: var(--ink-3); }
+.eq-math { display: block; margin: 6px 0; overflow-x: auto; overflow-y: hidden; font-size: 1.15em; }
+.eq-where { margin: 0; font: 400 var(--fs-md)/1.5 var(--font); color: var(--ink-2, var(--ink-3)); }
