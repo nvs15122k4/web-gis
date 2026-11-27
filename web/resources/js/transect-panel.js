@@ -111,7 +111,6 @@ async function highlightTransect(id) {
     }).addTo(highlight);
 }
 
-const ICON_ALERT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v5M12 17.5v.01"/></svg>';
 
 /** Trạng thái đang tải trong thẻ chi tiết (chỉ khi thẻ đã mở sẵn, tránh nháy thẻ rỗng). */
 function showDetailLoading() {
@@ -125,7 +124,7 @@ function showDetailError() {
     const panel = document.getElementById('inspector');
     if (!panel || panel.hidden) return;
     panel.querySelector('.inspector-body')?.removeAttribute('aria-busy');
-    document.getElementById('transect-detail').innerHTML = `<div class="state-block is-error" role="alert">${ICON_ALERT}<div><strong>Không tải được chi tiết transect</strong>${UPDATING}. Thử chọn lại đoạn này sau ít giây.</div></div>`;
+    document.getElementById('transect-detail').innerHTML = `<div class="state-block is-error" role="alert"><div><strong>Không tải được chi tiết transect</strong>${UPDATING}. Thử chọn lại đoạn này sau ít giây.</div></div>`;
 }
 
 async function featureAt(map, latlng) {
