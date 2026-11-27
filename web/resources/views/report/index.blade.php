@@ -24,7 +24,7 @@
 <html lang="vi">
 <head>
     @include('partials.head', ['title' => 'Báo cáo công việc đã làm — WebGIS Sông Hậu', 'description' => 'Báo cáo công việc của đề tài WebGIS giám sát biến động bờ sông Hậu (nội bộ).'])
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/back-to-top.js'])
 </head>
 <body class="page">
 @include('partials.nav')
@@ -55,7 +55,7 @@
 <article class="doc">
 
     <section id="so-lieu">
-        <h2>@include('partials.icon', ['name' => 'chart', 'class' => 'ico h-ico']) Số liệu chung</h2>
+        <h2>Số liệu chung</h2>
         <table class="stats">
             <caption>Các con số chính của đề tài tính đến ngày 27/11/2026.</caption>
             <tbody>
@@ -74,7 +74,7 @@
     </section>
 
     <section id="tien-do">
-        <h2>@include('partials.icon', ['name' => 'list', 'class' => 'ico h-ico']) Tiến độ theo đề cương</h2>
+        <h2>Tiến độ theo đề cương</h2>
         <div class="table-wrap"><table>
             <caption>Đối chiếu từng hạng mục của đề cương với kết quả và bằng chứng.</caption>
             <tr><th>Mục</th><th>Nội dung</th><th>Trạng thái</th><th>Kết quả / bằng chứng</th></tr>
@@ -90,7 +90,7 @@
     </section>
 
     <section id="moc-thoi-gian">
-        <h2>@include('partials.icon', ['name' => 'clock', 'class' => 'ico h-ico']) Mốc thời gian</h2>
+        <h2>Mốc thời gian</h2>
         <ol class="history">
             <li><time datetime="2026-09-27">27/09/2026 — 65 commit</time>
                 Dựng khung Laravel, lược đồ MySQL/PostGIS, REST API, lệnh nhập dữ liệu và cấu hình GeoServer; giao diện bản đồ (Leaflet, WMS, biểu đồ transect, chia sẻ liên kết).
@@ -119,22 +119,22 @@
     </section>
 
     <section id="tinh-nang">
-        <h2>@include('partials.icon', ['name' => 'check', 'class' => 'ico h-ico']) Tính năng đã làm</h2>
-        <h3>@include('partials.icon', ['name' => 'code', 'class' => 'ico h-ico']) Pipeline (Python)</h3>
+        <h2>Tính năng đã làm</h2>
+        <h3>Pipeline (Python)</h3>
         <ul>
             <li>Tải Sentinel-2 L2A, lọc mây bằng SCL, composite trung vị mùa khô tháng 1–3.</li>
             <li>Chỉ số nước NDWI/MNDWI/AWEI so sánh trên ground truth, chọn MNDWI; ngưỡng Otsu, vector hoá đường bờ cắt theo ranh giới xã.</li>
             <li>Baseline, transect cách đều, NSM/EPR/LRR/R² kèm khoảng tin cậy 95% của LRR, độ bất định, phân loại Mục 2.5, gom hotspot lùi mạnh.</li>
             <li>Đánh giá Precision/Recall/F1/IoU và RMSE từ ground truth số hoá; đối chiếu chéo sản phẩm phủ bề mặt độc lập.</li>
         </ul>
-        <h3>@include('partials.icon', ['name' => 'map', 'class' => 'ico h-ico']) Ứng dụng web (Laravel)</h3>
+        <h3>Ứng dụng web (Laravel)</h3>
         <ul>
             <li>REST API tra cứu đường bờ, transect, hotspot, sự kiện tham chiếu, thống kê; xuất GeoJSON/CSV.</li>
             <li>Bản đồ tương tác: lớp bản đồ (GeoJSON từ API, hoặc WMS khi có GeoServer), tô màu theo mức biến động, đường bờ nhiều năm trong một lớp, so sánh hai năm, lọc hotspot, tìm kiếm, bảng thuộc tính, chia sẻ liên kết.</li>
             <li>Trang Phương pháp (9 bước giải đoán ảnh), Quản trị ngưỡng (có nhật ký), Hướng dẫn sử dụng và Báo cáo công việc (chỉ admin, chặn phía máy chủ).</li>
             <li>Giao diện sáng theo hệ thiết kế Transect (lưới 1 px, Cobalt/Vermilion), hỗ trợ bàn phím, trình đọc màn hình, màn hình cảm ứng, bố cục điện thoại dạng bottom sheet và cài được như ứng dụng web.</li>
         </ul>
-        <h3>@include('partials.icon', ['name' => 'server', 'class' => 'ico h-ico']) Hạ tầng</h3>
+        <h3>Hạ tầng</h3>
         <ul>
             <li>GeoServer (tuỳ chọn) với style SLD và layer group nền bản đồ tự phục vụ; PostGIS cho dữ liệu không gian, MySQL cho người dùng và cấu hình.</li>
             <li>CI GitHub Actions; E2E chạy trên CSDL và workspace GeoServer riêng.</li>
@@ -143,7 +143,7 @@
     </section>
 
     <section id="kiem-thu">
-        <h2>@include('partials.icon', ['name' => 'flask', 'class' => 'ico h-ico']) Kiểm thử</h2>
+        <h2>Kiểm thử</h2>
         <div class="table-wrap"><table>
             <caption>Các bộ kiểm thử của dự án.</caption>
             <tr><th>Loại</th><th>Công cụ</th><th>Quy mô</th></tr>
@@ -156,7 +156,7 @@
     </section>
 
     <section id="con-lai">
-        <h2>@include('partials.icon', ['name' => 'alert', 'class' => 'ico h-ico']) Việc còn lại và rủi ro</h2>
+        <h2>Việc còn lại và rủi ro</h2>
         <ul>
             <li>Toạ độ chính xác của điểm sạt lở tham chiếu (Km 89+272 / 89+076) chưa có; các số quyết định lấy từ báo chí, chưa đối chiếu bản gốc.</li>
             <li>Pipeline chưa phát hiện đoạn lùi bờ quanh vùng sạt lở 2019–2020 (73 transect trong 300 m: 50 bồi, 23 ổn định); cần trình bày như hạn chế của phương pháp, không như bằng chứng khớp thực tế.</li>
@@ -182,5 +182,6 @@
         byId.forEach((_, id) => document.getElementById(id) && io.observe(document.getElementById(id)));
     })();
 </script>
+@include('partials.back-to-top')
 </body>
 </html>
