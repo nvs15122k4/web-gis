@@ -35,7 +35,8 @@ body.map-page { display: grid; grid-template-rows: var(--appbar-h) minmax(0, 1fr
 
 .sidebar {
     display: flex; flex-direction: column; flex: none; width: var(--panel-w); min-height: 0; overflow: hidden;
-    background: var(--surface); border-right: 1px solid var(--ink);
+    background: var(--surface); border-right: 4px solid var(--ink);
+    box-shadow: 3px 0 0 var(--line-strong);
     z-index: 1100;
 }
 /* thu gọn: ẩn cả bảng (trên điện thoại do sidebar.css xử lý riêng) */
