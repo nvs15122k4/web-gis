@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Không tìm thấy trang — WebGIS Sông Hậu</title>
+    @include('partials.head', ['title' => 'Không tìm thấy trang — WebGIS Sông Hậu', 'description' => 'Trang bạn tìm không tồn tại hoặc đã được chuyển.'])
     @vite(['resources/css/app.css'])
 </head>
 <body class="page">
