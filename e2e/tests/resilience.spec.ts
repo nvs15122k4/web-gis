@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { BASE } from '../env';
 import { openMap, openTab } from './helpers';
-import { openMapLoose, appErrors } from './helpers-journey';
+import { openMapLoose, appErrors, loginViaForm } from './helpers-journey';
 
 // Các test dưới đây là "partial E2E (mocked: API/GeoServer)": giả lập lỗi hạ tầng bằng page.route
 // vì không thể làm hỏng dịch vụ thật dùng chung. Mọi test đều chặn trước khi tải trang.
@@ -119,18 +119,18 @@ test.describe('Chịu lỗi: chậm và mất mạng', () => {
         await expect(page.locator('#hotspot-count')).not.toContainText('đang cập nhật');
     });
 
-    test('E11 mất mạng sau khi tải: trang admin đăng nhập báo lỗi thay vì treo', { tag: ['@negative', '@resilience'] }, async ({ page, context }) => {
-        await page.goto('/admin');
-        await context.setOffline(true);
-        await page.fill('#login-form [name=email]', 'admin@webgis.test');
-        await page.fill('#login-form [name=password]', 'password');
+    test('E11 mất mạng khi đang ở trang admin: lưu ngưỡng báo lỗi/không treo, có mạng lại lưu được', { tag: ['@negative', '@resilience'] }, async ({ page, context }) => {
+        await loginViaForm(page);
         const errors: string[] = [];
         page.on('pageerror', (e) => errors.push(e.message));
-        await page.click('#login-form button[type=submit]');
-        await expect(page.locator('#admin-panel')).toBeHidden();
-        await context.setOffline(false);
-        await page.click('#login-form button[type=submit]');
+        const form = page.locator('.threshold-form').first();
+        await form.locator('input[name=value]').fill('1');
+        await context.setOffline(true);
+        await form.locator('button').click();
         await expect(page.locator('#admin-panel')).toBeVisible();
+        await context.setOffline(false);
+        await form.locator('button').click();
+        await expect(page.locator('#admin-message')).toContainText('Đã cập nhật');
     });
 });
 
@@ -198,21 +198,21 @@ test.describe('Console và network sạch', () => {
         page.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
         page.on('pageerror', (e) => errs.push(e.message));
         await page.goto('/gioi-thieu');
-        await page.goto('/admin');
-        await expect(page.locator('#login-form')).toBeVisible();
+        await loginViaForm(page);
+        await expect(page.locator('#admin-panel')).toBeVisible();
         expect(bad).toEqual([]);
         expect(appErrors(errs)).toEqual([]);
     });
 
-    test('C03 đăng nhập sai chỉ sinh đúng một 401 từ /api/auth/login (là lỗi mong đợi)', { tag: ['@negative', '@regression'] }, async ({ page }) => {
+    test('C03 đăng nhập sai ở /dang-nhap không gọi /api/auth/login và không sinh lỗi 4xx/5xx', { tag: ['@negative', '@regression'] }, async ({ page }) => {
         const codes: number[] = [];
         page.on('response', (r) => { if (r.url().includes('/api/auth/login')) codes.push(r.status()); });
-        await page.goto('/admin');
-        await page.fill('#login-form [name=email]', 'admin@webgis.test');
-        await page.fill('#login-form [name=password]', 'sai');
-        await page.click('#login-form button[type=submit]');
-        await expect(page.locator('#admin-message')).toContainText('Sai email hoặc mật khẩu');
-        expect(codes).toEqual([401]);
+        await page.goto('/dang-nhap');
+        await page.fill('#session-login-form [name=email]', 'admin@webgis.test');
+        await page.fill('#session-login-form [name=password]', 'sai');
+        await page.click('#session-login-form button[type=submit]');
+        await expect(page.locator('#session-login-form .field-error')).toContainText('Sai email hoặc mật khẩu');
+        expect(codes).toEqual([]);
     });
 
     test('C04 trang 404 không để lộ stack trace', { tag: ['@regression', '@security'] }, async ({ page }) => {
