@@ -104,6 +104,12 @@ cd ../e2e && npm install && npx playwright install && npx playwright test
 fixture cố định (`E2eFixtureSeeder`: năm 2022 thiếu composite, transect T05 thiếu 2020–2021, sạt lở tham chiếu chỉ ở phía bắc).
 WebKit trên Linux cần thư viện hệ thống (`sudo npx playwright install-deps`). Trên Ubuntu mới hơn 24.04 (vd. 26.04) bản WebKit của Playwright không khởi chạy được vì thiếu `libicu74`/`libjxl0.8`; khi đó chạy `cd e2e && npm run test:no-webkit` (chỉ Chromium và Firefox).
 
+## 5b. Tối ưu tải trang khi triển khai máy chủ riêng
+
+Sau mỗi lần deploy (không áp dụng cho Vercel, nơi `api/index.php` tự dời cache sang `/tmp`): `composer install --no-dev --optimize-autoloader && npm run build && php artisan optimize && php artisan view:cache`
+(gộp cache config/route/event/view). Khi đổi `.env` hoặc route, chạy `php artisan optimize:clear` rồi `optimize` lại. `public/.htaccess` đã bật nén và cache tài nguyên tĩnh;
+Nginx cần tự bật `gzip`/`brotli` và `expires` tương đương. Trên Vercel nén do CDN lo, header cache khai trong `vercel.json`.
+
 ## 6. Triển khai: Supabase + Vercel + UptimeRobot
 
 Sản phẩm chạy với **một** CSDL Supabase Postgres + PostGIS (kết nối `pgsql`; bảng người dùng/ngưỡng và bảng không gian cùng nằm trong đó). Các bước dưới đây do chủ dự án tự làm trên dashboard; mã nguồn đã sẵn `vercel.json`, `api/index.php` và route `/healthz`.
