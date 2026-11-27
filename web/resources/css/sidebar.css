@@ -22,6 +22,13 @@
 .rail .tab:hover { color: var(--ink); border-bottom-color: var(--line-strong); }
 .rail .tab[aria-selected=true] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
 .rail .tab:focus-visible { outline-offset: 2px; }
+/* thanh gạch chân trượt thay cho gạch chân từng tab (JS tabs.js đặt --ind-x, --ind-w) */
+.rail { position: relative; }
+.rail.has-indicator .tab[aria-selected=true] { border-bottom-color: transparent; }
+.rail.has-indicator::after {
+    content: ''; position: absolute; left: 0; bottom: -1px; height: 2px; width: var(--ind-w, 0); background: var(--accent);
+    transform: translateX(var(--ind-x, 0));
+}
 
 /* ---- vùng nội dung ---- */
 .panels { order: 3; background: var(--surface); }

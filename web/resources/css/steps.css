@@ -9,10 +9,13 @@
 .step {
     display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 40px; align-items: start;
     min-height: 78vh; padding: 28px 0; border-top: 1px solid var(--line);
-    transition: opacity .25s ease;
+    transition: border-color .25s ease;
 }
-.steps-js .step { opacity: .55; }
-.steps-js .step.is-active, .steps-js .step:focus-within { opacity: 1; }
+/* Chữ luôn rõ nét để đọc khi cuộn; bước đang xem chỉ được nhấn bằng viền trên và số bước, hình của bước khác dịu đi. */
+.step-fig { transition: opacity .25s ease; }
+.steps-js .step { border-top-color: var(--line); }
+.steps-js .step.is-active, .steps-js .step:focus-within { border-top-color: var(--accent-ink); }
+.steps-js .step:not(.is-active):not(:focus-within) .step-fig { opacity: .75; }
 .step-text { padding-top: 12vh; font: 400 16.5px/1.7 var(--serif); color: var(--ink); }
 .step-num { margin: 0; font: 600 44px/1 var(--mono); color: var(--accent-ink); }
 .step-tag { margin: 6px 0 4px; font: 500 var(--fs-sm) var(--mono); color: var(--ink-3); }
@@ -49,11 +52,11 @@
 .step-limits ul { margin: 0; padding-left: 20px; font: 400 15px/1.6 var(--font); }
 .step-limits li { margin: 0 0 8px; }
 
-@media (prefers-reduced-motion: reduce) { .step { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .step, .step-fig { transition: none; } }
 
 @media (max-width: 860px) {
     .step { grid-template-columns: minmax(0, 1fr); gap: 16px; min-height: 0; }
-    .steps-js .step { opacity: 1; }
+    .steps-js .step:not(.is-active):not(:focus-within) .step-fig { opacity: 1; }
     .step-text { padding-top: 0; }
     .step-fig { position: static; }
     .steps-head h2 { font-size: 26px; }

@@ -24,6 +24,7 @@
 @keyframes toast-in { from { opacity: 0; transform: translateY(12px) scale(.98); } }
 @keyframes toast-out { to { opacity: 0; transform: translateY(8px); } }
 @keyframes banner-in { from { opacity: 0; transform: translateY(-6px); } }
+@keyframes sidebar-enter { from { opacity: 0; transform: translateX(-24px); } }
 @keyframes focus-pulse { from { outline-offset: 6px; outline-color: transparent; } }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -47,6 +48,17 @@
     :is(.class-counts, .facts, .item-list, .year-grid) > :nth-child(n + 9) { --i: 8; }
     .class-bar { animation: bar-grow 700ms var(--ease-out) 120ms both; }
     .kpis { animation: fade-in var(--dur-3) var(--ease-out) both; }
+
+    /* gạch chân tab trượt, nảy nhẹ khi tới nơi */
+    .rail.has-indicator::after { transition: transform var(--dur-3) var(--ease-out), width var(--dur-3) var(--ease-out); }
+
+    /* mở trang: thanh bên trượt vào từ trái, bản đồ hiện dần ngay sau đó => thấy rõ hai vùng riêng */
+    body.map-page .sidebar:not(.collapsed) { animation: sidebar-enter var(--dur-3) var(--ease-out) backwards; }
+    body.map-page .map-wrap { animation: fade-in 600ms var(--ease-out) 120ms backwards; }
+
+    /* nút nổi trên bản đồ nhấc lên khi rê chuột, tách khỏi nền bản đồ */
+    .map-actions .tool-btn:hover, .map-search:hover, .map-search:focus-within { box-shadow: 0 3px 10px rgba(31, 28, 23, .22); transform: translateY(-1px); }
+    .map-search { transition: box-shadow var(--dur-1) var(--ease), transform var(--dur-1) var(--ease); }
 
     /* thanh bên thu gọn/mở mượt */
     .sidebar { transition: width var(--dur-2) var(--ease-out); }
