@@ -35,10 +35,19 @@ describe('layers: chế độ GeoJSON (không có GeoServer)', () => {
     });
     afterEach(() => { delete globalThis.fetch; });
 
+    it('lớp transect tắt mặc định thì chưa gọi /api/transects', async () => {
+        const { mod, map } = await setup({ url: null, workspace: 'songhau' });
+        mod.initLayers(map);
+        await new Promise((r) => setTimeout(r, 20));
+        expect(globalThis.fetch.mock.calls.some(([u]) => String(u).includes('/api/transects'))).toBe(false);
+    });
+
     it('không gọi WMS: lớp transect là GeoJSON vẽ từ /api/transects', async () => {
         const { mod, map } = await setup({ url: null, workspace: 'songhau' });
         expect(mod.USE_WMS).toBe(false);
         mod.initLayers(map);
+        mod.layers.transects.addTo(map);
+        mod.layers.transects.addTo(map); // lớp tắt mặc định: chỉ tải dữ liệu khi được bật
         await vi.waitFor(() => expect(mod.layers.transects.getLayers()).toHaveLength(2));
         expect(globalThis.fetch.mock.calls.some(([u]) => String(u).includes('/wms'))).toBe(false);
     });
@@ -46,6 +55,7 @@ describe('layers: chế độ GeoJSON (không có GeoServer)', () => {
     it('lọc "chỉ ý nghĩa thống kê" giữ lại transect có is_significant', async () => {
         const { mod, map } = await setup({ url: null, workspace: 'songhau' });
         mod.initLayers(map);
+        mod.layers.transects.addTo(map); // lớp tắt mặc định: chỉ tải dữ liệu khi được bật
         await vi.waitFor(() => expect(mod.layers.transects.getLayers()).toHaveLength(2));
         const box = document.getElementById('only-significant');
         box.checked = true;
@@ -59,6 +69,7 @@ describe('layers: chế độ GeoJSON (không có GeoServer)', () => {
     it('bấm một transect gọi handler với feature và vị trí', async () => {
         const { mod, map } = await setup({ url: null, workspace: 'songhau' });
         mod.initLayers(map);
+        mod.layers.transects.addTo(map); // lớp tắt mặc định: chỉ tải dữ liệu khi được bật
         await vi.waitFor(() => expect(mod.layers.transects.getLayers()).toHaveLength(2));
         mod.handlers.onTransectClick = vi.fn();
         mod.layers.transects.getLayers()[0].fire('click', { latlng: L.latLng(10.5, 105.2) });
