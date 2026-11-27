@@ -15,14 +15,14 @@
 
         <section id="admin-panel">
             <div class="admin-user"><span>Đăng nhập: <strong id="admin-user">{{ auth()->user()->email }} ({{ auth()->user()->role }})</strong></span></div>
-            <h2 class="section-title">Ngưỡng hiển thị</h2>
+            <h2 class="section-title">@include('partials.icon', ['name' => 'settings', 'class' => 'ico h-ico']) Ngưỡng hiển thị</h2>
             <div id="thresholds"></div>
-            <h2 class="section-title">Quản lý lớp bản đồ</h2>
+            <h2 class="section-title">@include('partials.icon', ['name' => 'layers', 'class' => 'ico h-ico']) Quản lý lớp bản đồ</h2>
             <p class="hint">Đặt trạng thái mặc định của lớp trên bản đồ công khai: bật/tắt, độ trong suốt, thứ tự chồng lớp (trên cùng nằm trên).</p>
             <ol id="layer-admin" class="layer-admin"></ol>
         </section>
 
-        <h2 class="section-title">Dữ liệu trong hệ thống</h2>
+        <h2 class="section-title">@include('partials.icon', ['name' => 'database', 'class' => 'ico h-ico']) Dữ liệu trong hệ thống</h2>
         <dl class="status-grid" id="admin-status"><dt>Trạng thái</dt><dd>Đang cập nhật</dd></dl>
         <p class="hint">Chọn một dòng trong bảng để phóng tới transect trên bản đồ; bấm transect trên bản đồ để chọn dòng tương ứng.</p>
     </aside>
