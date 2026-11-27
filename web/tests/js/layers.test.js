@@ -103,4 +103,35 @@ describe('layers: chế độ GeoServer (tương thích ngược)', () => {
         expect(mod.layers.transects.wmsParams.layers).toBe('songhau:transects');
         delete globalThis.fetch;
     });
+
+    it('mọi năm đang bật dùng MỘT lớp WMS chung, lọc bằng CQL và tô màu theo năm', async () => {
+        globalThis.fetch = vi.fn(async () => ({ ok: true, status: 200, json: async () => [] }));
+        const { mod, map } = await setup({ url: 'http://gs.test/geoserver', workspace: 'songhau' });
+        mod.initLayers(map);
+        const p = mod.layers.shorelines.wmsParams;
+        expect(p.layers).toBe('songhau:shorelines');
+        expect(p.styles).toBe('shoreline_by_year');
+        expect(p.cql_filter).toBe('year IN (2018,2019)');
+        expect(mod.layers.years.size).toBe(0);
+        expect(map.hasLayer(mod.layers.shorelines)).toBe(true);
+
+        const box = document.getElementById('year-2018');
+        box.checked = false;
+        box.dispatchEvent(new Event('change', { bubbles: true }));
+        expect(mod.layers.shorelines.wmsParams.cql_filter).toBe('year IN (2019)');
+
+        document.getElementById('year-2019').checked = false;
+        document.getElementById('year-2019').dispatchEvent(new Event('change', { bubbles: true }));
+        expect(map.hasLayer(mod.layers.shorelines)).toBe(false);
+        delete globalThis.fetch;
+    });
+
+    it('SLD shoreline_by_year dùng đúng thang màu YEAR_COLORS của giao diện', async () => {
+        const { readFileSync } = await import('node:fs');
+        const { mod } = await setup({ url: null, workspace: 'songhau' });
+        const sld = readFileSync('geoserver/styles/shoreline_by_year.sld', 'utf8');
+        mod.YEAR_COLORS.forEach((c, i) => {
+            expect(sld).toContain(`<ogc:Literal>${2018 + i}</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>\n          <LineSymbolizer><Stroke>\n            <CssParameter name="stroke">${c}</CssParameter>`);
+        });
+    });
 });
