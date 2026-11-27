@@ -27,14 +27,9 @@ export function initSwipe(map, years) {
     const bar = document.getElementById('swipe-bar');
     const toggle = document.getElementById('swipe-toggle');
     if (!bar || !toggle) return null;
-    const selA = document.getElementById('swipe-a');
-    const selB = document.getElementById('swipe-b');
+    const selA = document.getElementById('compare-a');
+    const selB = document.getElementById('compare-b');
     const handle = bar.querySelector('.swipe-handle');
-    const opts = years.all.map((y) => `<option value="${y}">${y}</option>`).join('');
-    selA.innerHTML = opts;
-    selB.innerHTML = opts;
-    selA.value = String(years.all[0]);
-    selB.value = String(years.all[years.all.length - 1]);
 
     map.createPane('swipeA').style.zIndex = 450;
     map.createPane('swipeB').style.zIndex = 451;
