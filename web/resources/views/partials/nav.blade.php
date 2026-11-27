@@ -15,20 +15,20 @@
         </span>
     </a>
     <nav class="topnav" aria-label="Điều hướng chính">
-        <a href="/" @class(['active' => request()->is('/')]) @if (request()->is('/')) aria-current="page" @endif>@include('partials.icon', ['name' => 'map']) Bản đồ</a>
-        <a href="/gioi-thieu" @class(['active' => request()->is('gioi-thieu')]) @if (request()->is('gioi-thieu')) aria-current="page" @endif>@include('partials.icon', ['name' => 'book']) Phương pháp</a>
-        <a href="/huong-dan" @class(['active' => request()->is('huong-dan')]) @if (request()->is('huong-dan')) aria-current="page" @endif>@include('partials.icon', ['name' => 'compass']) Hướng dẫn</a>
+        <a href="/" @class(['active' => request()->is('/')]) @if (request()->is('/')) aria-current="page" @endif>Bản đồ</a>
+        <a href="/gioi-thieu" @class(['active' => request()->is('gioi-thieu')]) @if (request()->is('gioi-thieu')) aria-current="page" @endif>Phương pháp</a>
+        <a href="/huong-dan" @class(['active' => request()->is('huong-dan')]) @if (request()->is('huong-dan')) aria-current="page" @endif>Hướng dẫn</a>
         @if (auth()->user()?->isAdmin())
-            <a href="/bao-cao" @class(['active' => request()->is('bao-cao')]) @if (request()->is('bao-cao')) aria-current="page" @endif>@include('partials.icon', ['name' => 'chart']) Báo cáo</a>
-            <a href="/admin" @class(['active' => request()->is('admin')]) @if (request()->is('admin')) aria-current="page" @endif>@include('partials.icon', ['name' => 'settings']) Quản trị</a>
+            <a href="/bao-cao" @class(['active' => request()->is('bao-cao')]) @if (request()->is('bao-cao')) aria-current="page" @endif>Báo cáo</a>
+            <a href="/admin" @class(['active' => request()->is('admin')]) @if (request()->is('admin')) aria-current="page" @endif>Quản trị</a>
         @endif
         @auth
             <form method="post" action="/dang-xuat" class="nav-logout">
                 @csrf
-                <button type="submit" title="Đang đăng nhập: {{ auth()->user()->email }}">@include('partials.icon', ['name' => 'logout']) Đăng xuất</button>
+                <button type="submit" title="Đang đăng nhập: {{ auth()->user()->email }}">Đăng xuất</button>
             </form>
         @else
-            <a href="/dang-nhap" @class(['active' => request()->is('dang-nhap')]) @if (request()->is('dang-nhap')) aria-current="page" @endif>@include('partials.icon', ['name' => 'login']) Đăng nhập</a>
+            <a href="/dang-nhap" @class(['active' => request()->is('dang-nhap')]) @if (request()->is('dang-nhap')) aria-current="page" @endif>Đăng nhập</a>
         @endauth
     </nav>
 </header>
