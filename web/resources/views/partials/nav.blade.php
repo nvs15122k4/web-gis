@@ -20,8 +20,8 @@
         <a href="/huong-dan" @class(['active' => request()->is('huong-dan')]) @if (request()->is('huong-dan')) aria-current="page" @endif>Hướng dẫn</a>
         @if (auth()->user()?->isAdmin())
             <a href="/bao-cao" @class(['active' => request()->is('bao-cao')]) @if (request()->is('bao-cao')) aria-current="page" @endif>Báo cáo</a>
+            <a href="/admin" @class(['active' => request()->is('admin')]) @if (request()->is('admin')) aria-current="page" @endif>Quản trị</a>
         @endif
-        <a href="/admin" @class(['active' => request()->is('admin')]) @if (request()->is('admin')) aria-current="page" @endif>Quản trị</a>
         @auth
             <form method="post" action="/dang-xuat" class="nav-logout">
                 @csrf
