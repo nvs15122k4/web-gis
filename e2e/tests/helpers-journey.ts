@@ -23,12 +23,18 @@ export async function putThreshold(request: APIRequestContext, value: string | n
     });
 }
 
-/** Đăng nhập qua form /admin. */
+/** Gửi form đăng nhập phiên ở /dang-nhap (không kiểm tra kết quả). */
+export async function sessionLogin(page: Page, user = ADMIN) {
+    await page.goto('/dang-nhap');
+    await page.fill('#session-login-form [name=email]', user.email);
+    await page.fill('#session-login-form [name=password]', user.password);
+    await page.click('#session-login-form button[type=submit]');
+}
+
+/** Đăng nhập admin bằng phiên (/dang-nhap) rồi mở /admin; panel quản trị hiện ngay. */
 export async function loginViaForm(page: Page, user = ADMIN) {
+    await sessionLogin(page, user);
     await page.goto('/admin');
-    await page.fill('#login-form [name=email]', user.email);
-    await page.fill('#login-form [name=password]', user.password);
-    await page.click('#login-form button[type=submit]');
     await expect(page.locator('#admin-panel')).toBeVisible();
 }
 
