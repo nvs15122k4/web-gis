@@ -43,6 +43,11 @@ class E2eFixtureSeeder extends Seeder
     public function run(): void
     {
         $this->call(DatabaseSeeder::class);
+        // Admin mật khẩu mặc định chỉ dành cho test/E2E; `db:seed` thường không tạo.
+        \App\Models\User::updateOrCreate(
+            ['email' => 'admin@webgis.test'],
+            ['name' => 'Admin', 'password' => 'password', 'role' => 'admin']
+        );
         // Người dùng không phải admin, dùng cho kịch bản kiểm thử từ chối quyền.
         \App\Models\User::updateOrCreate(
             ['email' => 'viewer@webgis.test'],
