@@ -154,28 +154,27 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
     });
 
     test('12 đăng nhập admin: sai/viewer bị từ chối, admin sửa ngưỡng và UI phản ánh ngay', { tag: ['@happy'] }, async ({ page }) => {
-        await page.goto('/admin');
         const login = async (email: string, password: string) => {
-            await page.fill('#login-form [name=email]', email);
-            await page.fill('#login-form [name=password]', password);
-            await page.click('#login-form button[type=submit]');
+            await page.goto('/dang-nhap');
+            await page.fill('#session-login-form [name=email]', email);
+            await page.fill('#session-login-form [name=password]', password);
+            await page.click('#session-login-form button[type=submit]');
         };
 
         await login('admin@webgis.test', 'sai-mat-khau');
-        await expect(page.locator('#admin-message')).toContainText('Sai email hoặc mật khẩu');
-        await expect(page.locator('#admin-panel')).toBeHidden();
+        await expect(page.locator('#session-login-form .field-error')).toContainText('Sai email hoặc mật khẩu');
+        await page.goto('/admin');
+        await expect(page).toHaveURL(/\/dang-nhap$/);
 
-        // tài khoản không phải admin: đăng nhập được nhưng sửa ngưỡng bị từ chối
+        // tài khoản không phải admin: đăng nhập được nhưng /admin bị 403
         await login('viewer@webgis.test', 'password');
-        await expect(page.locator('#admin-panel')).toBeVisible();
-        await page.fill('.threshold-form input[name=value]', '9');
-        await page.click('.threshold-form button');
-        await expect(page.locator('#admin-message')).toContainText('Không đủ quyền');
-        await page.click('#logout');
+        expect((await page.goto('/admin'))!.status()).toBe(403);
+        await page.goto('/');
+        await page.click('.nav-logout button');
 
         // admin: sửa ngưỡng thành công
-        await page.waitForSelector('#login-form');
         await login('admin@webgis.test', 'password');
+        await page.goto('/admin');
         await page.fill('.threshold-form input[name=value]', '2.5');
         await page.click('.threshold-form button');
         await expect(page.locator('#admin-message')).toContainText('2.5');
@@ -187,7 +186,6 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
 
         // trả về mặc định để không ảnh hưởng các project trình duyệt sau
         await page.goto('/admin');
-        await login('admin@webgis.test', 'password');
         await page.fill('.threshold-form input[name=value]', '1.0');
         await page.click('.threshold-form button');
         await expect(page.locator('#admin-message')).toContainText('1.0');
