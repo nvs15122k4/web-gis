@@ -275,7 +275,7 @@
     <div class="steps-inner">
         <header class="steps-head">
             <p class="eyebrow">Quy trình giải đoán ảnh</p>
-            <h2 id="steps-title">@include('partials.icon', ['name' => 'layers', 'class' => 'ico h-ico']) Từ ảnh vệ tinh đến đường bờ và tốc độ biến động</h2>
+            <h2 id="steps-title">Từ ảnh vệ tinh đến đường bờ và tốc độ biến động</h2>
             <p class="lead">Mười một bước dưới đây đúng với những gì pipeline Python đã chạy trong repo, từ thu thập ảnh đến xuất lên GeoServer. Hình minh hoạ vẽ lại từ dữ liệu trung gian thật của pipeline, không phải ảnh mô phỏng. Mỗi bước có phần chi tiết kỹ thuật bấm để mở; cuối quy trình là các hạn chế chưa giải quyết được.</p>
         </header>
         <ol class="step-list">
@@ -326,7 +326,7 @@
             @endforeach
         </ol>
         <aside class="step-limits" id="han-che-giai-doan" aria-labelledby="step-limits-title">
-            <h3 id="step-limits-title">@include('partials.icon', ['name' => 'alert', 'class' => 'ico h-ico']) Hạn chế của quy trình</h3>
+            <h3 id="step-limits-title">Hạn chế của quy trình</h3>
             <p>Những chỗ kết quả không khớp kỳ vọng hoặc phụ thuộc vào lựa chọn của đồ án. Không chỗ nào được chỉnh thông số để cho đẹp.</p>
             <ul>
                 @foreach ($limits as $l)
