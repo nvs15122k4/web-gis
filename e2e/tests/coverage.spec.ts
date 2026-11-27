@@ -132,12 +132,12 @@ test.describe('Lớp dữ liệu', () => {
     test('L02 bật hai năm cùng lúc: cả hai lớp trên bản đồ, tắt một năm không ảnh hưởng năm kia', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
-        await page.locator('#year-2019').check();
-        await page.locator('#year-2024').check();
+        await page.locator('.tick[data-year="2019"]').click();
+        await page.locator('.tick[data-year="2024"]').click();
         const on = (y: number) => page.evaluate((yy) => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.years.get(yy)); }, y);
         expect(await on(2019)).toBe(true);
         expect(await on(2024)).toBe(true);
-        await page.locator('#year-2019').uncheck();
+        await page.locator('.tick[data-year="2019"]').click();
         expect(await on(2019)).toBe(false);
         expect(await on(2024)).toBe(true);
     });
