@@ -30,7 +30,7 @@
                     @if ($errors->any())
                         <p class="field-error" id="login-error" role="alert">{{ $errors->first() }}</p>
                     @endif
-                    <button type="submit" class="btn btn-primary btn-block">@include('partials.icon', ['name' => 'login']) Đăng nhập</button>
+                    <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
                 </form>
 
                 <ol class="sheet-notes" aria-label="Ghi chú">
