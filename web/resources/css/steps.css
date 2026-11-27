@@ -69,6 +69,6 @@
 
 /* công thức dạng toán: MathML, phân số có vạch ngang, tự cuộn ngang khi hẹp */
 .eq { margin: 10px 0 0; padding: 8px 12px; background: var(--surface-2); border-left: 3px solid var(--line-strong); }
-.eq-name { margin: 0; font: 600 var(--fs-sm) var(--mono); letter-spacing: .02em; color: var(--ink-3); }
-.eq-math { display: block; margin: 6px 0; overflow-x: auto; overflow-y: hidden; font-size: 1.15em; }
+.eq-name { margin: 0; font: 600 var(--fs-sm) var(--font); letter-spacing: .01em; color: var(--ink-3); }
+.eq-math { display: block math; margin: 6px 0; overflow-x: auto; overflow-y: hidden; font-size: 1.15em; }
 .eq-where { margin: 0; font: 400 var(--fs-md)/1.5 var(--font); color: var(--ink-2, var(--ink-3)); }
