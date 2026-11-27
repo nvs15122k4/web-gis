@@ -10,6 +10,20 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    build: {
+        // vietmap (~1 MB) chỉ tải động khi người dùng chọn nền VietMap; không nằm trên đường tải đầu.
+        chunkSizeWarningLimit: 1100,
+        rolldownOptions: {
+            output: {
+                codeSplitting: {
+                    groups: [
+                        // Leaflet dùng chung mọi trang bản đồ: tách riêng để cache lâu, không đổi hash khi sửa mã app.
+                        { name: 'leaflet', test: /node_modules[\\/]leaflet[\\/]/ },
+                    ],
+                },
+            },
+        },
+    },
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],

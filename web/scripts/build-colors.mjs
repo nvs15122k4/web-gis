@@ -45,6 +45,20 @@ writeFileSync('geoserver/styles/shoreline.sld', sld('shoreline', `        <Rule>
           <CssParameter name="stroke-width">2.5</CssParameter>
         </Stroke></LineSymbolizer></Rule>`));
 
+// Đường bờ nhiều năm trong MỘT lớp WMS: màu theo năm (cùng thang plasma với YEAR_COLORS trong layers.js, năm đầu = FIRST_YEAR).
+// Gộp để trang chỉ gửi một chuỗi tile thay vì mỗi năm một chuỗi; có test đối chiếu hai nguồn màu.
+const YEAR_COLORS = ['#0d0887', '#47039f', '#7301a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#e8b800'];
+const FIRST_YEAR = 2018;
+const yearRule = (y) => `        <Rule>
+          <Name>${y}</Name>
+          <ogc:Filter><ogc:PropertyIsEqualTo><ogc:PropertyName>year</ogc:PropertyName><ogc:Literal>${y}</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>
+          <LineSymbolizer><Stroke>
+            <CssParameter name="stroke">${YEAR_COLORS[(y - FIRST_YEAR) % YEAR_COLORS.length]}</CssParameter>
+            <CssParameter name="stroke-width">2.5</CssParameter>
+          </Stroke></LineSymbolizer>
+        </Rule>`;
+writeFileSync('geoserver/styles/shoreline_by_year.sld', sld('shoreline_by_year', Array.from({ length: 33 }, (_, i) => yearRule(FIRST_YEAR + i)).join('\n')));
+
 // Các lớp còn lại dùng style đơn sắc.
 writeFileSync('geoserver/styles/hotspot.sld', sld('hotspot', `        <Rule><LineSymbolizer><Stroke>
           <CssParameter name="stroke">${colors.severe_erosion}</CssParameter>

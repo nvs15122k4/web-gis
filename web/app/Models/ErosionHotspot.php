@@ -14,4 +14,9 @@ class ErosionHotspot extends Model
     protected $table = 'erosion_hotspots';
 
     public $timestamps = false;
+
+    public function geoPropertyColumns(): ?array
+    {
+        return ['id', 'severity', 'period_start_year', 'period_end_year', 'notes'];
+    }
 }

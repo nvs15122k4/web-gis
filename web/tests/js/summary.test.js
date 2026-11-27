@@ -53,6 +53,26 @@ describe('loadSummary', () => {
         expect(document.getElementById('yearly-table').textContent).toContain(UPDATING.toLowerCase());
     });
 
+    it('biểu đồ theo năm chỉ tải chart.js khi canvas sắp hiện ra', async () => {
+        const renderYearlyChart = vi.fn();
+        vi.doMock('../../resources/js/chart', () => ({ renderYearlyChart }));
+        let trigger;
+        globalThis.IntersectionObserver = class { constructor(cb) { trigger = cb; } observe() {} disconnect() {} };
+        const stats = [{ year: 2019, mean_delta_m: 1, cumulative_m: 1, eroding: 1, accreting: 2 }];
+        globalThis.fetch = vi.fn(async (url) => ({ ok: true, status: 200, json: async () => (String(url).includes('yearly-stats') ? stats : summary()) }));
+        await loadSummary(() => {});
+        await new Promise((r) => setTimeout(r, 0));
+        expect(document.getElementById('yearly-table').textContent).toContain('2019');
+        expect(renderYearlyChart).not.toHaveBeenCalled();
+        trigger([{ isIntersecting: false }]);
+        await new Promise((r) => setTimeout(r, 0));
+        expect(renderYearlyChart).not.toHaveBeenCalled();
+        trigger([{ isIntersecting: true }]);
+        await vi.waitFor(() => expect(renderYearlyChart).toHaveBeenCalledTimes(1));
+        delete globalThis.IntersectionObserver;
+        vi.doUnmock('../../resources/js/chart');
+    });
+
     it('chưa có transect nào thì hiện thông báo chưa có kết quả phân tích', async () => {
         mockFetch(summary({ transects: { total: 0 } }));
         await loadSummary(() => {});

@@ -35,10 +35,19 @@ describe('layers: chế độ GeoJSON (không có GeoServer)', () => {
     });
     afterEach(() => { delete globalThis.fetch; });
 
+    it('lớp transect tắt mặc định thì chưa gọi /api/transects', async () => {
+        const { mod, map } = await setup({ url: null, workspace: 'songhau' });
+        mod.initLayers(map);
+        await new Promise((r) => setTimeout(r, 20));
+        expect(globalThis.fetch.mock.calls.some(([u]) => String(u).includes('/api/transects'))).toBe(false);
+    });
+
     it('không gọi WMS: lớp transect là GeoJSON vẽ từ /api/transects', async () => {
         const { mod, map } = await setup({ url: null, workspace: 'songhau' });
         expect(mod.USE_WMS).toBe(false);
         mod.initLayers(map);
+        mod.layers.transects.addTo(map);
+        mod.layers.transects.addTo(map); // lớp tắt mặc định: chỉ tải dữ liệu khi được bật
         await vi.waitFor(() => expect(mod.layers.transects.getLayers()).toHaveLength(2));
         expect(globalThis.fetch.mock.calls.some(([u]) => String(u).includes('/wms'))).toBe(false);
     });
@@ -46,6 +55,7 @@ describe('layers: chế độ GeoJSON (không có GeoServer)', () => {
     it('lọc "chỉ ý nghĩa thống kê" giữ lại transect có is_significant', async () => {
         const { mod, map } = await setup({ url: null, workspace: 'songhau' });
         mod.initLayers(map);
+        mod.layers.transects.addTo(map); // lớp tắt mặc định: chỉ tải dữ liệu khi được bật
         await vi.waitFor(() => expect(mod.layers.transects.getLayers()).toHaveLength(2));
         const box = document.getElementById('only-significant');
         box.checked = true;
@@ -59,6 +69,7 @@ describe('layers: chế độ GeoJSON (không có GeoServer)', () => {
     it('bấm một transect gọi handler với feature và vị trí', async () => {
         const { mod, map } = await setup({ url: null, workspace: 'songhau' });
         mod.initLayers(map);
+        mod.layers.transects.addTo(map); // lớp tắt mặc định: chỉ tải dữ liệu khi được bật
         await vi.waitFor(() => expect(mod.layers.transects.getLayers()).toHaveLength(2));
         mod.handlers.onTransectClick = vi.fn();
         mod.layers.transects.getLayers()[0].fire('click', { latlng: L.latLng(10.5, 105.2) });
@@ -91,5 +102,36 @@ describe('layers: chế độ GeoServer (tương thích ngược)', () => {
         mod.initLayers(map);
         expect(mod.layers.transects.wmsParams.layers).toBe('songhau:transects');
         delete globalThis.fetch;
+    });
+
+    it('mọi năm đang bật dùng MỘT lớp WMS chung, lọc bằng CQL và tô màu theo năm', async () => {
+        globalThis.fetch = vi.fn(async () => ({ ok: true, status: 200, json: async () => [] }));
+        const { mod, map } = await setup({ url: 'http://gs.test/geoserver', workspace: 'songhau' });
+        mod.initLayers(map);
+        const p = mod.layers.shorelines.wmsParams;
+        expect(p.layers).toBe('songhau:shorelines');
+        expect(p.styles).toBe('shoreline_by_year');
+        expect(p.cql_filter).toBe('year IN (2018,2019)');
+        expect(mod.layers.years.size).toBe(0);
+        expect(map.hasLayer(mod.layers.shorelines)).toBe(true);
+
+        const box = document.getElementById('year-2018');
+        box.checked = false;
+        box.dispatchEvent(new Event('change', { bubbles: true }));
+        expect(mod.layers.shorelines.wmsParams.cql_filter).toBe('year IN (2019)');
+
+        document.getElementById('year-2019').checked = false;
+        document.getElementById('year-2019').dispatchEvent(new Event('change', { bubbles: true }));
+        expect(map.hasLayer(mod.layers.shorelines)).toBe(false);
+        delete globalThis.fetch;
+    });
+
+    it('SLD shoreline_by_year dùng đúng thang màu YEAR_COLORS của giao diện', async () => {
+        const { readFileSync } = await import('node:fs');
+        const { mod } = await setup({ url: null, workspace: 'songhau' });
+        const sld = readFileSync('geoserver/styles/shoreline_by_year.sld', 'utf8');
+        mod.YEAR_COLORS.forEach((c, i) => {
+            expect(sld).toContain(`<ogc:Literal>${2018 + i}</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>\n          <LineSymbolizer><Stroke>\n            <CssParameter name="stroke">${c}</CssParameter>`);
+        });
     });
 });

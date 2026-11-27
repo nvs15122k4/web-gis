@@ -17,6 +17,11 @@ class Transect extends Model
 
     public $timestamps = false;
 
+    public function geoPropertyColumns(): ?array
+    {
+        return ['id', 'transect_code', 'baseline_id'];
+    }
+
     public function stats(): HasOne
     {
         return $this->hasOne(ShorelineChangeStat::class);

@@ -14,4 +14,9 @@ class Shoreline extends Model
     protected $table = 'shorelines';
 
     public $timestamps = false;
+
+    public function geoPropertyColumns(): ?array
+    {
+        return ['id', 'year', 'water_index', 'source_image_date'];
+    }
 }
