@@ -185,7 +185,7 @@ test.describe('Console và network sạch', () => {
         page.on('response', (r) => { if (r.status() >= 400 && new URL(r.url()).origin === new URL(BASE).origin) bad.push(`${r.status()} ${r.url()}`); });
         const errors = await openMap(page);
         for (const tab of ['hotspots', 'share', 'overview', 'layers']) await openTab(page, tab);
-        await page.locator('#year-2020').check();
+        await page.locator('.tick[data-year="2020"]').click();
         await expect(page.locator('#year-2020')).toBeChecked();
         expect(bad).toEqual([]);
         expect(appErrors(errors)).toEqual([]);
