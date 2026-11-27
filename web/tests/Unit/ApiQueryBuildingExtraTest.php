@@ -42,9 +42,16 @@ class ApiQueryBuildingExtraTest extends PretendQueryCase
     public function test_transect_index_chon_cot_thong_ke_va_geojson(): void
     {
         $q = $this->sqlOf(fn () => (new TransectController)->index($this->req([])));
-        foreach (['"transects".*', 'ST_AsGeoJSON(transects.geom, 6) AS geojson', '"s"."change_class"', '"s"."epr_m_per_year"', '"s"."lrr_m_per_year"'] as $frag) {
+        foreach (['"transects"."id"', '"transects"."transect_code"', 'ST_AsGeoJSON(transects.geom, 6) AS geojson', '"s"."change_class"', '"s"."epr_m_per_year"', '"s"."lrr_m_per_year"'] as $frag) {
             $this->assertStringContainsString($frag, $q['sql']);
         }
+    }
+
+    public function test_transect_index_khong_keo_cot_geom_nguyen_ban(): void
+    {
+        $q = $this->sqlOf(fn () => (new TransectController)->index($this->req([])));
+        $this->assertStringNotContainsString('"transects".*', $q['sql']);
+        $this->assertStringNotContainsString('"transects"."geom"', $q['sql']);
     }
 
     public function test_transect_index_loc_change_class(): void
@@ -155,6 +162,30 @@ class ApiQueryBuildingExtraTest extends PretendQueryCase
             $this->assertEquals(array_values($expectedBindings), $q['bindings']);
         }
         $this->assertStringContainsString('order by "year" asc', $q['sql']);
+    }
+
+    public static function tolerances(): array
+    {
+        return [
+            'hop le' => ['0.0005', true],
+            'bang khong' => ['0', false],
+            'qua lon' => ['1', false],
+            'am' => ['-0.1', false],
+            'rac' => ['abc', false],
+        ];
+    }
+
+    #[DataProvider('tolerances')]
+    public function test_shoreline_tolerance_chi_gian_luoc_khi_hop_le(string $value, bool $simplified): void
+    {
+        $q = $this->sqlOf(fn () => (new ShorelineController)->index($this->req(['tolerance' => $value])));
+        if ($simplified) {
+            $this->assertStringContainsString('ST_SimplifyPreserveTopology', $q['sql']);
+            $this->assertEquals([(float) $value], $q['bindings']);
+        } else {
+            $this->assertStringNotContainsString('ST_SimplifyPreserveTopology', $q['sql']);
+            $this->assertSame([], $q['bindings']);
+        }
     }
 
     // ---- ErosionHotspotController ----
