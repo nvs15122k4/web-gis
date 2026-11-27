@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { openMap, openTab } from './helpers';
-import { appErrors } from './helpers-journey';
+import { appErrors, loginViaForm } from './helpers-journey';
 
 const VIEWPORTS = [
     { name: '320', width: 320, height: 640, mobile: true },
@@ -38,6 +38,7 @@ for (const vp of VIEWPORTS) {
         });
 
         test(`V03 ${vp.name}: trang giới thiệu và quản trị không tràn ngang`, { tag: ['@responsive'] }, async ({ page }) => {
+            await loginViaForm(page);
             for (const p of ['/gioi-thieu', '/admin']) {
                 await page.goto(p);
                 expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), p).toBe(true);
