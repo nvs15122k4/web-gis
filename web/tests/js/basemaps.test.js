@@ -52,6 +52,17 @@ describe('initBasemaps', () => {
         expect(map.addedLayers.some((l) => l._url?.includes('nen_ban_do'))).toBe(false);
     });
 
+    it('nền vector không tải GeoJSON khi người dùng đang chọn nền khác', async () => {
+        window.WEBGIS = { geoserver: { url: null, workspace: 'songhau' } };
+        localStorage.setItem('webgis_basemap', 'Ảnh vệ tinh (Esri)');
+        globalThis.fetch = vi.fn(() => Promise.resolve({ json: () => Promise.resolve({ type: 'FeatureCollection', features: [] }) }));
+        const { initBasemaps } = await load();
+        const { map } = makeMap();
+        await initBasemaps(map);
+        await new Promise((r) => setTimeout(r, 0));
+        expect(globalThis.fetch).not.toHaveBeenCalled();
+    });
+
     it('nền vector tải thêm ranh giới tỉnh, sông, hồ và hiện nhãn tên tỉnh khi phóng đủ lớn', async () => {
         window.WEBGIS = { geoserver: { url: null, workspace: 'songhau' } };
         const empty = { type: 'FeatureCollection', features: [] };
