@@ -44,6 +44,12 @@ class MapController extends Controller
         return view('about.index', ['years' => range(...self::STUDY_YEARS)]);
     }
 
+    /** Quy trình giải đoán ảnh bằng QGIS (9 bước), tách khỏi trang Phương pháp. */
+    public function workflow(): View
+    {
+        return view('workflow.index', ['years' => range(...self::STUDY_YEARS)]);
+    }
+
     public function admin(): View
     {
         return view('admin.index', [
