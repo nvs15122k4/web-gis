@@ -13,7 +13,7 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ## Tính năng
 
-Ứng dụng web (Laravel + Leaflet + Chart.js) gồm các trang sau; dữ liệu chính của web là kết quả dựng bằng giao diện QGIS 3.40 (270 transect, 9 đường bờ 2018–2026). Một số ảnh chụp giao diện bên dưới được chụp trên bản dữ liệu trước đó (266 transect) nên số liệu trong ảnh có thể khác.
+Ứng dụng web (Laravel + Leaflet + Chart.js) gồm các trang sau; dữ liệu chính của web là kết quả dựng bằng giao diện QGIS 3.40 (270 transect, 9 đường bờ 2018–2026). Ảnh chụp giao diện bên dưới được chụp lại trên dữ liệu này.
 
 | Đường dẫn | Quyền | Nội dung |
 |---|---|---|
@@ -41,7 +41,7 @@ thanh công cụ (phóng to/thu nhỏ, định vị, toàn khung, chọn, đo đ
 | ![Thẻ Lớp dữ liệu](docs/minh_chung/giao_dien_moi_v3/02_tab_lop.png) | ![Thẻ Hotspot](docs/minh_chung/giao_dien_moi_v3/03_tab_diem_nong.png) |
 | **Lớp dữ liệu**: cây lớp chia nhóm (Biến động đường bờ, Cảnh báo sạt lở); mỗi lớp có công tắc, độ mờ và nút đưa lên/xuống; lớp *điểm tốc độ biến động (LRR)* bật sẵn, *transect* bật khi cần (có lọc "chỉ transect có ý nghĩa thống kê 95%") | **Hotspot**: lọc đoạn lùi bờ theo tốc độ tối thiểu (m/năm), bấm một đoạn để phóng tới |
 | ![Chi tiết transect](docs/minh_chung/giao_dien_moi_v3/05_chi_tiet_transect.png) | ![So sánh hai năm](docs/minh_chung/giao_dien_moi_v3/06_so_sanh_nam.png) |
-| **Chi tiết transect T0094** (mở bằng tìm kiếm hoặc bấm trên bản đồ): NSM, EPR, LRR, R², khoảng tin cậy 95%, ý nghĩa thống kê, độ bất định, số giai đoạn lùi liên tiếp, biểu đồ lịch sử vị trí đường bờ | **So sánh hai năm** (2018 – 2026): chồng hai đường bờ; ngoài ra có **so sánh vuốt (swipe)** kéo thanh dọc để xem năm A bên trái, năm B bên phải |
+| **Chi tiết transect T0089** (mở bằng tìm kiếm hoặc bấm trên bản đồ): NSM, EPR, LRR, R², khoảng tin cậy 95%, ý nghĩa thống kê, độ bất định, số giai đoạn lùi liên tiếp, biểu đồ lịch sử vị trí đường bờ | **So sánh hai năm** (2018 – 2026): chồng hai đường bờ; ngoài ra có **so sánh vuốt (swipe)** kéo thanh dọc để xem năm A bên trái, năm B bên phải |
 
 - **Chia sẻ & xuất dữ liệu** — thẻ **Chia sẻ**: liên kết lưu khung nhìn, lớp, năm trong URL (`#map=…`); tải từng lớp dạng GeoJSON/CSV tại `/api/export/{lớp}.{geojson|csv}`; ảnh ở `04_tab_chia_se.png`.
 - **Giao diện di động** — bảng điều khiển và chi tiết transect thành ngăn kéo phía dưới, thanh điều hướng chia đều một hàng, xem [ảnh](docs/minh_chung/giao_dien_moi_v3/13_di_dong.png).
