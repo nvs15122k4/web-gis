@@ -73,6 +73,7 @@ test.describe('Tính năng bổ sung theo WebGIS tham chiếu', () => {
     test('14 lọc ý nghĩa thống kê: WMS transect gửi CQL_FILTER is_significant=true', { tag: ['@happy', '@regression'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
+        await page.locator('#layer-transects').check(); // lớp transect mặc định tắt; bật thì WMS mới gửi tile
         const req = page.waitForRequest((r) => /transects/.test(r.url()) && /cql_filter=is_significant%3Dtrue/i.test(r.url()));
         await page.locator('#only-significant').check();
         await req;
