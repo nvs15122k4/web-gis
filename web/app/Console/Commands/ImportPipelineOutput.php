@@ -143,8 +143,8 @@ class ImportPipelineOutput extends Command
                 'INSERT INTO shorelines (year, water_index, source_image_date, geom)
                  VALUES (?, ?, ?, ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)))
                  ON CONFLICT (year, water_index) DO UPDATE
-                 SET source_image_date = EXCLUDED.source_image_date, geom = EXCLUDED.geom',
-                [$p['year'], $p['water_index'], $p['source_image_date'] ?? null, json_encode($f['geometry'])]
+                 SET source_image_date = COALESCE(EXCLUDED.source_image_date, shorelines.source_image_date), geom = EXCLUDED.geom',
+                [$p['year'], strtoupper($p['water_index']), $p['source_image_date'] ?? null, json_encode($f['geometry'])]
             );
             $n++;
         }
