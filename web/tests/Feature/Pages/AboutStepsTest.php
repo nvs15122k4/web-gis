@@ -5,7 +5,7 @@ namespace Tests\Feature\Pages;
 use Tests\TestCase;
 
 /**
- * Trang /gioi-thieu chỉ mô tả cách làm bằng QGIS. Mỗi số trong trang được đối chiếu với nguồn thật:
+ * Trang /gioi-thieu và /quy-trinh-qgis chỉ mô tả cách làm bằng QGIS. Mỗi số trong trang được đối chiếu với nguồn thật:
  * pipeline/data/qgis_gui/<năm>/BUOC.md, giai_doan2/BUOC.md, export/*.geojson, config.py, scenes.json, evaluation.json.
  */
 class AboutStepsTest extends TestCase
@@ -14,7 +14,8 @@ class AboutStepsTest extends TestCase
 
     private function page(): string
     {
-        return $this->get('/gioi-thieu')->assertOk()->getContent();
+        // Nội dung phương pháp (/gioi-thieu) và quy trình QGIS (/quy-trinh-qgis) cùng nhau là toàn bộ phần mô tả cách làm.
+        return $this->get('/gioi-thieu')->assertOk()->getContent().$this->get('/quy-trinh-qgis')->assertOk()->getContent();
     }
 
     /** Văn bản thuần của trang (bỏ thẻ, giải mã thực thể) để so số liệu. */
