@@ -25,6 +25,9 @@ export default async function globalSetup() {
     const gs = process.env.GEOSERVER_URL ?? 'http://127.0.0.1:8080/geoserver';
     const res = await fetch(`${gs}/songhau_e2e/wms?service=WMS&request=GetCapabilities`).catch(() => null);
     if (!res?.ok) throw new Error(`GeoServer không phản hồi tại ${gs} (workspace songhau_e2e). Xem README mục GeoServer.`);
+    // Style tô màu đường bờ theo năm do provision.sh nạp: thiếu thì mọi tile đường bờ lỗi StyleNotDefined (ORB chặn) và test bản đồ đỏ khó hiểu.
+    const styles = await fetch(`${gs}/rest/workspaces/songhau_e2e/styles/shoreline_by_year.json`, { headers: { Authorization: `Basic ${Buffer.from('admin:geoserver').toString('base64')}` } }).catch(() => null);
+    if (styles && styles.status === 404) throw new Error('Workspace songhau_e2e thiếu style shoreline_by_year: chạy lại `geoserver/provision.sh songhau_e2e webgis_spatial_e2e` (xem README mục GeoServer).');
 }
 
 /** Tạo CSDL MySQL riêng của slot nếu chưa có; tên đã được env.ts kiểm tra chặt (a-z0-9_). */
