@@ -132,17 +132,31 @@
 
     <section id="han-che">
         <h2>Hạn chế &amp; lưu ý khi sử dụng</h2>
+        <h3>Về ý nghĩa của kết quả</h3>
         <ul>
             <li>Kết quả cho biết <strong>có biến động</strong>, không cho biết <strong>nguyên nhân</strong> (dòng chảy, khai thác cát, san lấp, kè…).</li>
-            <li>Mỗi năm chỉ có một đường bờ mùa khô, nên không phản ánh biến động theo mùa, triều hay lũ, hoặc sạt lở đột ngột giữa hai năm.</li>
-            <li>Độ phân giải 10 m: biến động nhỏ hơn độ bất định không được kết luận.</li>
-            <li>Khu vực có bãi bồi, bùn, thực vật ven bờ, công trình hay tàu thuyền neo đậu có thể làm sai lệch đường bờ.</li>
             <li>Hệ thống <strong>không dự báo thời điểm hay vị trí sạt lở</strong> và không thay thế khảo sát thuỷ lực, địa chất,
                 địa kỹ thuật tại hiện trường.</li>
-            <li>Độ chính xác đường bờ được kiểm chứng trên 5 ô mẫu ground truth số hoá (2018, 2022, 2026); U<sub>classify</sub> lấy theo RMSE đường bờ (16,73 – 21,69 m), nên biến động nhỏ hơn cỡ này không được kết luận.</li>
-            <li>Bản tính trước đó bằng chuỗi script Python được giữ làm bản đối chiếu (xem trang báo cáo nội bộ), không dùng cho số liệu hiển thị.</li>
-            <li class="disclaimer">Thông tin mang tính tham khảo phục vụ nghiên cứu. Không dùng thay cho cảnh báo chính thức của cơ quan chức năng.</li>
+            <li>Dữ liệu chưa phát hiện đoạn lùi bờ nào quanh vùng sạt lở 2019–2020 (hotspot duy nhất, T0089, cách vùng này hơn 5 km), vì vậy không dùng làm bằng chứng khớp với sự kiện thực tế.
+                Chỉ có một transect được xếp lùi bờ mạnh trên tổng số 270.</li>
         </ul>
+        <h3>Về dữ liệu ảnh</h3>
+        <ul>
+            <li>Mỗi năm chỉ có một đường bờ mùa khô, nên không phản ánh biến động theo mùa, triều hay lũ, hoặc sạt lở đột ngột giữa hai năm.</li>
+            <li>Số cảnh dùng chênh nhiều giữa các năm (từ 4 cảnh năm 2018 đến 13 cảnh năm 2020), nên chất lượng ảnh trung vị không đồng đều.</li>
+            <li>Độ phân giải 10 m: biến động nhỏ hơn độ bất định không được kết luận.</li>
+            <li>Khu vực có bãi bồi, bùn, thực vật ven bờ, công trình hay tàu thuyền neo đậu có thể làm sai lệch đường bờ.</li>
+        </ul>
+        <h3>Về cách làm trong QGIS</h3>
+        <ul>
+            <li>QGIS 3.40 không có công cụ Otsu: ngưỡng nước được tính riêng trên histogram của ảnh MNDWI rồi nhập vào Raster Calculator; histogram trong QGIS dùng để đối chiếu bằng mắt.</li>
+            <li>Baseline và hướng transect được dựng bán thủ công (phía đất xác định bằng mắt), nên tốc độ biến động LRR từng transect chỉ nên đọc theo nhóm biến động, không so tuyệt đối từng mét.
+                Ở đầu tuyến (T0001–T0007) giao điểm gần nhất nhảy mạnh giữa các năm.</li>
+            <li>Độ chính xác đường bờ được kiểm chứng trên 5 ô mẫu ground truth số hoá (2018, 2022, 2026); U<sub>classify</sub> lấy theo RMSE đường bờ (16,73 – 21,69 m), nên biến động nhỏ hơn cỡ này không được kết luận.
+                Phép đo này chạy trên bản đường bờ giải đoán bằng script QGIS trước đó, chưa đo lại trên bản dựng bằng giao diện.</li>
+            <li>Bản tính trước đó bằng chuỗi script Python được giữ làm bản đối chiếu (xem trang báo cáo nội bộ), không dùng cho số liệu hiển thị.</li>
+        </ul>
+        <p class="disclaimer">Thông tin mang tính tham khảo phục vụ nghiên cứu. Không dùng thay cho cảnh báo chính thức của cơ quan chức năng.</p>
     </section>
 
     <section id="tai-du-lieu">
