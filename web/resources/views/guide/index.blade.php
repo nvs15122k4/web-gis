@@ -26,6 +26,7 @@
     <a href="#bat-dau">Bắt đầu</a>
     <a href="#tong-quan">Tổng quan</a>
     <a href="#lop-du-lieu">Lớp dữ liệu</a>
+    <a href="#cong-cu">Công cụ trên bản đồ</a>
     <a href="#transect">Xem một transect</a>
     <a href="#hotspot">Hotspot</a>
     <a href="#so-sanh">So sánh hai năm</a>
@@ -43,23 +44,36 @@
             <li>Bảng điều khiển bên trái có bốn thẻ: <strong>Tổng quan</strong>, <strong>Lớp dữ liệu</strong>, <strong>Hotspot</strong>
                 và <strong>Chia sẻ</strong>. Trên điện thoại, bấm nút ba gạch ở góc trái thanh tiêu đề để mở hoặc đóng bảng này.</li>
             <li>Chú giải màu nằm ở góc bản đồ; bấm vào tiêu đề chú giải để thu gọn hoặc mở rộng.</li>
-            <li>Trang <a href="/gioi-thieu">Phương pháp</a> giải thích dữ liệu, cách tính và các hạn chế.</li>
+            <li>Trang <a href="/gioi-thieu">Phương pháp</a> giải thích dữ liệu, tiêu chí phân loại, độ bất định và hạn chế; trang <a href="/quy-trinh-qgis">Quy trình QGIS</a> trình bày chín bước giải đoán ảnh từ ảnh Sentinel-2 đến tốc độ biến động.</li>
         </ol>
     </section>
 
     <section id="tong-quan">
         <h2>Thẻ Tổng quan</h2>
-        <p>Tóm tắt số lượng transect theo từng mức biến động (bồi, ổn định, lùi nhẹ, lùi mạnh) và các chỉ số chung của toàn đoạn bờ.
+        <p>Tóm tắt 270 transect của đoạn bờ theo từng mức biến động (bồi, ổn định, lùi nhẹ, lùi mạnh), tốc độ biến động LRR trung bình và số transect có ý nghĩa thống kê.
             Khi dữ liệu chưa sẵn sàng, mục tương ứng ghi <em>Đang cập nhật</em> thay vì hiện số giả.</p>
     </section>
 
     <section id="lop-du-lieu">
         <h2>Thẻ Lớp dữ liệu</h2>
+        <p>Thẻ này là một cây lớp chia hai nhóm; mỗi lớp có công tắc bật/tắt, thanh độ trong suốt và nút ↑ ↓ đổi thứ tự chồng lớp.</p>
         <ul>
-            <li><strong>Transect</strong> — các mặt cắt vuông góc với bờ, tô màu theo mức biến động. Bật <em>Chỉ transect có ý nghĩa thống kê (95%)</em> để ẩn những mặt cắt chưa đủ cơ sở kết luận.</li>
-            <li><strong>Hotspot lùi bờ mạnh</strong> — đoạn bờ gộp từ các transect lùi mạnh liên tiếp.</li>
+            <li><strong>Điểm tốc độ biến động (LRR)</strong> — mỗi transect một chấm trên đường bờ mới nhất, màu từ đỏ (lùi) qua xám (ổn định) đến xanh (bồi); chấm to là transect có ý nghĩa thống kê. Lớp này bật sẵn.</li>
+            <li><strong>Transect</strong> — các mặt cắt vuông góc với bờ, tô màu theo mức biến động; mặc định tắt, nên phóng to để xem. Bật <em>Chỉ transect có ý nghĩa thống kê (95%)</em> để ẩn những mặt cắt chưa đủ cơ sở kết luận.</li>
+            <li><strong>Hotspot lùi bờ mạnh</strong> — đoạn bờ gộp từ các transect lùi mạnh liên tiếp (hiện có một hotspot).</li>
             <li><strong>Sạt lở tham chiếu 2019–2020</strong> — vùng cảnh báo từ nguồn công bố, chỉ để đối chiếu; mặc định tắt.</li>
-            <li><strong>Đường bờ theo năm</strong> — bật nhiều năm để thấy bờ dịch chuyển. Năm bị làm mờ là năm chưa có ảnh hợp lệ.</li>
+            <li><strong>Đường bờ theo năm</strong> — chín đường bờ 2018–2026 vẽ chung trong một lớp, chọn năm ở thanh thời gian dưới bản đồ: bấm một năm để bật/tắt, bấm <em>Phát</em> để xem bờ dịch chuyển lần lượt. Năm bị làm mờ là năm chưa có ảnh hợp lệ.</li>
+        </ul>
+    </section>
+
+    <section id="cong-cu">
+        <h2>Công cụ trên bản đồ</h2>
+        <ul>
+            <li><strong>Thanh công cụ nổi</strong> (góc trên trái bản đồ): phóng to, thu nhỏ, vị trí của tôi, toàn màn hình; <em>Chọn đối tượng</em>, <em>Đo khoảng cách</em>, <em>Đo diện tích</em> và <em>Xoá phép đo</em>. Kết quả đo hiện ở dòng dưới bản đồ; bấm <kbd>Esc</kbd> để thoát chế độ đo.</li>
+            <li><strong>Ô tìm kiếm</strong>: gõ mã transect (ví dụ T0089) hoặc toạ độ (10.54, 105.29) để bản đồ phóng tới đó.</li>
+            <li><strong>Bảng thuộc tính</strong> (nút bảng ở góc phải): liệt kê transect với mã, mức biến động, EPR, LRR và ý nghĩa thống kê (bấm tiêu đề cột để sắp xếp); chọn một dòng để phóng tới transect, và ngược lại.</li>
+            <li><strong>In / xuất PDF</strong> (nút máy in): in khung bản đồ hiện tại.</li>
+            <li><strong>Chú giải</strong> và <strong>mũi tên bắc</strong> nằm ở góc bản đồ.</li>
         </ul>
     </section>
 
@@ -84,14 +98,14 @@
     <section id="so-sanh">
         <h2>So sánh hai năm</h2>
         <p>Trong thẻ Lớp dữ liệu, chọn <strong>Năm A</strong> và <strong>Năm B</strong> rồi bấm <strong>So sánh</strong>; hai đường bờ được vẽ
-            bằng hai màu khác nhau. Bấm <strong>Bỏ so sánh</strong> để quay lại.</p>
+            bằng hai màu khác nhau. Bấm <strong>Vuốt</strong> để chia đôi bản đồ bằng thanh kéo (năm A bên trái, năm B bên phải). Bấm <strong>Bỏ so sánh</strong> để quay lại.</p>
     </section>
 
     <section id="chia-se">
         <h2>Chia sẻ và tải dữ liệu</h2>
         <ul>
             <li><strong>Sao chép liên kết</strong> (thẻ Chia sẻ) giữ nguyên vị trí, mức phóng và transect đang chọn; gửi liên kết cho người khác là họ thấy đúng khung nhìn của bạn.</li>
-            <li>Mục <strong>Tải dữ liệu</strong> cho phép tải bốn lớp (transect, đường bờ, hotspot, sạt lở tham chiếu) dạng GeoJSON hoặc CSV, hệ toạ độ EPSG:4326.</li>
+            <li>Mục <strong>Tải dữ liệu</strong> (thẻ Chia sẻ, và cuối trang <a href="/gioi-thieu#tai-du-lieu">Phương pháp</a>) cho phép tải bốn lớp (transect, đường bờ, hotspot, sạt lở tham chiếu) dạng GeoJSON hoặc CSV, hệ toạ độ EPSG:4326.</li>
         </ul>
     </section>
 
@@ -123,7 +137,8 @@
             <dt>Vì sao một số năm bị mờ?</dt><dd>Năm đó không có ảnh vệ tinh hợp lệ (mây, thiếu cảnh), nên không có đường bờ.</dd>
             <dt>Vì sao hiện “Đang cập nhật”?</dt><dd>Dữ liệu lớp đó chưa được nạp hoặc dịch vụ chưa sẵn sàng; hãy thử lại sau.</dd>
             <dt>Vì sao vùng sạt lở 2019–2020 không có hotspot?</dt><dd>Xem mục “Sạt lở tham chiếu” ở trang <a href="/gioi-thieu#sat-lo">Phương pháp</a>: ảnh 10 m mỗi năm một lần không bắt được sạt lở đột ngột.</dd>
-            <dt>Tôi là quản trị viên, chỉnh ngưỡng ở đâu?</dt><dd>Trang <a href="/admin">Quản trị</a> (đăng nhập bằng tài khoản admin).</dd>
+            <dt>Dữ liệu được dựng thế nào?</dt><dd>Hoàn toàn bằng giao diện QGIS 3.40 từ ảnh Sentinel-2; xem từng bước ở trang <a href="/quy-trinh-qgis">Quy trình QGIS</a>.</dd>
+            <dt>Tôi là quản trị viên, chỉnh ngưỡng ở đâu?</dt><dd>Trang <a href="/admin">Quản trị</a> (đăng nhập bằng tài khoản admin): ngưỡng hotspot và cấu hình lớp bản đồ mặc định.</dd>
         </dl>
     </section>
 </article>
