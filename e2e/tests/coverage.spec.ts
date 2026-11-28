@@ -80,20 +80,22 @@ test.describe('Bản đồ: bố cục và tab', () => {
         for (const t of ['Bồi', 'Ổn định', 'Lùi nhẹ', 'Lùi mạnh', 'Đặc biệt nguy hiểm', 'Chưa phân loại']) {
             await expect(legend).toContainText(t);
         }
-        await legend.locator('summary').click();
+        // Giao diện v3: chú giải mặc định thu gọn (chỉ hiện tiêu đề), bấm để mở rồi bấm lại để thu.
         await expect(legend.locator('.legend-body')).toBeHidden();
         await legend.locator('summary').click();
         await expect(legend.locator('.legend-body')).toBeVisible();
+        await legend.locator('summary').click();
+        await expect(legend.locator('.legend-body')).toBeHidden();
     });
 
     test('M03 điều khiển zoom: tăng rồi giảm mức phóng', { tag: ['@happy'] }, async ({ page }) => {
         await openMap(page);
         const zoom = () => page.evaluate(() => (window as any).__webgis.map.getZoom());
         const z0 = await zoom();
-        await page.click('.leaflet-control-zoom-in');
+        await page.click('.tool-btn[data-tool="in"]');
         await expect.poll(zoom).toBe(z0 + 1);
         await expect.poll(() => page.evaluate(() => (window as any).__webgis.map._animatingZoom)).toBeFalsy(); // chờ hết hoạt ảnh, Leaflet bỏ qua click khi đang zoom
-        await page.click('.leaflet-control-zoom-out');
+        await page.click('.tool-btn[data-tool="out"]');
         await expect.poll(zoom).toBe(z0);
     });
 
@@ -132,13 +134,21 @@ test.describe('Lớp dữ liệu', () => {
     test('L02 bật hai năm cùng lúc: cả hai lớp trên bản đồ, tắt một năm không ảnh hưởng năm kia', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
-        await page.locator('.tick[data-year="2019"]').click();
-        await page.locator('.tick[data-year="2024"]').click();
-        const on = (y: number) => page.evaluate((yy) => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.years.get(yy)); }, y);
+        // v3 (WMS): các năm đã bật cùng nằm trong CQL `year IN (...)` của lớp đường bờ chung; mọi năm có dữ liệu được bật sẵn
+        const on = (y: number) => page.evaluate((yy) => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.shorelines) && new RegExp(`\\b${yy}\\b`).test(w.layers.shorelines.wmsParams.cql_filter); }, y);
         expect(await on(2019)).toBe(true);
         expect(await on(2024)).toBe(true);
+        // tắt cả hai rồi bật lại từng năm bằng mốc thời gian: hai năm cùng hiện
         await page.locator('.tick[data-year="2019"]').click();
-        expect(await on(2019)).toBe(false);
+        await page.locator('.tick[data-year="2024"]').click();
+        await expect.poll(() => on(2019)).toBe(false);
+        await expect.poll(() => on(2024)).toBe(false);
+        await page.locator('.tick[data-year="2019"]').click();
+        await page.locator('.tick[data-year="2024"]').click();
+        await expect.poll(() => on(2019)).toBe(true);
+        expect(await on(2024)).toBe(true);
+        await page.locator('.tick[data-year="2019"]').click(); // tắt 2019
+        await expect.poll(() => on(2019)).toBe(false);
         expect(await on(2024)).toBe(true);
     });
 
@@ -183,8 +193,8 @@ test.describe('Tổng quan, bộ lọc, chi tiết', () => {
         const body = JSON.stringify(s);
         expect(body).toContain('10');
         await expect(page.locator('#kpi-transects')).toHaveText('10');
-        const sum = await page.locator('#summary [data-class]').evaluateAll((els) => els.reduce((a, e) => a + Number(e.textContent), 0));
-        expect(sum).toBe(10);
+        // các số đếm chạy từ 0 lên giá trị cuối (countUp) nên chờ tới khi ổn định
+        await expect.poll(() => page.locator('#summary [data-class]').evaluateAll((els) => els.reduce((a, e) => a + Number(e.textContent), 0))).toBe(10);
     });
 
     test('F02 hotspot: danh sách khớp API erosion-hotspots với cùng ngưỡng', { tag: ['@sanity', '@happy', '@regression'] }, async ({ page }) => {
@@ -426,8 +436,8 @@ test.describe('Responsive & giao diện', () => {
         await page.emulateMedia({ colorScheme: 'dark' });
         await page.goto('/gioi-thieu');
         const c = await page.evaluate(() => { const s = getComputedStyle(document.body); return { fg: s.color, bg: s.backgroundColor, scheme: getComputedStyle(document.documentElement).colorScheme }; });
-        expect(c.bg).toBe('rgb(232, 233, 231)');
-        expect(c.fg).toBe('rgb(23, 25, 27)');
+        expect(c.bg).toBe('rgb(239, 233, 218)'); // nền kem của giao diện v3
+        expect(c.fg).toBe('rgb(31, 28, 23)');
         expect(c.scheme).toBe('light');
     });
 
