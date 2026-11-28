@@ -28,7 +28,7 @@ test.describe('Hướng dẫn và Báo cáo', () => {
 
     test('GR03 user thường: không có menu Báo cáo, vào thẳng /bao-cao bị 403', { tag: ['@negative', '@regression'] }, async ({ page }) => {
         await sessionLogin(page, VIEWER);
-        await expect(page).toHaveURL(/\/$/);
+        await expect(page).toHaveURL(/\/(#.*)?$/);
         await expect(page.locator('.topnav a[href="/bao-cao"]')).toHaveCount(0);
         const res = await page.goto('/bao-cao');
         expect(res?.status()).toBe(403);
@@ -41,7 +41,7 @@ test.describe('Hướng dẫn và Báo cáo', () => {
         await page.goto('/huong-dan');
         await expect(page.locator('.topnav a[href="/bao-cao"]')).toBeVisible();
         await page.click('.nav-logout button');
-        await expect(page).toHaveURL(/\/$/);
+        await expect(page).toHaveURL(/\/(#.*)?$/);
         await expect(page.locator('.topnav a[href="/bao-cao"]')).toHaveCount(0);
         await page.goto('/bao-cao');
         await expect(page).toHaveURL(/\/dang-nhap$/);
@@ -65,6 +65,7 @@ test.describe('Hướng dẫn và Báo cáo', () => {
     test('GR07 chỉ còn giao diện sáng: hệ điều hành chọn tối vẫn giữ nền sáng', { tag: ['@regression', '@responsive'] }, async ({ page }) => {
         await page.emulateMedia({ colorScheme: 'dark' });
         await sessionLogin(page);
+        await expect(page).not.toHaveURL(/dang-nhap/); // chờ chuyển trang xong (admin về trang chủ) rồi mới đọc style
         const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
         expect(bg).toBe('rgb(239, 233, 218)');
     });

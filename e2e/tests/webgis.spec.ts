@@ -18,15 +18,30 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
     test('02 layer control: bật/tắt lớp Đường bờ 2020', { tag: ['@sanity', '@happy'] }, async ({ page }) => {
         await openMap(page);
         await openTab(page, 'layers');
-        const req = page.waitForRequest((r) => /shorelines/.test(r.url()) && /year%3D2020|year=2020/i.test(r.url()));
+        // v3 (WMS): mọi năm có dữ liệu bật sẵn trong MỘT lớp đường bờ chung lọc bằng CQL `year IN (...)`.
+        const cql = () => page.evaluate(() => (window as any).__webgis.layers.shorelines.wmsParams.cql_filter as string);
+        const shown = () => page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.shorelines); });
+        expect(await shown()).toBe(true);
+        expect(await cql()).toMatch(/\b2020\b/);
+        // bấm mốc 2020 là tắt năm đó: CQL bỏ 2020 và WMS gửi lại tile với bộ lọc mới
+        const yearsIn = (u: string) => new URL(u).searchParams.get('cql_filter') ?? '';
+        const without = page.waitForRequest((r) => /shorelines/.test(r.url()) && /^year IN/i.test(yearsIn(r.url())) && !/2020/.test(yearsIn(r.url())));
         await page.locator('.tick[data-year="2020"]').click();
-        await req;
-        expect(await page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.years.get(2020)); })).toBe(true);
+        await without;
+        expect(await cql()).not.toMatch(/\b2020\b/);
+        expect(await shown()).toBe(true);
+        // bấm lại là bật lại năm 2020
+        // (không chờ request: tile của bộ lọc ban đầu đã nằm trong cache trình duyệt nên có thể không gửi lại)
         await page.locator('.tick[data-year="2020"]').click();
-        expect(await page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.years.get(2020)); })).toBe(false);
+        await expect.poll(cql).toMatch(/\b2020\b/);
+        expect(await shown()).toBe(true);
         // lớp transect cũng bật/tắt theo checkbox
+        const hasTransects = () => page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.transects); });
+        expect(await hasTransects()).toBe(false); // mặc định tắt
+        await page.locator('#layer-transects').check();
+        expect(await hasTransects()).toBe(true);
         await page.locator('#layer-transects').uncheck();
-        expect(await page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.transects); })).toBe(false);
+        expect(await hasTransects()).toBe(false);
     });
 
     test('03 so sánh năm: 2019 & 2024 hiển thị đồng thời, hai màu khác nhau', { tag: ['@happy'] }, async ({ page }) => {
@@ -143,14 +158,15 @@ test.describe('Bản đồ WebGIS sông Hậu', () => {
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
         // bản đồ vẫn zoom được
         const z0 = await page.evaluate(() => (window as any).__webgis.map.getZoom());
-        await page.click('.leaflet-control-zoom-in');
+        await page.click('.tool-btn[data-tool="in"]');
         await expect.poll(() => page.evaluate(() => (window as any).__webgis.map.getZoom())).toBeGreaterThan(z0);
         // mở sidebar bằng nút, dùng được điều khiển bên trong
         await page.click('#sidebar-toggle');
         await expect(page.locator('#sidebar')).not.toHaveClass(/collapsed/);
         await openTab(page, 'layers');
-        await page.locator('.tick[data-year="2020"]').click();
-        await expect(page.locator('#year-2020')).toBeChecked();
+        // v3: thanh mốc năm nằm dưới bản đồ và bị sidebar phủ trên điện thoại; dùng công tắc lớp ngay trong sidebar
+        await page.locator('#layer-transects').check();
+        expect(await page.evaluate(() => { const w = (window as any).__webgis; return w.map.hasLayer(w.layers.transects); })).toBe(true);
     });
 
     test('12 đăng nhập admin: sai/viewer bị từ chối, admin sửa ngưỡng và UI phản ánh ngay', { tag: ['@happy'] }, async ({ page }) => {

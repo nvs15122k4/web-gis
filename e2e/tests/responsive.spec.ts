@@ -32,8 +32,9 @@ for (const vp of VIEWPORTS) {
             const t = await page.request.get('/api/transects').then((r) => r.json());
             await page.evaluate((id) => (window as any).__webgis.showTransect(id), t.features[0].properties.id);
             await expect(page.locator('#inspector')).toBeVisible();
+            // thẻ chi tiết trượt vào bằng hoạt ảnh (panel-in-*): đợi hoạt ảnh xong rồi mới đo vị trí cuối
+            await expect.poll(async () => { const b = await page.locator('#inspector').boundingBox(); return b!.x + b!.width; }).toBeLessThanOrEqual(vp.width + 1);
             const ins = await page.locator('#inspector').boundingBox();
-            expect(ins!.x + ins!.width).toBeLessThanOrEqual(vp.width + 1);
             expect(ins!.x).toBeGreaterThanOrEqual(-1);
         });
 

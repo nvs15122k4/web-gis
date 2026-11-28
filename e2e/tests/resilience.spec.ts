@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { BASE } from '../env';
-import { openMap, openTab } from './helpers';
+import { openMap, openTab, centerOnTransect } from './helpers';
 import { openMapLoose, appErrors, loginViaForm } from './helpers-journey';
 
 // Các test dưới đây là "partial E2E (mocked: API/GeoServer)": giả lập lỗi hạ tầng bằng page.route
@@ -100,7 +100,7 @@ test.describe('Chịu lỗi: chậm và mất mạng', () => {
         await openMapLoose(page);
         await openTab(page, 'layers');
         await expect(page.locator('#panel-layers')).toBeVisible();
-        await page.click('.leaflet-control-zoom-in');
+        await page.click('.tool-btn[data-tool="in"]');
         release();
         await openTab(page, 'hotspots');
         await expect(page.locator('#hotspot-list li').first()).toBeAttached();
@@ -156,8 +156,10 @@ test.describe('Chịu lỗi: GeoServer', () => {
     test('E14 GeoServer trả 503: click transect báo trạng thái "Thông tin transect (GeoServer)"', { tag: ['@negative', '@resilience'] }, async ({ page }) => {
         await openMap(page);
         const t = await (await page.request.get('/api/transects')).json();
-        const [[lng1, lat1], [lng2]] = t.features[0].geometry.coordinates;
-        await page.evaluate(([la, ln]) => (window as any).__webgis.map.setView([la, ln], 16, { animate: false }), [lat1, lng1 + (lng2 - lng1) / 2]);
+        // lớp transect mặc định tắt: helper bật lớp và đưa bản đồ về giữa transect đầu tiên
+        await centerOnTransect(page, t.features[0].properties.transect_code);
+        // tắt dải/điểm tốc độ (nằm trên cùng, tự bắt click bằng dữ liệu API) để click rơi vào đường đi WMS GetFeatureInfo
+        await page.evaluate(() => { const b = document.getElementById('layer-rates') as HTMLInputElement; b.checked = false; b.dispatchEvent(new Event('change', { bubbles: true })); });
         await page.route('**/geoserver/**/wms?*GetFeatureInfo*', (r) => r.fulfill({ status: 503, body: 'x' }));
         const c = await page.evaluate(() => { const m = (window as any).__webgis.map.getContainer().getBoundingClientRect(); return { x: m.left + m.width / 2, y: m.top + m.height / 2 }; });
         await page.mouse.click(c.x, c.y);
@@ -185,8 +187,10 @@ test.describe('Console và network sạch', () => {
         page.on('response', (r) => { if (r.status() >= 400 && new URL(r.url()).origin === new URL(BASE).origin) bad.push(`${r.status()} ${r.url()}`); });
         const errors = await openMap(page);
         for (const tab of ['hotspots', 'share', 'overview', 'layers']) await openTab(page, tab);
-        await page.locator('.tick[data-year="2020"]').click();
+        // v3: mọi năm có dữ liệu được bật sẵn, bấm mốc thời gian là TẮT năm đó
         await expect(page.locator('#year-2020')).toBeChecked();
+        await page.locator('.tick[data-year="2020"]').click();
+        await expect(page.locator('#year-2020')).not.toBeChecked();
         expect(bad).toEqual([]);
         expect(appErrors(errors)).toEqual([]);
     });

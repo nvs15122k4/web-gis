@@ -27,6 +27,11 @@ export const API = {
 /** Đưa bản đồ về vùng có transect và trả toạ độ (lat,lng) giữa transect để click. */
 export async function centerOnTransect(page: Page, code: string) {
     const t = await API.transect(page, code);
+    // Giao diện v3: lớp transect mặc định TẮT (mặc định chỉ có dải/điểm tốc độ), phải bật thì mới có WMS tile và click mới trả GetFeatureInfo.
+    await page.evaluate(() => {
+        const box = document.getElementById('layer-transects') as HTMLInputElement;
+        if (!box.checked) { box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
     const [[lng1, lat1], [lng2]] = t.geometry.coordinates;
     const lng = lng1 + (lng2 - lng1) * 0.5;
     await page.evaluate(([lat, lng]) => (window as any).__webgis.map.setView([lat, lng], 16, { animate: false }), [lat1, lng]);
