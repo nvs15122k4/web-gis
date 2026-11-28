@@ -6,14 +6,44 @@ use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
- * Nạp output pipeline THẬT (pipeline/output) rồi kiểm số liệu chốt: 266 transect, phân lớp 71/181/10/4,
- * 3 hotspot (T0020, T0094, T0200–T0201), 2 sự kiện sạt lở tham chiếu; /api/summary phải khớp. Chạy trong transaction nên được rollback.
+ * Nạp dữ liệu THẬT dựng bằng QGIS (pipeline/data/qgis_gui/giai_doan2/export, kèm sự kiện sạt lở tham chiếu từ pipeline/output)
+ * rồi kiểm số liệu chốt: 270 transect, phân lớp 52/209/8/1, 1 hotspot (T0089), 2 sự kiện sạt lở tham chiếu;
+ * /api/summary phải khớp. Chạy trong transaction nên được rollback.
  */
 class ImportRealPipelineOutputTest extends TestCase
 {
+    private string $tmp = '';
+
+    protected function tearDown(): void
+    {
+        if ($this->tmp !== '' && is_dir($this->tmp)) {
+            array_map('unlink', glob("{$this->tmp}/*"));
+            rmdir($this->tmp);
+        }
+        parent::tearDown();
+    }
+
+    /** Thư mục tạm gồm GeoJSON xuất từ QGIS + reference.json (sạt lở tham chiếu, không do QGIS tạo). */
     private function outputDir(): string
     {
-        return realpath(base_path('../pipeline/output')) ?: base_path('../pipeline/output');
+        $qgis = base_path('../pipeline/data/qgis_gui/giai_doan2/export');
+        $ref = base_path('../pipeline/output/reference.json');
+        foreach (['baseline', 'shorelines', 'transects', 'hotspots'] as $f) {
+            if (! is_file("{$qgis}/{$f}.geojson")) {
+                $this->markTestSkipped("Thiếu {$qgis}/{$f}.geojson — dựng dữ liệu trong QGIS trước khi kiểm thử này.");
+            }
+        }
+        if (! is_file($ref)) {
+            $this->markTestSkipped('Thiếu pipeline/output/reference.json.');
+        }
+        $this->tmp = sys_get_temp_dir().'/webgis_real_'.uniqid();
+        mkdir($this->tmp);
+        foreach (['baseline', 'shorelines', 'transects', 'hotspots'] as $f) {
+            copy("{$qgis}/{$f}.geojson", "{$this->tmp}/{$f}.geojson");
+        }
+        copy($ref, "{$this->tmp}/reference.json");
+
+        return $this->tmp;
     }
 
     private function pg()
@@ -24,11 +54,6 @@ class ImportRealPipelineOutputTest extends TestCase
     private function importReal(): void
     {
         $dir = $this->outputDir();
-        foreach (['baseline', 'shorelines', 'transects', 'hotspots', 'reference'] as $f) {
-            if (! is_file("{$dir}/{$f}.json")) {
-                $this->markTestSkipped("Thiếu pipeline/output/{$f}.json — chạy pipeline trước khi kiểm thử này.");
-            }
-        }
         // Bỏ dữ liệu fixture để chỉ còn dữ liệu thật (rollback sau test).
         foreach (['shoreline_change_stats', 'transect_shoreline_distances', 'transects', 'shorelines'] as $t) {
             $this->pg()->table($t)->delete();
@@ -40,13 +65,13 @@ class ImportRealPipelineOutputTest extends TestCase
     {
         $this->importReal();
 
-        $this->assertSame(266, $this->pg()->table('transects')->count());
-        $this->assertSame(266, $this->pg()->table('shoreline_change_stats')->count());
-        $this->assertSame(3, $this->pg()->table('erosion_hotspots')->count());
+        $this->assertSame(270, $this->pg()->table('transects')->count());
+        $this->assertSame(270, $this->pg()->table('shoreline_change_stats')->count());
+        $this->assertSame(1, $this->pg()->table('erosion_hotspots')->count());
         $this->assertSame(2, $this->pg()->table('reference_landslide_events')->count());
     }
 
-    public function test_change_class_distribution_matches_pipeline_summary(): void
+    public function test_change_class_distribution_matches_qgis_summary(): void
     {
         $this->importReal();
 
@@ -55,7 +80,7 @@ class ImportRealPipelineOutputTest extends TestCase
             ->map(fn ($n) => (int) $n)->all();
         ksort($byClass);
 
-        $this->assertSame(['accretion' => 71, 'mild_erosion' => 10, 'severe_erosion' => 4, 'stable' => 181], $byClass);
+        $this->assertSame(['accretion' => 52, 'mild_erosion' => 8, 'severe_erosion' => 1, 'stable' => 209], $byClass);
     }
 
     public function test_hotspots_are_on_severe_erosion_transects(): void
@@ -65,10 +90,10 @@ class ImportRealPipelineOutputTest extends TestCase
         $severe = $this->pg()->table('shoreline_change_stats as s')->join('transects as t', 't.id', '=', 's.transect_id')
             ->where('s.change_class', 'severe_erosion')->pluck('t.transect_code')->all();
         sort($severe);
-        $this->assertSame(['T0020', 'T0094', 'T0200', 'T0201'], $severe);
+        $this->assertSame(['T0089'], $severe);
 
         $notes = $this->pg()->table('erosion_hotspots')->pluck('notes')->implode(' ');
-        foreach (['T0020', 'T0094', 'T0200'] as $code) {
+        foreach (['T0089'] as $code) {
             $this->assertStringContainsString($code, $notes, "Ghi chú hotspot phải nêu transect $code");
         }
     }
@@ -79,13 +104,13 @@ class ImportRealPipelineOutputTest extends TestCase
 
         $s = $this->getJson('/api/summary')->assertOk()->json();
 
-        $this->assertSame(266, $s['transects']['total']);
+        $this->assertSame(270, $s['transects']['total']);
         $this->assertSame(
-            ['accretion' => 71, 'stable' => 181, 'mild_erosion' => 10, 'severe_erosion' => 4],
+            ['accretion' => 52, 'stable' => 209, 'mild_erosion' => 8, 'severe_erosion' => 1],
             $s['transects']['by_class']
         );
-        $this->assertSame(3, $s['hotspots']['count']);
+        $this->assertSame(1, $s['hotspots']['count']);
         $this->assertSame(2, $s['reference_events']['count']);
-        $this->assertSame('T0200', $s['transects']['max_erosion']['transect_code']);
+        $this->assertSame('T0006', $s['transects']['max_erosion']['transect_code']);
     }
 }
