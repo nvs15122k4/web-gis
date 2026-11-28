@@ -54,3 +54,51 @@ with_variable('b', geometry(get_feature_by_id('baseline',1)),
 - Không tính `unc_epr`, `unc_lrr`, `low_r2_caution`, hotspot (không nằm trong yêu cầu giai đoạn này). Giá trị t Student tra bảng 3 chữ số thập phân (sai khác < 0,001 so với scipy).
 - Lớp trung gian lưu thành file `.gpkg` trong thư mục này (không dùng lớp tạm) để dễ kiểm tra; `transects.gpkg-wal/-shm` là file phụ của SQLite sinh ra khi QGIS đang mở.
 - Một số ảnh có số thứ tự trùng (20, 34, 37, 38) do chụp trong lúc thử lại; tra theo tên.
+
+---
+
+# Giai đoạn 3 — Hoàn thiện thống kê biến động (độ bất định, phân lớp, hotspot, số tóm tắt, xuất web)
+
+Làm tiếp trong `giai_doan2.qgz` bằng giao diện QGIS 3.40.15 (Field Calculator, Processing Toolbox, Layer > Save As). Không dùng Python console. Ảnh: `docs/minh_chung/qgis/giai_doan3/NN_ten.png` (tra theo tên; ảnh `*-tham-so` là hộp thoại trước khi chạy, `*-log` là nhật ký sau khi chạy). Công thức/tham số lấy từ `s5_stats.py`, `config.py` (CHỈ ĐỌC).
+
+## 1. Cột mới trên lớp `transects` (Field Calculator, `01`–`09`)
+Chuỗi dùng là `c2018…c2026` (đã khử đột biến ở giai đoạn 2). `u_shoreline(y) = sqrt(5² + 6² + U_classify²)`, `U_classify = {2018: 16,73; 2022: 17,82; 2026: 21,69}`, năm khác 21,7 (`U_CLASSIFY_DEFAULT`), nhúng bằng `map('2018',16.73,'2022',17.82,'2026',21.69)` + `coalesce(map_get(...), 21.7)`.
+
+| Cột | Biểu thức (rút gọn) |
+|---|---|
+| `n_years` (int) | `to_int("c2018" is not null)+…+to_int("c2026" is not null)` |
+| `unc_lrr` | `round("t_crit"*"se_lrr",3)` (`t_crit`, `se_lrr`, `first_year`, `last_year` đã có từ giai đoạn 2; t Student hai phía 95 %, df = n−2, tra bảng nhúng) |
+| `is_significant` (boolean) | `abs("lrr") > "t_crit"*"se_lrr"` |
+| `unc_epr` | `round(1.959964*sqrt(u(first_year)^2+u(last_year)^2)/(last_year-first_year),3)` |
+| `u_shoreline_avg` | `round(mean(u(y)) trên các năm có c không NULL, 2)` (`array_filter(generate_series(0,8), …)` + `array_foreach`) |
+| `consecutive_erosion_periods` (int) | cờ '1'/'0' cho từng cặp năm liền kề (cả hai có dữ liệu và c_sau < c_trước) → `array_to_string` → `string_to_array(…,'0')` → `array_max(length)`; thiếu năm thì ngắt chuỗi, đúng `longest_decline()` |
+| `low_r2_caution` (boolean) | `"r2" < 0.3` |
+
+Đối chiếu nội bộ (SQL ngoài QGIS, chỉ để kiểm tra): `is_significant` trùng `is_sig` và `consecutive_erosion_periods` trùng `consec_dec` của giai đoạn 2 ở cả 270 transect. Hàm `pow()` không có trong QGIS (lần dán đầu báo "Expression is invalid", đã đổi thành toán tử `^`), nên `unc_epr`, `u_shoreline_avg` được áp dụng lại. Lần thử đầu còn tạo nhầm một cột tạm `dummy`, đã xoá (đồng thời lỡ xoá cột `DN` không dùng của lớp transect).
+
+## 2. Phân lớp lại `change_class` (`08`)
+`if(not "is_significant",'stable', if("lrr">0,'accretion', if(round("lrr",3)<=-2.0 and "consecutive_erosion_periods">=2,'severe_erosion','mild_erosion')))` (cập nhật cột có sẵn). Kết quả KHÔNG đổi so với giai đoạn 2 (quy tắc ở giai đoạn 2 đã đúng `classify()`): stable 209, accretion 52, mild_erosion 8, severe_erosion 1. (`MIN_CONSECUTIVE_DECLINE = 3` mốc ⇔ 2 giai đoạn liền nhau.)
+
+## 3. Hotspot (`10`–`31`, `38`)
+Chỉ 1 transect `severe_erosion` (T0089), nên có 1 hotspot. Các bước (đều Processing, lưu `hs_*.gpkg` trong thư mục này):
+1. `hs_1_severe` — Extract by expression `"change_class"='severe_erosion'` (`10`,`11`).
+2. `hs_2_nhom` — Field calculator (Processing) `grp` = số khoảng cách > 75 m giữa các chainage severe đứng trước (`with_variable('a', array_sort(aggregate(...'array_agg',"chainage_m")), …)`; `12`,`13`). Thử thêm cột bằng Field Calculator trực tiếp trên lớp này báo "Could not add the new field to the provider" nên chuyển sang thuật toán Field calculator của Processing.
+3. `hs_3_goc_tr` — thêm `az_tr = azimuth(start_point($geometry), end_point($geometry))` (`14`,`15`).
+4. `hs_4_diem_bo` — Geometry by expression (Point): giao điểm GẦN gốc transect nhất với `sl_2026` (đường bờ mới nhất, như `latest` trong `s5_stats.py`), nếu không giao thì lấy gốc transect (`16`,`17`).
+5. `hs_5_dau_nhom` — Extract by expression `"chainage_m" = minimum("chainage_m", group_by:="grp")` (một điểm đại diện/đoạn; `18`,`19`).
+6. `hs_6_duong` — Geometry by expression (Line): nếu nhóm có ≥ 2 điểm thì `make_line` nối các điểm giao theo thứ tự chainage (`aggregate(...,'collect',$geometry, filter:=…, order_by:="chainage_m")`), nếu chỉ 1 điểm thì đoạn dài 50 m (±25 m) dọc bờ, vuông góc transect (`20`,`21`).
+7. `hs_7`…`hs_11_ghi_chu` — Field calculator thêm `severity = round(-mean(lrr),2)`, `period_start_year = min(first_year)`, `period_end_year = max(last_year)`, `n_transect`, `notes = 'Lùi bờ mạnh '||min(transect_code)||'–'||max(transect_code)||' ('||n||' transect, ~'||(n*50)||' m)'` (aggregate theo `grp` trên `hs_4_diem_bo`; `22`–`31`). Lần chạy `notes` đầu lỗi do thứ tự toán tử `||` và `*` (thiếu ngoặc quanh `n*50`), đã sửa và chạy lại.
+Kết quả: 1 đoạn, `severity` 2,83 m/năm, 2018–2026, `Lùi bờ mạnh T0089–T0089 (1 transect, ~50 m)`. Ảnh vị trí: `38_ban-do-hotspot-T0089.png`.
+
+## 4. Số tóm tắt (`32`–`35`)
+- Statistics by categories (`thong_ke_theo_lop.gpkg`, trường `lrr`, nhóm theo `change_class`): stable 209 (LRR TB 0,109; trung vị 0,094), accretion 52 (TB 1,945; trung vị 1,781), mild_erosion 8 (TB −2,010; trung vị −1,885), severe_erosion 1 (−2,827).
+- Basic statistics for fields trên `lrr` (`thong_ke_lrr_chung.gpkg`): 270 transect, **TB 0,389 m/năm, trung vị 0,269**, độ lệch chuẩn 1,383, min −7,365, max 6,306, Q1 −0,167, Q3 1,145. (Lần chạy đầu chọn nhầm trường `r2`, đã chạy lại.)
+
+## 5. Xuất GeoJSON (EPSG:4326, `COORDINATE_PRECISION=7`, bỏ "Persist layer metadata" nên không sinh `.qmd`; các `.qmd` cũ đã xoá; `36`,`37`)
+`export/transects.geojson` (ghi đè, 270 feature): `transect_code, chainage_m, d2018…d2026, med_d, c2018…c2026, n_obs, n_despiked, first_year, last_year, nsm, epr, lrr, r2, se_lrr, t_crit, change_class, n_years, unc_lrr, is_significant, consecutive_erosion_periods, low_r2_caution, unc_epr, u_shoreline_avg` (bỏ `fid, distance, angle, consec_dec, is_sig`). `export/hotspots.geojson` (LineString; `severity, period_start_year, period_end_year, notes`). `shorelines.geojson`, `baseline.geojson` giữ nguyên từ giai đoạn 2.
+
+## Khác biệt so với `s5_stats.py`
+- Hotspot chỉ có 1 transect: `s5_stats.py` đệm 25 m quanh điểm thành POLYGON, bản QGIS dùng LINESTRING 50 m (một lớp GeoPackage/GeoJSON chỉ nên có một kiểu hình học; các nhóm ≥ 2 transect vẫn là đường nối giao điểm).
+- `t_crit` tra bảng 3 chữ số thập phân thay vì `scipy.stats.t.ppf`; các cột số không làm tròn như Python (chỉ `unc_lrr`, `unc_epr`, `u_shoreline_avg`, `severity` được làm tròn).
+- `is_significant` và `low_r2_caution` là kiểu boolean (`true/false` trong GeoJSON); bản cũ lồng trong object `stats`. Thuộc tính phẳng (không có object `distances`/`stats`), nên web phải đọc theo cột phẳng.
+- Giá trị nền tảng (giao điểm, khoảng cách, đột biến) là của bản GUI giai đoạn 2, nên số transect (270) và kết quả (1 severe) khác bản Python (266, 4 severe).
