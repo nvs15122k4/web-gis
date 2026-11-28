@@ -30,6 +30,7 @@
     <a href="#du-lieu">Dữ liệu</a>
     <a href="#phuong-phap">Phương pháp</a>
     <a href="#phan-loai">Phân loại</a>
+    <a href="#qgis">Thực hiện bằng QGIS</a>
     <a href="#bat-dinh">Độ bất định</a>
     <a href="#sat-lo">Sạt lở tham chiếu</a>
     <a href="#han-che">Hạn chế</a>
@@ -142,6 +143,81 @@
             <li>Độ chính xác đường bờ được kiểm chứng trên 5 ô mẫu ground truth số hoá (2018, 2022, 2026); U<sub>classify</sub> lấy theo RMSE đường bờ từng năm (15,1 – 20,0 m), nên biến động nhỏ hơn cỡ này không được kết luận.</li>
             <li class="disclaimer">Thông tin mang tính tham khảo phục vụ nghiên cứu. Không dùng thay cho cảnh báo chính thức của cơ quan chức năng.</li>
         </ul>
+    </section>
+
+    <section id="qgis">
+        <h2>Thực hiện bằng QGIS</h2>
+        <p>Toàn bộ chuỗi giải đoán đường bờ (chín năm 2018–2026) và phần dựng baseline, transect, thống kê biến động được thực hiện lại
+            bằng giao diện QGIS 3.40 LTR, có chụp màn hình từng bước. Ảnh dưới đây lấy từ năm 2026 và từ giai đoạn dựng transect;
+            toàn bộ ảnh các năm và ghi chú tham số nằm trong thư mục <code>docs/minh_chung/qgis/</code> và <code>pipeline/data/qgis_gui/</code>
+            của kho mã nguồn.</p>
+        <p>Ngưỡng nước được chọn từ đồ thị phân bố MNDWI. QGIS 3.40 không có công cụ Otsu, nên giá trị chính xác được tính riêng
+            rồi nhập vào Raster Calculator; đường bờ QGIS dài 15,1–15,7 km mỗi năm, sát kết quả tính trước đó.
+            Kết quả transect lệch kết quả cũ (RMSE LRR 1,39 m/năm) nên dùng làm dữ liệu đối chiếu, số liệu chính của hệ thống giữ nguyên.</p>
+            <figure class="fig">
+                <img src="/img/qgis/a1-stac-them-band.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: thêm các band ảnh Sentinel-2 L2A từ kho STAC vào QGIS (Data Source Manager).">
+                <figcaption>Thêm các band ảnh Sentinel-2 L2A từ kho STAC vào QGIS (Data Source Manager).</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/a2-batch-clip.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: cắt ảnh theo vùng phân tích bằng Clip Raster by Mask Layer chạy hàng loạt (Batch).">
+                <figcaption>Cắt ảnh theo vùng phân tích bằng Clip Raster by Mask Layer chạy hàng loạt (Batch).</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/a3-che-may-scl.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: che mây và bóng mây theo lớp SCL bằng GDAL Raster Calculator.">
+                <figcaption>Che mây và bóng mây theo lớp SCL bằng GDAL Raster Calculator.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/a4-median.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: gộp các cảnh thành ảnh trung vị bằng Cell Statistics (Median).">
+                <figcaption>Gộp các cảnh thành ảnh trung vị bằng Cell Statistics (Median).</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/a5-mndwi.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: tính chỉ số nước MNDWI = (Green − SWIR1)/(Green + SWIR1) trong Raster Calculator.">
+                <figcaption>Tính chỉ số nước MNDWI = (Green − SWIR1)/(Green + SWIR1) trong Raster Calculator.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/a6-histogram.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: biểu đồ phân bố MNDWI trong QGIS, ngưỡng nước chọn ở đáy giữa hai đỉnh.">
+                <figcaption>Biểu đồ phân bố MNDWI trong QGIS, ngưỡng nước chọn ở đáy giữa hai đỉnh.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/a7-polygonize.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: vector hoá mặt nạ nước bằng GDAL Polygonize.">
+                <figcaption>Vector hoá mặt nạ nước bằng GDAL Polygonize.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/a8-duong-bo-2026.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: đường bờ năm 2026 trên ảnh vệ tinh, kết quả cuối của chuỗi giải đoán.">
+                <figcaption>Đường bờ năm 2026 trên ảnh vệ tinh, kết quả cuối của chuỗi giải đoán.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/b1-baseline.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: dựng baseline: dịch đường bờ đã làm trơn vào phía đất 250 m.">
+                <figcaption>Dựng baseline: dịch đường bờ đã làm trơn vào phía đất 250 m.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/b2-transect.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: tạo transect vuông góc baseline, cách nhau 50 m, dài 600 m.">
+                <figcaption>Tạo transect vuông góc baseline, cách nhau 50 m, dài 600 m.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/b3-lrr.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: tính tốc độ biến động LRR bằng Field Calculator.">
+                <figcaption>Tính tốc độ biến động LRR bằng Field Calculator.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/b4-bang-thuoc-tinh.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: bảng thuộc tính transect với khoảng cách và thống kê biến động theo năm.">
+                <figcaption>Bảng thuộc tính transect với khoảng cách và thống kê biến động theo năm.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/b5-rmse.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: so sánh LRR và EPR của QGIS với kết quả tính trước đó.">
+                <figcaption>So sánh LRR và EPR của QGIS với kết quả tính trước đó.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/c1-ban-do-9-duong-bo.webp" width="1600" height="1131" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: bản đồ chín đường bờ 2018–2026, xuất bằng Print Layout.">
+                <figcaption>Bản đồ chín đường bờ 2018–2026, xuất bằng Print Layout.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/c2-ban-do-transect-lrr.webp" width="1600" height="1131" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: bản đồ transect tô màu theo tốc độ biến động LRR.">
+                <figcaption>Bản đồ transect tô màu theo tốc độ biến động LRR.</figcaption>
+            </figure>
+            <figure class="fig">
+                <img src="/img/qgis/c3-ban-do-so-sanh-lrr.webp" width="1600" height="1131" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: bản đồ so sánh LRR giữa QGIS và kết quả tính trước đó.">
+                <figcaption>Bản đồ so sánh LRR giữa QGIS và kết quả tính trước đó.</figcaption>
+            </figure>
     </section>
 
     <section id="tai-du-lieu">
