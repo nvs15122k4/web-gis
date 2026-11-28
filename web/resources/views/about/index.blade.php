@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    @include('partials.head', ['title' => 'Giới thiệu & phương pháp — WebGIS Sông Hậu', 'description' => 'Phương pháp DSAS và nguồn ảnh Sentinel-2 dùng để giám sát biến động bờ sông Hậu, xã Bình Mỹ.'])
+    @include('partials.head', ['title' => 'Giới thiệu & phương pháp — WebGIS Sông Hậu', 'description' => 'Cách làm bằng QGIS: ảnh Sentinel-2, giải đoán đường bờ, transect kiểu DSAS và phân loại biến động bờ sông Hậu, xã Bình Mỹ.'])
     @vite(['resources/css/app.css', 'resources/js/steps.js', 'resources/js/back-to-top.js'])
 </head>
 <body class="page">
@@ -12,11 +12,11 @@
         <p class="eyebrow">Phương pháp và dữ liệu</p>
         <h1>Giới thiệu &amp; phương pháp</h1>
         <p class="lead">WebGIS giám sát biến động bờ sông Hậu tại xã Bình Mỹ, tỉnh An Giang, giai đoạn
-        {{ $years[0] }}–{{ end($years) }}. Kết quả được tính sẵn bằng pipeline Python từ ảnh vệ tinh; web chỉ đọc và hiển thị,
+        {{ $years[0] }}–{{ end($years) }}. Toàn bộ dữ liệu được dựng bằng giao diện QGIS 3.40 từ ảnh vệ tinh Sentinel-2; web chỉ đọc và hiển thị,
         không tính lại các chỉ số.</p>
         <dl class="page-stamp" aria-label="Thông tin dữ liệu">
             <div><dt>Ảnh</dt><dd>Sentinel-2 L2A</dd></div>
-            <div><dt>Phương pháp</dt><dd>DSAS</dd></div>
+            <div><dt>Phương pháp</dt><dd>QGIS · DSAS</dd></div>
             <div><dt>Giai đoạn</dt><dd>{{ $years[0] }}–{{ end($years) }}</dd></div>
         </dl>
     </div>
@@ -30,7 +30,6 @@
     <a href="#du-lieu">Dữ liệu</a>
     <a href="#phuong-phap">Phương pháp</a>
     <a href="#phan-loai">Phân loại</a>
-    <a href="#qgis">Thực hiện bằng QGIS</a>
     <a href="#bat-dinh">Độ bất định</a>
     <a href="#sat-lo">Sạt lở tham chiếu</a>
     <a href="#han-che">Hạn chế</a>
@@ -51,8 +50,8 @@
         <h2>Dữ liệu</h2>
         <div class="table-wrap"><table>
             <tr><th>Lớp</th><th>Nội dung</th><th>Trạng thái</th></tr>
-            <tr><td>Ảnh vệ tinh</td><td>Composite Sentinel-2 L2A mùa khô (tháng 1–3) mỗi năm, lọc mây theo lớp SCL; xử lý trong pipeline, không phát lên web</td><td>Đã xử lý (pipeline)</td></tr>
-            <tr><td>Đường bờ theo năm</td><td>Ranh giới nước–đất trích từ chỉ số nước NDWI / MNDWI / AWEI (ngưỡng Otsu)</td><td data-layer="shorelines"></td></tr>
+            <tr><td>Ảnh vệ tinh</td><td>Ảnh trung vị Sentinel-2 L2A mùa khô (tháng 1–3) mỗi năm, che mây theo lớp SCL; xử lý trong QGIS, không phát lên web</td><td>Đã xử lý (QGIS)</td></tr>
+            <tr><td>Đường bờ theo năm</td><td>Ranh giới nước–đất trích từ chỉ số nước MNDWI (ngưỡng nước tính trên histogram từng năm)</td><td data-layer="shorelines"></td></tr>
             <tr><td>Transect</td><td>Mặt cắt vuông góc với đường cơ sở (baseline), cách đều nhau dọc bờ</td><td data-layer="transects"></td></tr>
             <tr><td>Hotspot lùi bờ</td><td>Đoạn bờ gộp từ các transect lùi bờ mạnh liên tiếp</td><td data-layer="hotspots"></td></tr>
             <tr><td>Sạt lở tham chiếu</td><td>Sự kiện 2019–2020 từ nguồn công bố chính thức, chỉ dùng để đối chiếu</td><td data-layer="reference_events"></td></tr>
@@ -80,7 +79,7 @@
 
     <section id="phan-loai">
         <h2>Tiêu chí phân loại mức biến động (Mục 2.5 đề cương)</h2>
-        <p>Các tiêu chí dưới đây được chốt trước khi chạy lại pipeline và không điều chỉnh theo kết quả. Transect có xu hướng biến động thực sự khi <strong>|LRR| &gt; t × SE(LRR)</strong>, với t là hệ số phân phối Student (hai phía, độ tin cậy 95%, bậc tự do n − 2 của từng transect; chuỗi 9 năm có t = 2,365), tức khoảng tin cậy 95% của LRR không chứa 0.</p>
+        <p>Các tiêu chí dưới đây được chốt trước khi tính và không điều chỉnh theo kết quả. Transect có xu hướng biến động thực sự khi <strong>|LRR| &gt; t × SE(LRR)</strong>, với t là hệ số phân phối Student (hai phía, độ tin cậy 95%, bậc tự do n − 2 của từng transect; chuỗi 9 năm có t = 2,365), tức khoảng tin cậy 95% của LRR không chứa 0.</p>
         <div class="table-wrap"><table>
             <tr><th>Mức</th><th>Điều kiện</th></tr>
             <tr><td><span class="legend-swatch inline" style="background:var(--c-accretion)"></span> Bồi</td><td>Có ý nghĩa thống kê và LRR &gt; 0</td></tr>
@@ -104,10 +103,10 @@
             <mfrac><mrow><mn>1,96</mn><mo>·</mo><msqrt><msup><mrow><mi>U</mi><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mrow><mi>U</mi><mo>(</mo><msub><mi>t</mi><mn>2</mn></msub><mo>)</mo></mrow><mn>2</mn></msup></msqrt></mrow><mrow><mo>|</mo><msub><mi>t</mi><mn>2</mn></msub><mo>−</mo><msub><mi>t</mi><mn>1</mn></msub><mo>|</mo></mrow></mfrac>
         </math>
         <p class="formula">Trong đó U<sub>pixel</sub> = 5 m
-            (nửa pixel 10 m), U<sub>georef</sub> theo thông số ESA, U<sub>classify</sub> = RMSE so với đường bờ số hóa thủ công.
+            (nửa pixel 10 m), U<sub>georef</sub> theo thông số ESA, U<sub>classify</sub> = RMSE so với đường bờ số hóa thủ công (16,73 m năm 2018, 17,82 m năm 2022, 21,69 m năm 2026).
             Mọi thành phần quy về cùng chuẩn 1σ: U<sub>georef</sub> = 12 m ở độ tin cậy 95,5% (2σ) nên dùng 6 m (1σ).
             Độ bất định LRR (95%) = t × SE(LRR); độ bất định EPR (95%) là công thức thứ hai ở trên.
-            Năm không có ground truth dùng U<sub>classify</sub> lớn nhất đã đo (20 m); 
+            Năm không có ground truth dùng U<sub>classify</sub> = 21,7 m (giá trị lớn nhất đã đo, làm tròn lên); 
             U<sub>pixel</sub> lấy theo nửa pixel (Vos và cs. 2019), U<sub>georef</sub> theo đặc tả định vị của ESA và Clerc và cs.; công thức gộp từng đường bờ,
             phép quy 12 m (95,5%) về 6 m (1σ) và ngưỡng khử đột biến 50 m là suy luận/giả định của đồ án, không gán cho nguồn. Cách lan truyền sang EPR và khoảng tin cậy của LRR theo DSAS (Himmelstoss và cs. 2021).</p>
     </section>
@@ -122,13 +121,13 @@
                 <span class="dot" style="background:#7b3fe4"></span> <strong>Bình thường</strong> — theo tiêu chí tại Điều 4 của Quy chế</li>
             <li><span class="dot" style="background:#9e9e9e"></span> <strong>Chưa phân loại</strong> — đang cập nhật</li>
         </ul>
-        <p>Dữ liệu này chỉ dùng để đối chiếu, không dùng để huấn luyện hay hiệu chỉnh pipeline.</p>
+        <p>Dữ liệu này chỉ dùng để đối chiếu, không dùng để chọn ngưỡng hay hiệu chỉnh kết quả.</p>
         <p><strong>Về độ chính xác vị trí:</strong> nguồn công khai chỉ nêu lý trình Km trên QL91, không có toạ độ. Hai sự kiện
             (01/08/2019 và 27/05/2020) vì vậy dùng chung một vùng cảnh báo dài khoảng 3,3 km, không phải vị trí sạt lở chính xác.
             Số quyết định (1843/QĐ-UBND năm 2019, 1174/QĐ-UBND năm 2020) được lấy từ báo chí, chưa đối chiếu với bản gốc.</p>
-        <p><strong>Kết quả đối chiếu:</strong> trong khoảng 300 m quanh vùng cảnh báo có 73 transect, trong đó 50 bồi và 23 ổn định;
-            pipeline <strong>không phát hiện đoạn lùi bờ</strong> nào ở đây. Đây là một hạn chế của phương pháp (ảnh 10 m, một ảnh mỗi năm,
-            sạt lở đột ngột giữa hai năm), không phải bằng chứng pipeline khớp với thực tế.</p>
+        <p><strong>Kết quả đối chiếu:</strong> trong vùng đệm 100 m quanh vùng cảnh báo có 70 transect, trong đó 21 bồi và 49 ổn định;
+            kết quả QGIS <strong>không phát hiện đoạn lùi bờ</strong> có ý nghĩa thống kê nào ở đây, và hotspot duy nhất (T0089) cách vùng cảnh báo khoảng 5,2 km. Đây là một hạn chế của phương pháp (ảnh 10 m, một ảnh mỗi năm,
+            sạt lở đột ngột giữa hai năm), không phải bằng chứng kết quả khớp với thực tế.</p>
     </section>
 
     <section id="han-che">
@@ -140,84 +139,10 @@
             <li>Khu vực có bãi bồi, bùn, thực vật ven bờ, công trình hay tàu thuyền neo đậu có thể làm sai lệch đường bờ.</li>
             <li>Hệ thống <strong>không dự báo thời điểm hay vị trí sạt lở</strong> và không thay thế khảo sát thuỷ lực, địa chất,
                 địa kỹ thuật tại hiện trường.</li>
-            <li>Độ chính xác đường bờ được kiểm chứng trên 5 ô mẫu ground truth số hoá (2018, 2022, 2026); U<sub>classify</sub> lấy theo RMSE đường bờ từng năm (15,1 – 20,0 m), nên biến động nhỏ hơn cỡ này không được kết luận.</li>
+            <li>Độ chính xác đường bờ được kiểm chứng trên 5 ô mẫu ground truth số hoá (2018, 2022, 2026); U<sub>classify</sub> lấy theo RMSE đường bờ (16,73 – 21,69 m), nên biến động nhỏ hơn cỡ này không được kết luận.</li>
+            <li>Bản tính trước đó bằng chuỗi script Python được giữ làm bản đối chiếu (xem trang báo cáo nội bộ), không dùng cho số liệu hiển thị.</li>
             <li class="disclaimer">Thông tin mang tính tham khảo phục vụ nghiên cứu. Không dùng thay cho cảnh báo chính thức của cơ quan chức năng.</li>
         </ul>
-    </section>
-
-    <section id="qgis">
-        <h2>Thực hiện bằng QGIS</h2>
-        <p>Toàn bộ chuỗi giải đoán đường bờ (chín năm 2018–2026) và phần dựng baseline, transect, thống kê biến động được thực hiện lại
-            bằng giao diện QGIS 3.40 LTR, có chụp màn hình từng bước. Ảnh dưới đây lấy từ năm 2026 và từ giai đoạn dựng transect;
-            toàn bộ ảnh các năm và ghi chú tham số nằm trong thư mục <code>docs/minh_chung/qgis/</code> và <code>pipeline/data/qgis_gui/</code>
-            của kho mã nguồn.</p>
-        <p>Ngưỡng nước được chọn từ đồ thị phân bố MNDWI. QGIS 3.40 không có công cụ Otsu, nên giá trị chính xác được tính riêng
-            rồi nhập vào Raster Calculator; đường bờ QGIS dài 15,1–15,7 km mỗi năm, sát kết quả tính trước đó.
-            Kết quả transect lệch kết quả cũ (RMSE LRR 1,39 m/năm) nên dùng làm dữ liệu đối chiếu, số liệu chính của hệ thống giữ nguyên.</p>
-            <figure class="fig">
-                <img src="/img/qgis/a1-stac-them-band.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: thêm các band ảnh Sentinel-2 L2A từ kho STAC vào QGIS (Data Source Manager).">
-                <figcaption>Thêm các band ảnh Sentinel-2 L2A từ kho STAC vào QGIS (Data Source Manager).</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/a2-batch-clip.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: cắt ảnh theo vùng phân tích bằng Clip Raster by Mask Layer chạy hàng loạt (Batch).">
-                <figcaption>Cắt ảnh theo vùng phân tích bằng Clip Raster by Mask Layer chạy hàng loạt (Batch).</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/a3-che-may-scl.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: che mây và bóng mây theo lớp SCL bằng GDAL Raster Calculator.">
-                <figcaption>Che mây và bóng mây theo lớp SCL bằng GDAL Raster Calculator.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/a4-median.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: gộp các cảnh thành ảnh trung vị bằng Cell Statistics (Median).">
-                <figcaption>Gộp các cảnh thành ảnh trung vị bằng Cell Statistics (Median).</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/a5-mndwi.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: tính chỉ số nước MNDWI = (Green − SWIR1)/(Green + SWIR1) trong Raster Calculator.">
-                <figcaption>Tính chỉ số nước MNDWI = (Green − SWIR1)/(Green + SWIR1) trong Raster Calculator.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/a6-histogram.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: biểu đồ phân bố MNDWI trong QGIS, ngưỡng nước chọn ở đáy giữa hai đỉnh.">
-                <figcaption>Biểu đồ phân bố MNDWI trong QGIS, ngưỡng nước chọn ở đáy giữa hai đỉnh.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/a7-polygonize.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: vector hoá mặt nạ nước bằng GDAL Polygonize.">
-                <figcaption>Vector hoá mặt nạ nước bằng GDAL Polygonize.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/a8-duong-bo-2026.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: đường bờ năm 2026 trên ảnh vệ tinh, kết quả cuối của chuỗi giải đoán.">
-                <figcaption>Đường bờ năm 2026 trên ảnh vệ tinh, kết quả cuối của chuỗi giải đoán.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/b1-baseline.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: dựng baseline: dịch đường bờ đã làm trơn vào phía đất 250 m.">
-                <figcaption>Dựng baseline: dịch đường bờ đã làm trơn vào phía đất 250 m.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/b2-transect.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: tạo transect vuông góc baseline, cách nhau 50 m, dài 600 m.">
-                <figcaption>Tạo transect vuông góc baseline, cách nhau 50 m, dài 600 m.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/b3-lrr.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: tính tốc độ biến động LRR bằng Field Calculator.">
-                <figcaption>Tính tốc độ biến động LRR bằng Field Calculator.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/b4-bang-thuoc-tinh.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: bảng thuộc tính transect với khoảng cách và thống kê biến động theo năm.">
-                <figcaption>Bảng thuộc tính transect với khoảng cách và thống kê biến động theo năm.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/b5-rmse.webp" width="1600" height="894" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: so sánh LRR và EPR của QGIS với kết quả tính trước đó.">
-                <figcaption>So sánh LRR và EPR của QGIS với kết quả tính trước đó.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/c1-ban-do-9-duong-bo.webp" width="1600" height="1131" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: bản đồ chín đường bờ 2018–2026, xuất bằng Print Layout.">
-                <figcaption>Bản đồ chín đường bờ 2018–2026, xuất bằng Print Layout.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/c2-ban-do-transect-lrr.webp" width="1600" height="1131" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: bản đồ transect tô màu theo tốc độ biến động LRR.">
-                <figcaption>Bản đồ transect tô màu theo tốc độ biến động LRR.</figcaption>
-            </figure>
-            <figure class="fig">
-                <img src="/img/qgis/c3-ban-do-so-sanh-lrr.webp" width="1600" height="1131" loading="lazy" decoding="async" alt="Ảnh chụp màn hình QGIS: bản đồ so sánh LRR giữa QGIS và kết quả tính trước đó.">
-                <figcaption>Bản đồ so sánh LRR giữa QGIS và kết quả tính trước đó.</figcaption>
-            </figure>
     </section>
 
     <section id="tai-du-lieu">
