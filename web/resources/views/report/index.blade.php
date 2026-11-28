@@ -4,7 +4,7 @@
         ['2.1', 'Phân tích yêu cầu hệ thống', 'done', 'Yêu cầu, phạm vi và kiến trúc ghi trong README và báo cáo đồ án (docs/).'],
         ['2.2', 'Khu vực nghiên cứu, dữ liệu ảnh và dữ liệu tham chiếu', 'done', 'Ranh giới xã Bình Mỹ từ OSM, ảnh Sentinel-2 L2A mùa khô 2018–2026 nạp trong QGIS qua STAC (Earth Search), sự kiện sạt lở 2019–2020 và các số quyết định.'],
         ['2.3', 'Xử lý ảnh và trích xuất đường bờ (QGIS)', 'done', 'Làm hoàn toàn bằng giao diện QGIS 3.40 cho cả 9 năm: cắt vùng, che mây SCL, composite trung vị, MNDWI, ngưỡng nước, lọc đốm, vector hoá, baseline và 270 transect; hơn 350 ảnh chụp từng bước (docs/minh_chung/qgis/).'],
-        ['2.4', 'Đánh giá độ chính xác và kiểm chứng', 'done', 'Ground truth số hoá 5 ô mẫu (2018, 2022, 2026), RMSE đường bờ 15,1–20,0 m đưa vào U_classify; chọn MNDWI vì sai số đường bờ thấp nhất (18,45 m, so với NDWI 27,83 m và AWEI 60,01 m); đối chiếu chéo ESA WorldCover và Impact Observatory LULC.'],
+        ['2.4', 'Đánh giá độ chính xác và kiểm chứng', 'done', 'Ground truth số hoá 5 ô mẫu (2018, 2022, 2026), RMSE đường bờ 16,73–21,69 m đưa vào U_classify; chọn MNDWI vì sai số đường bờ thấp nhất (18,45 m, so với NDWI 27,83 m và AWEI 60,01 m); đối chiếu chéo ESA WorldCover và Impact Observatory LULC.'],
         ['2.5', 'Tiêu chí phân loại và độ bất định', 'done', 'NSM/EPR/LRR/R² tính bằng Field Calculator của QGIS, kiểm định |LRR| > t × SE (t Student 95%, n − 2 bậc tự do; chuỗi 9 năm t = 2,365), bốn mức biến động, lùi mạnh khi LRR ≤ −2 m/năm và giảm liên tục ≥ 3 mốc năm, U_georef 12 m (2σ) quy về 6 m (1σ).'],
         ['2.6', 'Kiến trúc, cơ sở dữ liệu và giao diện WebGIS', 'done', 'MySQL (người dùng, cấu hình) + PostGIS (không gian), GeoServer WMS (tuỳ chọn, một lớp chung tô màu đường bờ theo năm), Leaflet + Chart.js; giao diện sáng thiết kế v3 theo hệ Transect, hỗ trợ bàn phím và cảm ứng.'],
         ['3.5', 'Đối chiếu với sạt lở tham chiếu 2019–2020', 'part', 'Nguồn công khai chỉ có lý trình Km, chưa có toạ độ nên dùng vùng cảnh báo ~3,3 km; kết quả hiện không phát hiện đoạn lùi bờ trong vùng này (đã ghi rõ ở trang Phương pháp).'],
@@ -145,6 +145,9 @@
             nguồn ảnh cũng khác (QGIS dùng COG Earth Search, bản Python dùng composite Planetary Computer).</p>
 
         <h3>Transect và thống kê biến động</h3>
+        <p class="hint">Có hai bản để so: <strong>bản Python</strong> là chuỗi script chạy trọn từ đầu (đường bờ contour dưới pixel, bảng dưới đây),
+            và <strong>bản hiển thị trước đó trên web</strong> (266 transect, 4 lùi mạnh) dùng đường bờ giải đoán bằng script QGIS với transect dựng bằng Python.
+            Bản QGIS so với bản hiển thị trước đó: RMSE LRR 1,39 m/năm, 164 trong 261 transect ghép được cùng nhóm (trang Giới thiệu dùng so sánh này).</p>
         <div class="table-wrap"><table>
             <caption>Kết quả transect của hai bản.</caption>
             <tr><th>Chỉ tiêu</th><th>QGIS (dữ liệu chính)</th><th>Python (đối chiếu)</th></tr>
@@ -225,7 +228,7 @@
         <h2>Việc còn lại và rủi ro</h2>
         <ul>
             <li>Toạ độ chính xác của điểm sạt lở tham chiếu (Km 89+272 / 89+076) chưa có; các số quyết định lấy từ báo chí, chưa đối chiếu bản gốc.</li>
-            <li>Dữ liệu QGIS chưa phát hiện đoạn lùi bờ quanh vùng sạt lở 2019–2020 (74 transect trong 300 m: 22 bồi, 52 ổn định; hotspot gần nhất cách 5.185 m); cần trình bày như hạn chế của phương pháp, không như bằng chứng khớp thực tế.</li>
+            <li>Dữ liệu QGIS chưa phát hiện đoạn lùi bờ quanh vùng sạt lở 2019–2020 (74 transect trong 300 m: 22 bồi, 52 ổn định; hotspot gần nhất cách khoảng 5,2 km); cần trình bày như hạn chế của phương pháp, không như bằng chứng khớp thực tế.</li>
             <li>Mỗi năm chỉ có một đường bờ mùa khô và số cảnh dùng chênh nhiều giữa các năm (4 đến 13 cảnh), nên chất lượng composite không đồng đều.</li>
             <li>Ground truth mới có 5 ô mẫu; nếu bổ sung thêm ô và năm thì cần đánh giá lại và cập nhật U_classify.</li>
             <li>Rà lại số liệu trong báo cáo docx: dữ liệu chính đã chuyển sang bản QGIS (270 transect, 1 hotspot), nhiều số trong báo cáo cũ cần cập nhật.</li>
