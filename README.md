@@ -13,7 +13,7 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ## Tính năng
 
-Ứng dụng web (Laravel + Leaflet + Chart.js) gồm các trang sau; ảnh chụp từ bản chạy thật trên dữ liệu pipeline (266 transect).
+Ứng dụng web (Laravel + Leaflet + Chart.js) gồm các trang sau; dữ liệu chính của web là kết quả dựng bằng giao diện QGIS 3.40 (270 transect, 9 đường bờ 2018–2026). Một số ảnh chụp giao diện bên dưới được chụp trên bản dữ liệu trước đó (266 transect) nên số liệu trong ảnh có thể khác.
 
 | Đường dẫn | Quyền | Nội dung |
 |---|---|---|
@@ -31,7 +31,7 @@ nóng xói lở và hiển thị trên bản đồ web tương tác.
 
 ![Bản đồ tổng quan](docs/minh_chung/giao_dien_moi_v3/01_ban_do_tong_quan.png)
 
-*Thẻ **Tổng quan** (cột bên trái): 266 transect theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), tỉ lệ đang lùi bờ, LRR trung bình, số transect có ý nghĩa thống kê,
+*Thẻ **Tổng quan** (cột bên trái): 270 transect theo mức biến động (bồi / ổn định / lùi nhẹ / lùi mạnh), tỉ lệ đang lùi bờ, LRR trung bình, số transect có ý nghĩa thống kê,
 transect lùi/bồi mạnh nhất (bấm mã để phóng tới), hotspot, sạt lở tham chiếu và biểu đồ dịch chuyển bờ trung bình theo năm. Trên bản đồ: ô tìm mã transect hoặc toạ độ,
 thanh công cụ (phóng to/thu nhỏ, định vị, toàn khung, chọn, đo đường, đo diện tích, xoá), nút lớp nền, **in bản đồ** và **bảng thuộc tính**, chú giải thu gọn ở góc dưới phải, dải năm 2018–2026 ở đáy
 (bấm một năm để bật/tắt đường bờ, nút **Phát** chạy lần lượt). Lần đầu vào có hộp gợi ý ngắn. Nền bản đồ tự phục vụ trên GeoServer.*
@@ -52,7 +52,7 @@ thanh công cụ (phóng to/thu nhỏ, định vị, toàn khung, chọn, đo đ
 
 Ba trang dài nên mỗi ảnh chụp được cắt thành các phần theo thứ tự từ trên xuống.
 
-**`/gioi-thieu` — phương pháp và hạn chế.** Mục lục bên trái; mục tiêu, dữ liệu Sentinel-2; mục **Từ ảnh vệ tinh đến đường bờ và tốc độ biến động** gồm các bước quy trình đánh số (thu thập và lọc cảnh, composite, làm nổi mặt nước bằng chỉ số, hình thái học, …), mỗi bước có ảnh minh hoạ từ dữ liệu thật của pipeline và nút *Chi tiết kỹ thuật*; sau đó là chuỗi phân tích DSAS (NSM, EPR, LRR, R²), tiêu chí phân loại, độ bất định, sạt lở tham chiếu, hạn chế, liên kết WMS/WFS và tài liệu tham khảo.
+**`/gioi-thieu` — phương pháp và hạn chế.** Mục lục bên trái; mục tiêu, dữ liệu Sentinel-2; mục **Từ ảnh vệ tinh đến đường bờ và tốc độ biến động** gồm các bước quy trình đánh số (thu thập và lọc cảnh, composite, làm nổi mặt nước bằng chỉ số, hình thái học, …), mỗi bước có ảnh chụp màn hình QGIS và nút *Chi tiết kỹ thuật*; sau đó là chuỗi phân tích DSAS (NSM, EPR, LRR, R²), tiêu chí phân loại, độ bất định, sạt lở tham chiếu, hạn chế, liên kết WMS/WFS và tài liệu tham khảo.
 
 | Phần 1 | Phần 2 |
 |---|---|
@@ -110,7 +110,7 @@ nền ảnh tổng hợp Sentinel-2, hệ toạ độ WGS 84 / UTM 48N, xuất 3
 
 ```mermaid
 flowchart LR
-    S2[(Sentinel-2 L2A<br/>Planetary Computer)] --> P[pipeline/<br/>Python]
+    S2[(Sentinel-2 L2A<br/>STAC)] --> P[QGIS 3.40<br/>làm bằng giao diện]
     P -->|GeoJSON| I[webgis:import]
     subgraph web/ [web/ — Laravel]
         I --> PG[(PostGIS<br/>dữ liệu không gian)]
@@ -122,13 +122,13 @@ flowchart LR
     API --> UI
 ```
 
-Web chỉ **đọc** kết quả: mọi chỉ số được pipeline tính sẵn, Laravel không tính lại.
+Web chỉ **đọc** kết quả: mọi chỉ số được tính sẵn trong QGIS (Field Calculator), Laravel không tính lại. Chuỗi script Python ở `pipeline/` được giữ làm bản đối chiếu.
 
 ## Cấu trúc thư mục
 
 ```
 .
-├── pipeline/   Xử lý ảnh Sentinel-2 → đường bờ, transect, thống kê (Python)
+├── pipeline/   Dữ liệu và ghi chú các bước làm trong QGIS (data/qgis_gui) + bản đối chiếu bằng script Python
 ├── web/        Ứng dụng WebGIS: API, giao diện bản đồ, cấu hình GeoServer (Laravel)
 ├── e2e/        Kiểm thử đầu-cuối (Playwright)
 └── .github/    CI và mẫu issue / pull request
@@ -136,7 +136,7 @@ Web chỉ **đọc** kết quả: mọi chỉ số được pipeline tính sẵn
 
 | Thành phần | Công nghệ | Tài liệu |
 |---|---|---|
-| Pipeline | Python, rasterio, xarray, geopandas, scikit-image | [`pipeline/README.md`](pipeline/README.md) |
+| Dữ liệu | QGIS 3.40 (chính); Python, rasterio, xarray, geopandas, scikit-image (đối chiếu) | [`pipeline/README.md`](pipeline/README.md) |
 | Web | Laravel 13, PostGIS, MySQL, GeoServer, Leaflet, Chart.js, Tailwind CSS | [`web/README.md`](web/README.md) |
 | E2E | Playwright (Chromium, Firefox, WebKit) | [`web/README.md#5-kiểm-thử`](web/README.md#5-kiểm-thử) |
 
@@ -153,7 +153,7 @@ cp .env.example .env && php artisan key:generate
 # Mở .env, bỏ comment khối "Chế độ cục bộ (docker compose)" ở cuối file rồi xoá/ghi đè các dòng DB_PGSQL_* mặc định (Supabase)
 
 php artisan migrate --seed
-php artisan webgis:import ../pipeline/output       # nạp kết quả pipeline có sẵn trong repo
+php artisan webgis:import ../pipeline/data/qgis_gui/giai_doan2/export   # nạp dữ liệu dựng bằng QGIS có sẵn trong repo
 set -a && . ./.env && set +a                  # build_basemap.py và provision.sh đọc DB_PGSQL_* từ môi trường
 python3 geoserver/basemap/build_basemap.py         # nền bản đồ tự phục vụ (Natural Earth quan điểm VN + OSM)
 geoserver/provision.sh songhau webgis_spatial      # workspace, store, style, layer, nền nen_ban_do
@@ -166,7 +166,7 @@ npm run build && php artisan serve                 # http://127.0.0.1:8000
 Chỉ cần xem giao diện, không dùng GeoServer: bỏ hai lệnh `build_basemap.py` / `provision.sh`, để trống `GEOSERVER_URL` — bản đồ vẽ GeoJSON từ `/api/*`.
 Muốn có sẵn tài khoản demo, điền `DEMO_*` trong `.env` trước khi `db:seed` rồi đăng nhập tại `/dang-nhap` (xem mục [Tài khoản kiểm thử](#tài-khoản-kiểm-thử)).
 
-Chạy lại pipeline từ ảnh gốc: xem [`pipeline/README.md`](pipeline/README.md) và mục [Tái lập kết quả thực nghiệm](#tái-lập-kết-quả-thực-nghiệm).
+Dựng lại dữ liệu từ ảnh gốc bằng QGIS: xem ghi chú từng bước `pipeline/data/qgis_gui/<năm>/BUOC.md` và ảnh chụp trong `docs/minh_chung/qgis/`; bản script Python: xem [`pipeline/README.md`](pipeline/README.md) và mục [Tái lập kết quả thực nghiệm](#tái-lập-kết-quả-thực-nghiệm).
 
 ## Kiểm thử
 
@@ -252,22 +252,22 @@ Hai CSDL, theo các migration trong `web/database/migrations/`.
 
 ## Kết quả thực nghiệm
 
-Trích từ `pipeline/output/*.json` (bản demo, sinh bởi pipeline).
+Trích từ dữ liệu dựng bằng QGIS (`pipeline/data/qgis_gui/giai_doan2/export/*.geojson`) đã nạp vào web. Số liệu của bản script Python cũ nằm ở `pipeline/output/*.json`, dùng đối chiếu.
 
-**Tổng quan** (`summary.json`): 266 transect, chỉ số nước đang dùng `mndwi`, 9 quan sát bị khử đột biến, 3 hotspot. Đường bờ chính do QGIS tự giải đoán từ ảnh (`config.SHORELINE_ENGINE = "qgis"`, `qgis_interpret.py`); bản Python cũ (contour dưới pixel) giữ ở `data/shoreline_python/` làm mốc đối chiếu.
+**Tổng quan** (`/api/summary`): 270 transect, chỉ số nước `mndwi`, 1 hotspot, LRR trung bình 0,389 m/năm (trung vị 0,269). Toàn bộ chuỗi (ảnh → đường bờ → transect → thống kê) làm bằng giao diện QGIS; bản Python cũ (contour dưới pixel) giữ ở `data/shoreline_python/` làm mốc đối chiếu.
 
 | Lớp biến động | Số transect |
 |---|---|
-| Bồi (`accretion`) | 71 |
-| Ổn định (`stable`) | 181 |
-| Lùi nhẹ (`mild_erosion`) | 10 |
-| Lùi mạnh (`severe_erosion`) | 4 |
+| Bồi (`accretion`) | 52 |
+| Ổn định (`stable`) | 209 |
+| Lùi nhẹ (`mild_erosion`) | 8 |
+| Lùi mạnh (`severe_erosion`) | 1 |
 
 Tiêu chí chốt trước khi chạy lại (không chỉnh theo kết quả): có ý nghĩa thống kê khi |LRR| > t(0,975; n − 2)·SE (n = 9 năm thì t = 2,365);
 lùi mạnh khi có ý nghĩa, LRR ≤ −2 m/năm và khoảng cách giảm liên tục ≥ 3 mốc năm liền nhau; R² &lt; 0,3 chỉ là cờ chất lượng.
 Trước đó dùng z = 1,96 và ngưỡng M − S = −1,804 m/năm (tính trên chính kết quả, hậu nghiệm): 124 transect có ý nghĩa, 3 lùi mạnh, 2 hotspot.
-Hotspot (`hotspots.json`, giai đoạn 2018–2026): 3 đoạn — T0020 (1 transect, LRR −2,68 m/năm), T0094 (1 transect, −2,67 m/năm), T0200–T0201 (2 transect, ~100 m, −3,09 m/năm).
-So với bản Python cũ (267 transect, 1 lùi mạnh, 1 hotspot T0094), số lùi mạnh tăng do đường bờ QGIS đi theo cạnh pixel 10 m còn Python nội suy dưới pixel, nên các transect sát ngưỡng −2 m/năm đổi nhóm; LRR hai bản tương quan r = 0,95 (`output/qgis_interpret.json`). Đây là sai khác phương pháp cỡ một pixel, không phải thay đổi thực địa.
+Hotspot (`hotspots.geojson`, giai đoạn 2018–2026): 1 đoạn — T0089 (1 transect, ~50 m, tốc độ lùi 2,83 m/năm).
+So với bản hiển thị trước đó (266 transect, 4 lùi mạnh, 3 hotspot) và bản Python (267 transect, 1 lùi mạnh): LRR QGIS lệch bản trước đó RMSE 1,39 m/năm, 164 trong 261 transect ghép được cùng nhóm. Phần lớn chênh lệch đến từ cách dựng baseline và hướng transect (QGIS xác định phía đất bằng mắt, bản Python bằng mặt nạ nước), không phải từ đường bờ; đường bờ hai bản khớp 93–98% trong 10 m (trừ 2022: 82%). Chi tiết ở trang báo cáo nội bộ `/bao-cao`.
 Hai chỗ lệch hình học đã kiểm tra:
 - Khoảng cách Hausdorff 133 m giữa bản QGIS và Python năm 2019 là đầu một kênh rộng ~130 m tại (537090; 1158790): QGIS đóng đầu kênh bằng cung tròn (hệ quả của buffer ∓50 m), Python cắt phẳng cách đó ~125 m. Đây là hai cách xử lý miệng kênh khác nhau, không phải lỗi của bên nào.
 - Từng có đoạn bờ giả 450–640 m ở bản đối chứng Sentinel-2 C1 2019 và Landsat 2021: đó là rìa vùng không có dữ liệu (mặt nạ mây), không phải bờ thật. Chuỗi QGIS nay lấp cụm no-data nhỏ (`gdal:fillnodata`) và cắt đoạn bờ trong 2 pixel quanh cụm từ 25 pixel (như `s3_shoreline`); đường bờ chính không đổi, Landsat 2021 hết đoạn thừa, Sentinel-2 C1 2019 bị cắt thành 3 đoạn vì thiếu dữ liệu quá lớn (năm này đã bị loại khỏi biến thể "tin cậy").
@@ -312,13 +312,15 @@ Repo chứa sẵn đầu vào trung gian và kết quả nên có thể kiểm t
 | Cần gì | Có trong repo | Ở đâu |
 |---|---|---|
 | Danh sách ảnh dùng (ngày, mây) | có | `pipeline/data/composite/scenes.json` |
-| Đường bờ từng năm, baseline, transect | có | `pipeline/data/shoreline/`, `baseline.json`, `transects.json` |
+| Đường bờ từng năm, baseline, transect (QGIS) | có | `pipeline/data/qgis_gui/<năm>/shoreline_<năm>.gpkg`, `pipeline/data/qgis_gui/giai_doan2/` |
+| Bản Python để đối chiếu | có | `pipeline/data/shoreline/`, `baseline.json`, `transects.json` |
+| Ảnh chụp từng bước làm trong QGIS | có | `docs/minh_chung/qgis/` |
 | Ground truth số hoá (5 ô mẫu × 2018/2022/2026) | có | `pipeline/data/ground_truth/ground_truth.gpkg`, project QGIS `so_hoa_ground_truth.qgz` |
 | Dữ liệu đối chiếu chéo (WorldCover, IO-LULC) | có (vector) | `pipeline/data/crosscheck/*.json` |
 | Kết quả: thống kê, hotspot, đánh giá, đối chiếu chéo | có | `pipeline/output/*.json` |
 | Ảnh composite Sentinel-2 (~300 MB), raster mặt nước | **không** (`.gitignore`) | sinh lại bằng `run.py` |
 
-Kiểm tra nhanh (vài giây, không cần mạng): `cd pipeline && .venv/bin/python -m pytest -q` (đối chiếu số liệu `output/*.json`, ngưỡng phân loại, công thức độ bất định), rồi `php artisan webgis:import ../pipeline/output` (266 transect, 3 hotspot).
+Kiểm tra nhanh (vài giây, không cần mạng): `cd pipeline && .venv/bin/python -m pytest -q` (đối chiếu số liệu `output/*.json`, ngưỡng phân loại, công thức độ bất định), rồi `php artisan webgis:import ../pipeline/data/qgis_gui/giai_doan2/export` (270 transect, 1 hotspot).
 
 Tái lập đầy đủ từ ảnh gốc (cần mạng, ~15 phút; kết quả có thể lệch nhẹ nếu Planetary Computer cập nhật ảnh):
 
@@ -351,7 +353,7 @@ API từ PostGIS; WMS/WFS qua GeoServer; MySQL lưu người dùng, ngưỡng, n
 | 4 | Bật/tắt "ranh giới AOI" trong bảng lớp (2.5) | AOI luôn hiển thị (nét đứt), có trong chú giải nhưng **không có công tắc** | |
 | 5 | WFS phục vụ chọn đối tượng và lọc (2.5) | Việc chọn transect và lọc đi qua REST API của Laravel; WFS được công bố và kiểm tra nhưng giao diện không gọi | |
 | 6 | API dùng `ST_Distance`, `ST_Intersection` để tính sẵn (2.5) | Chỉ truy vấn tổng hợp hotspot dùng hàm không gian; chỉ số do pipeline tính sẵn, Laravel không tính lại | Phù hợp nguyên tắc "web chỉ đọc" |
-| 7 | Sạt lở tham chiếu 2019–2020 làm dữ liệu kiểm chứng | 2 sự kiện, vị trí số hoá từ nguồn báo chí/UBND tỉnh, có vùng cảnh báo ~3,3 km; 2/2 sự kiện có hotspot trong 500 m (gần nhất 355 m; trước khi đổi sang đường bờ QGIS là 0/2). Vùng cảnh báo dài ~3,3 km và hotspot tăng từ 1 lên 3 nên khả năng "trúng" cũng tăng; kết quả này chưa phải bằng chứng độ chính xác tốt hơn | Chưa có dữ liệu thật từ UBND xã hay Ban chỉ huy PCTT-TKCN An Giang (yêu cầu liên hệ) |
+| 7 | Sạt lở tham chiếu 2019–2020 làm dữ liệu kiểm chứng | 2 sự kiện, vị trí số hoá từ nguồn báo chí/UBND tỉnh, có vùng cảnh báo ~3,3 km; 0/2 sự kiện có hotspot trong 500 m (hotspot gần nhất, T0089, cách khoảng 5,2 km); vùng này có 74 transect trong 300 m, đều ổn định hoặc bồi. Kết quả nêu như hạn chế của phương pháp, không phải bằng chứng khớp thực tế | Chưa có dữ liệu thật từ UBND xã hay Ban chỉ huy PCTT-TKCN An Giang (yêu cầu liên hệ) |
 | 8 | Chọn chỉ số nước theo F1 trung bình, hoà thì xét RMSE | F1 tốt nhất là `awei` (0,9457), nhưng chỉ số mặc định đang dùng `mndwi` (0,9456); chưa có bước xét RMSE trong mã | Chênh không đáng kể |
 | 9 | (không có trong đề cương) | Có thêm `/gioi-thieu`, `/huong-dan`, `/bao-cao`, liên kết chia sẻ, xuất GeoJSON/CSV, nền tự phục vụ, giao diện di động | Bổ sung ngoài phạm vi |
 
@@ -360,7 +362,7 @@ phần tài liệu.
 
 ## Dữ liệu
 
-Dữ liệu trong `pipeline/output/` và `pipeline/data/` là **bản demo** phục vụ phát triển. Độ bất định phân loại (U_classify)
+Dữ liệu chính của web là kết quả dựng bằng QGIS trong `pipeline/data/qgis_gui/`; `pipeline/output/` và phần còn lại của `pipeline/data/` là bản script Python dùng đối chiếu. Độ bất định phân loại (U_classify)
 lấy theo RMSE đường bờ so với ground truth số hoá trên 5 ô mẫu (2018, 2022, 2026); các năm còn lại dùng giá trị lớn nhất đã đo.
 Kết quả đánh giá nằm ở `pipeline/output/evaluation.json`.
 Ảnh Sentinel-2: © Copernicus / ESA, truy cập qua Microsoft Planetary Computer.
