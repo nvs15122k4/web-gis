@@ -133,10 +133,10 @@
             <tr><th>Năm</th><th>Dài QGIS (km)</th><th>Dài Python (km)</th><th>Trong 10 m</th><th>Trong 20 m</th><th>Lệch TB (m)</th></tr>
                 <tr><td class="code">2018</td><td>15,28</td><td>15,12</td><td>96,8%</td><td>99,5%</td><td>4,0</td></tr>
                 <tr><td class="code">2019</td><td>15,35</td><td>15,25</td><td>96,7%</td><td>99,6%</td><td>4,0</td></tr>
-                <tr><td class="code">2020</td><td>15,12</td><td>14,7</td><td>97,6%</td><td>100,0%</td><td>3,8</td></tr>
+                <tr><td class="code">2020</td><td>15,12</td><td>14,70</td><td>97,6%</td><td>100,0%</td><td>3,8</td></tr>
                 <tr><td class="code">2021</td><td>15,37</td><td>14,92</td><td>96,6%</td><td>100,0%</td><td>3,7</td></tr>
                 <tr><td class="code">2022</td><td>15,68</td><td>15,13</td><td>81,8%</td><td>93,1%</td><td>8,9</td></tr>
-                <tr><td class="code">2023</td><td>15,1</td><td>15,06</td><td>97,0%</td><td>99,9%</td><td>4,0</td></tr>
+                <tr><td class="code">2023</td><td>15,10</td><td>15,06</td><td>97,0%</td><td>99,9%</td><td>4,0</td></tr>
                 <tr><td class="code">2024</td><td>15,62</td><td>14,67</td><td>93,1%</td><td>96,9%</td><td>7,3</td></tr>
                 <tr><td class="code">2025</td><td>15,12</td><td>14,71</td><td>94,4%</td><td>99,7%</td><td>4,3</td></tr>
                 <tr><td class="code">2026</td><td>15,22</td><td>14,74</td><td>95,5%</td><td>99,9%</td><td>4,1</td></tr>
