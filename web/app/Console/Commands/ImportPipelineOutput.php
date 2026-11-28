@@ -64,9 +64,42 @@ class ImportPipelineOutput extends Command
         return self::SUCCESS;
     }
 
+    /** Đọc {name}.json, hoặc {name}.geojson (đuôi QGIS xuất ra) nếu không có file .json. */
     private function features(string $dir, string $name): array
     {
-        return $this->featuresOf("{$dir}/{$name}.json");
+        $file = is_file("{$dir}/{$name}.json") ? "{$dir}/{$name}.json" : "{$dir}/{$name}.geojson";
+
+        return $this->featuresOf($file);
+    }
+
+    /**
+     * Thuộc tính transect xuất từ QGIS là phẳng (d2018..d2026, lrr, epr, nsm, r2, ...): đưa về dạng lồng
+     * distances{năm: m} + stats{...} mà phần nạp bên dưới dùng. Dạng lồng giữ nguyên.
+     */
+    private function normalizeTransectProps(array $p): array
+    {
+        if (isset($p['distances']) || ! preg_grep('/^d\d{4}$/', array_keys($p))) {
+            return $p;
+        }
+        $d = [];
+        foreach ($p as $k => $v) {
+            if (preg_match('/^d(\d{4})$/', $k, $m)) {
+                $d[$m[1]] = $v === null ? null : (float) $v;
+            }
+        }
+        ksort($d);
+        $map = ['nsm' => 'nsm_m', 'epr' => 'epr_m_per_year', 'lrr' => 'lrr_m_per_year', 'r2' => 'r_squared'];
+        $stats = [];
+        foreach (['nsm', 'epr', 'lrr', 'r2', 'se_lrr', 'unc_lrr', 'unc_epr', 't_crit', 'is_significant', 'change_class',
+            'consecutive_erosion_periods', 'u_shoreline_avg', 'n_years', 'first_year', 'last_year', 'low_r2_caution'] as $k) {
+            if (array_key_exists($k, $p)) {
+                $stats[$map[$k] ?? $k] = in_array($k, ['is_significant', 'low_r2_caution'], true) ? (bool) $p[$k] : $p[$k];
+            }
+        }
+        $p['distances'] = $d;
+        $p['stats'] = $stats ?: null;
+
+        return $p;
     }
 
     private function featuresOf(string $file): array
@@ -138,7 +171,7 @@ class ImportPipelineOutput extends Command
     {
         $n = 0;
         foreach ($this->features($dir, 'transects') as $f) {
-            $p = $f['properties'];
+            $p = $this->normalizeTransectProps($f['properties']);
             $tid = $pg->selectOne(
                 'INSERT INTO transects (transect_code, baseline_id, geom)
                  VALUES (?, ?, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
