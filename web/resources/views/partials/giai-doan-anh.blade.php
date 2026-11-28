@@ -1,221 +1,207 @@
 @php
-    $img = '/img/phuong-phap/';
+    $img = '/img/qgis/';
     /*
      * Mỗi bước: hình chính (cột phải, dính khi cuộn), 2 đoạn tóm tắt và phần "Chi tiết kỹ thuật" (details/summary, không cần JS).
-     * Số liệu đọc từ pipeline/config.py và pipeline/output/*.json lúc viết; test AboutStepsTest đối chiếu lại từng số với file nguồn.
-     * 'more' = [Đầu vào/đầu ra, Thông số, Công thức/thuật toán, Kiểm tra chất lượng]; 'figs' = hình phụ trong phần chi tiết.
+     * Mọi bước làm bằng giao diện QGIS 3.40; số liệu lấy từ pipeline/data/qgis_gui/<năm>/BUOC.md, giai_doan2/BUOC.md và export/*.geojson.
+     * Test AboutStepsTest đối chiếu lại từng số với các file nguồn đó.
+     * 'more' = [Đầu vào/đầu ra, Thông số, Công thức/thuật toán, Kiểm tra chất lượng]; 'figs' = ảnh chụp phụ trong phần chi tiết.
      */
     $steps = [
         [
-            'id' => 'buoc-1', 'title' => 'Thu thập và lọc cảnh', 'tag' => 'Sentinel-2 L2A · s1_composite.py',
-            'img' => 'p1-loc-canh.webp', 'w' => 797, 'h' => 494,
-            'alt' => 'Biểu đồ các cảnh Sentinel-2 từng năm 2018 đến 2026 theo ngày trong mùa khô: điểm tròn là cảnh được dùng, dấu X đỏ là cảnh bị loại vì mây che quá 30%.',
-            'cap' => 'Mỗi điểm là một cảnh (ngày chụp trên trục ngang). Màu là tỉ lệ pixel bị che trong vùng tải; dấu X đỏ là cảnh bị loại. Tổng cộng 66 trên 126 cảnh được dùng.',
+            'id' => 'buoc-1', 'title' => 'Nạp ảnh Sentinel-2 từ kho STAC', 'tag' => 'Data Source Manager · STAC Earth Search',
+            'img' => 'a1-stac-them-band.webp', 'w' => 1600, 'h' => 894,
+            'alt' => 'Ảnh chụp màn hình QGIS: hộp thoại Data Source Manager nạp các band B03, B11 và lớp phân loại cảnh SCL của ảnh Sentinel-2 L2A từ kho STAC.',
+            'cap' => 'Thêm các band ảnh Sentinel-2 L2A từ kho STAC vào QGIS bằng Data Source Manager.',
             'body' => [
-                'Mỗi năm pipeline tìm các cảnh Sentinel-2 L2A chụp trong tháng 1–3 trên kho Microsoft Planetary Computer, trong khung bao quanh đoạn sông Hậu qua xã Bình Mỹ. Cảnh có mây metadata từ 80% trở lên bị bỏ ngay để bớt tải; qua bước lọc sơ này còn 126 cảnh cho cả chín năm, mỗi năm từ 11 đến 18 cảnh.',
-                'Với các cảnh còn lại, pipeline đếm tỉ lệ pixel bị che theo lớp phân loại cảnh SCL; cảnh che hơn 30% bị loại. Còn lại 66 cảnh được dùng, từ 4 cảnh (2018) đến 13 cảnh (2020).',
+                'Dự án QGIS đặt hệ toạ độ EPSG:32648 (UTM 48N). Ảnh lấy từ kho STAC Earth Search (earth-search.aws.element84.com/v1, không cần khoá truy cập) qua Browser &gt; STAC &gt; New STAC Connection. Mỗi cảnh nạp ba lớp COG: B03 (xanh lục), B11 (SWIR1) và SCL (phân loại cảnh).',
+                'QGIS 3.40 không có ô lọc theo khung bao hay ngày cho kết nối STAC (đã thử bốn cách, đều lỗi hoặc không lọc được), nên mỗi năm chọn đúng các cảnh đã lọc mây từ trước: 66 trong 126 cảnh mùa khô tháng 1–3 của 9 năm, từ 4 cảnh (2018) đến 13 cảnh (2020).',
             ],
             'more' => [
-                'io' => 'Vào: truy vấn STAC <code>sentinel-2-l2a</code>, các kênh B03, B08, B11, B12 và SCL. Ra: <code>data/composite/scenes.json</code>, mỗi cảnh một dòng gồm ngày, <code>masked_fraction</code>, <code>used</code>, <code>processing_baseline</code>; mỗi năm thêm số cảnh dùng và <code>source_image_date</code> (ngày của cảnh dùng cuối cùng).',
-                'params' => 'Khung tải (EPSG:4326): 105,17–105,36 kinh Đông, 10,45–10,575 vĩ Bắc. Mùa 01/01–31/03 mỗi năm, 2018–2026. Lọc sơ <code>eo:cloud_cover</code> &lt; 80%. Lớp SCL bị che: 0, 1, 3, 8, 9, 10, 11 (không dữ liệu, bão hoà, bóng mây, mây trung bình, mây cao, mây ti, tuyết). Ngưỡng loại cảnh: tỉ lệ pixel bị che &gt; 0,30 trong vùng tải. Gộp các cảnh cùng ngày mặt trời (<code>groupby solar_day</code>).',
-                'method' => 'Tỉ lệ che tính theo công thức ở trên, với các lớp SCL bị che nêu trong mục Thông số. Cảnh đạt ngưỡng đi tiếp sang bước tiền xử lý; cảnh bị loại vẫn được ghi trong <code>scenes.json</code> với <code>used = false</code> để truy vết.',
-                'qa' => 'Trong các cảnh được dùng, tỉ lệ che cao nhất là 0,283 (2025), luôn dưới ngưỡng 0,30. Mỗi năm đều còn ít nhất 4 cảnh nên không năm nào bị bỏ trống. Số cảnh dùng chênh nhiều giữa các năm (4 đến 13), nghĩa là chất lượng composite không đồng đều.',
+                'io' => 'Vào: kho STAC Earth Search, collection <code>sentinel-2-l2a</code>, tile 48PWS. Ra: các lớp raster trong dự án (đường dẫn <code>/vsicurl/…</code> tới COG), 3 lớp mỗi cảnh. Dữ liệu từng năm nằm ở <code>pipeline/data/qgis_gui/&lt;năm&gt;/</code>, kèm file ghi thao tác <code>BUOC.md</code>.',
+                'params' => 'Số cảnh dùng mỗi năm: 2018: 4; 2019: 9; 2020: 13; 2021: 8; 2022: 5; 2023: 7; 2024: 7; 2025: 7; 2026: 6. Tiêu chí chọn cảnh: tỉ lệ pixel bị che theo lớp SCL không quá 30% trong vùng tải. Lớp SCL bị che: 0, 1, 3, 8, 9, 10, 11 (không dữ liệu, bão hoà, bóng mây, mây trung bình, mây cao, mây ti, tuyết).',
+                'method' => 'Chọn cảnh bằng cách nạp từng nhóm đường dẫn COG trong Data Source Manager &gt; Raster; nạp từ xa từng lớp rất chậm nên các bước sau chạy hàng loạt (Batch) với đường dẫn điền bằng Autofill &gt; Calculate by Expression.',
+                'qa' => 'Cảnh dùng cho 2026 là 09/01, 19/01, 03/02, 10/03, 15/03 và 25/03. Năm 2022 có một cảnh (04/02/2022, processing baseline 04.00) còn cộng thêm 1000 vào giá trị số; cảnh này được trừ lại ở bước 3. Nếu không trừ, ngưỡng nước năm đó lệch hẳn (−0,045) và diện tích nước thành 18,8 km², là kết quả sai.',
             ],
             'figs' => [],
         ],
         [
-            'id' => 'buoc-2', 'title' => 'Tiền xử lý: cắt vùng, hiệu chỉnh, composite', 'tag' => 'Median composite · s1_composite.py',
-            'img' => 'b1-composite.webp', 'w' => 778, 'h' => 521,
-            'alt' => 'Ảnh composite giả màu năm 2026 quanh xã Bình Mỹ, sông Hậu màu xanh thẫm, ranh giới xã nét đứt vàng.',
-            'cap' => 'Composite mùa khô 2026, giả màu SWIR1 · NIR · Xanh lục (nước gần đen, thực vật xanh lục sáng). Nét đứt vàng là ranh giới xã.',
+            'id' => 'buoc-2', 'title' => 'Vùng phân tích và cắt ảnh', 'tag' => 'Reproject · Buffer · Clip Raster by Mask Layer',
+            'img' => 'a2-batch-clip.webp', 'w' => 1600, 'h' => 894,
+            'alt' => 'Ảnh chụp màn hình QGIS: hộp thoại Clip Raster by Mask Layer chạy hàng loạt (Batch Process) cho nhiều band ảnh.',
+            'cap' => 'Cắt ảnh theo vùng phân tích bằng Clip Raster by Mask Layer chạy hàng loạt (Batch).',
             'body' => [
-                'Các cảnh đạt yêu cầu được đưa về cùng một lưới 10 m trong hệ UTM 48N rồi lấy trung vị, pixel mây và bóng mây không tham gia. Kết quả là một ảnh bốn kênh phản xạ cho mỗi năm.',
-                'Từ processing baseline 04.00 (25/01/2022) ESA cộng thêm 1000 vào giá trị số của ảnh L2A, nên pipeline trừ lại để các năm so sánh được. Sau đó mới tính chỉ số nước và chỉ phân tích trong ranh giới xã cộng đệm 1 km.',
+                'Ranh giới xã Bình Mỹ (OpenStreetMap) được đổi sang EPSG:32648 bằng Reproject Layer. Buffer 1.000 m (có Dissolve) cho vùng phân tích; Buffer 100 m cho vùng bờ dùng để cắt đường bờ ở bước 5.',
+                'Clip Raster by Mask Layer chạy dạng Batch Process cắt mọi band theo vùng 1.000 m, ép về lưới 10 m, nên mọi cảnh và mọi năm cùng một lưới 2.004 × 1.331 pixel.',
             ],
             'more' => [
-                'io' => 'Vào: các cảnh đạt ở bước 1. Ra: <code>data/composite/&lt;năm&gt;.tif</code>, GeoTIFF nén deflate, 4 kênh (B03, B08, B11, B12) kiểu float32 trong khoảng 0–1, EPSG:32648, pixel 10 m. Ảnh 2026 rộng 2.081 × 1.385 pixel (khoảng 20,8 × 13,9 km).',
-                'params' => 'CRS: EPSG:32648. Độ phân giải: 10 m. SWIR (B11, B12) gốc 20 m được nội suy song tuyến lên 10 m; SCL dùng láng giềng gần nhất. Offset hiệu chỉnh: 1000 cho processing baseline từ 4,0 trở lên, 0 cho bản cũ. Trong danh sách cảnh, hai năm có cả hai nhóm baseline là 2019 (02.12 và 05.00) và 2022 (03.00, 04.00, 05.10); từ 2023 mọi cảnh đều từ 04.00 trở lên. Ranh giới xã lấy từ OSM relation 13646056; vùng phân tích là ranh giới này đệm 1.000 m.',
-                'method' => 'Pixel DN = 0 là không dữ liệu. Với mỗi pixel, composite lấy trung vị theo thời gian của các quan sát không bị che (<code>skipna</code>), tính theo hai công thức ở trên. Cắt vùng: ảnh giữ nguyên khung tải, còn các bước sau chỉ tính trong vùng phân tích.',
-                'qa' => 'Pixel mây còn sót vài điểm được xử lý ở bước làm sạch mặt nạ. Pipeline không có bước kiểm độc lập riêng cho việc trừ offset; chất lượng chung của composite chỉ được đo gián tiếp qua ground truth ở bước 9.',
+                'io' => 'Vào: ranh giới xã và các lớp raster ở bước 1. Ra: <code>ranh_gioi_xa_32648.gpkg</code>, <code>vung_phan_tich_dem1000m.gpkg</code>, <code>vung_bo_dem100m.gpkg</code> và ảnh đã cắt <code>clip/YYYYMMDD_&lt;band&gt;.tif</code> trong thư mục từng năm.',
+                'params' => 'CRS: EPSG:32648. Buffer 1.000 m và 100 m có Dissolve. Clip Raster by Mask Layer: mask = vùng 1.000 m, Target extent = phạm vi lớp vùng 1.000 m, Set output resolution = 10 × 10 m (B11 và SCL gốc 20 m được lấy mẫu láng giềng gần nhất về 10 m). Số dòng Batch mỗi năm bằng 3 band × số cảnh, ví dụ 12 dòng (2018), 27 (2019), 39 (2020), 18 (2026).',
+                'method' => 'Batch Process điền cột Input và Output bằng Autofill &gt; Calculate by Expression với biến <code>@row_number</code>, nên một lần chạy xử lý hết các band của cả năm.',
+                'qa' => 'Nhật ký của Processing báo hoàn tất từng dòng; ảnh sau cắt của mọi năm có cùng kích thước 2.004 × 1.331, nên xếp chồng được ở bước tiếp theo.',
             ],
             'figs' => [
-                ['p3-cat-vung.webp', 756, 536, 'Ảnh composite 2026 với ranh giới xã nét đứt vàng và vùng phân tích đệm 1 km viền xanh lơ.', 'Cắt vùng: ranh giới xã (vàng) và vùng phân tích đệm 1.000 m (xanh lơ) dùng để tính ngưỡng Otsu.'],
-                ['p2-bang-pho.webp', 1188, 229, 'Bốn ảnh xám của các kênh B03, B08, B11 và B12 quanh đoạn sông Hậu; nước tối ở kênh hồng ngoại.', 'Bốn kênh phổ dùng, cắt quanh đoạn sông có điểm nóng, kéo giãn 2–98% từng kênh. Nước tối dần ở NIR và SWIR, là cơ sở của chỉ số nước.'],
+                ['s2-buffer-1000m.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: hộp thoại Buffer với khoảng cách 1.000 m và tuỳ chọn Dissolve, tạo vùng phân tích quanh ranh giới xã.', 'Buffer 1.000 m có Dissolve quanh ranh giới xã để làm vùng phân tích.'],
             ],
         ],
         [
-            'id' => 'buoc-3', 'title' => 'Làm nổi mặt nước bằng chỉ số', 'tag' => 'MNDWI · Otsu · s2_water.py',
-            'img' => 'b2-mndwi.webp', 'w' => 751, 'h' => 419,
-            'alt' => 'Bản đồ chỉ số MNDWI năm 2026: sông Hậu và ao hồ màu xanh dương đậm, đất liền màu đỏ cam.',
-            'cap' => 'MNDWI năm 2026. Vùng xanh dương là nước, đỏ cam là đất; ngưỡng Otsu năm này là 0,113.',
+            'id' => 'buoc-3', 'title' => 'Che mây và gộp composite trung vị', 'tag' => 'GDAL Raster Calculator · Cell Statistics',
+            'img' => 'a3-che-may-scl.webp', 'w' => 1600, 'h' => 894,
+            'alt' => 'Ảnh chụp màn hình QGIS: GDAL Raster Calculator che mây và bóng mây theo lớp SCL, chạy hàng loạt.',
+            'cap' => 'Che mây và bóng mây theo lớp SCL bằng GDAL Raster Calculator (Batch).',
             'body' => [
-                'Pipeline tính ba chỉ số nước là NDWI, MNDWI và AWEI. Mỗi chỉ số được tách nước/đất bằng ngưỡng Otsu trong ranh giới xã cộng đệm 1 km.',
-                'Chọn chỉ số dựa trên ground truth số hoá thủ công (5 ô mẫu × 3 năm). F1 trung bình của MNDWI (0,9456) và AWEI (0,9457) gần như hoà, nên xét tiếp sai số đường bờ: MNDWI 18,45 m, NDWI 27,83 m, AWEI 60,01 m. MNDWI được chọn. Ngưỡng hoà 0,005 đặt sau khi đã thấy kết quả; đây là một lựa chọn của đồ án, không phải kết quả khách quan.',
+                'GDAL Raster Calculator chạy Batch đặt pixel mây, bóng mây và pixel không hợp lệ thành NoData (−9999) theo lớp SCL. Sau đó Cell Statistics lấy trung vị các cảnh của năm, bỏ qua NoData, riêng cho B03 và B11.',
+                'Kết quả mỗi năm là hai ảnh trung vị: <code>green_median_&lt;năm&gt;.tif</code> và <code>swir16_median_&lt;năm&gt;.tif</code>. Ảnh trung vị loại bỏ mây còn sót ở một cảnh nhờ các cảnh còn lại.',
             ],
             'more' => [
-                'io' => 'Vào: <code>composite/&lt;năm&gt;.tif</code>. Ra: <code>data/water/&lt;năm&gt;_&lt;chỉ số&gt;.tif</code> kiểu uint8 (1 nước, 0 đất, 255 không dữ liệu), cùng lưới 10 m, và <code>data/water/thresholds.json</code> (ngưỡng từng năm, từng chỉ số, làm tròn 4 chữ số).',
-                'params' => 'Ngưỡng Otsu MNDWI từng năm: 2018: 0,1633; 2019: 0,0673; 2020: 0,1349; 2021: 0,1211; 2022: 0,1207; 2023: 0,1289; 2024: 0,0404; 2025: 0,081; 2026: 0,1129. Vùng tính ngưỡng: ranh giới xã đệm 1.000 m; năm 2026 có 1.347.886 pixel hợp lệ, trong đó 9,82% là nước.',
-                'method' => 'Ba chỉ số lấy từ McFeeters 1996 (NDWI), Xu 2006 (MNDWI) và Feyisa et al. 2014 (AWEI<sub>nsh</sub>), công thức ở trên. Otsu chọn ngưỡng làm cực đại phương sai giữa hai lớp của histogram; histogram MNDWI 2026 có hai đỉnh rõ (đất quanh −0,4, nước quanh 0,7) nên ngưỡng nằm ở thung lũng giữa hai đỉnh.',
-                'qa' => 'Ngưỡng 2026 trong <code>thresholds.json</code> được tính lại từ composite bằng đúng hàm của pipeline khi vẽ hình histogram, hai giá trị khớp nhau. Độ chính xác của từng chỉ số đo trên ground truth ở bước 9.',
+                'io' => 'Vào: ảnh đã cắt ở bước 2. Ra: <code>mask/*_masked.tif</code> (Float32, NoData −9999) và <code>green_median_&lt;năm&gt;.tif</code>, <code>swir16_median_&lt;năm&gt;.tif</code> cùng lưới 10 m.',
+                'params' => 'Biểu thức GDAL Raster Calculator: <code>where(isin(B,[0,1,3,8,9,10,11]),-9999.0,A*1.0)</code> với A là band, B là SCL; kiểu Float32. Lần chạy đầu dùng A kiểu số nguyên không dấu nên giá trị −9999 bị tràn thành 55537; phải nhân <code>A*1.0</code> để ép kiểu thực. Cell Statistics: Statistic = Median, Ignore NoData, lớp tham chiếu là một ảnh đã che cùng lưới.',
+                'method' => 'Trung vị theo pixel của các quan sát không bị che, theo công thức ở trên. Với cảnh 04/02/2022, biểu thức đổi thành <code>A*1.0-1000.0</code> để bỏ phần cộng 1000.',
+                'qa' => 'Số lớp đầu vào của Cell Statistics bằng số cảnh của năm (ví dụ 6 lớp B03 và 6 lớp B11 cho 2026). Nhật ký xử lý của Processing báo hoàn tất từng lần chạy.',
             ],
             'figs' => [
-                ['p4-otsu.webp', 750, 397, 'Histogram MNDWI năm 2026 có hai đỉnh, đất quanh âm 0,4 và nước quanh 0,7, đường đỏ đứng là ngưỡng Otsu 0,113.', 'Histogram MNDWI 2026 trong vùng phân tích và ngưỡng Otsu 0,113 (đường đỏ). Đất chiếm đỉnh lớn bên trái, nước là đỉnh nhỏ bên phải.'],
+                ['a4-median.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: Cell Statistics với Statistic là Median, gộp các lớp B03 đã che mây thành ảnh trung vị.', 'Gộp các cảnh B03 đã che mây thành ảnh trung vị bằng Cell Statistics (Median).'],
             ],
         ],
         [
-            'id' => 'buoc-4', 'title' => 'Mặt nạ nước và làm sạch', 'tag' => 'Hình thái học · s3_shoreline.py',
-            'img' => 'b3-mat-na-nuoc.webp', 'w' => 778, 'h' => 521,
-            'alt' => 'Mặt nạ nước nhị phân năm 2026: sông Hậu màu xanh, đất màu nâu nhạt.',
-            'cap' => 'Mặt nạ nước 2026 sau ngưỡng MNDWI (xanh: nước, nâu: đất).',
+            'id' => 'buoc-4', 'title' => 'Chỉ số nước MNDWI và ngưỡng nước', 'tag' => 'Raster Calculator · Histogram',
+            'img' => 'a5-mndwi.webp', 'w' => 1600, 'h' => 894,
+            'alt' => 'Ảnh chụp màn hình QGIS: Raster Calculator tính chỉ số nước MNDWI từ hai ảnh trung vị xanh lục và SWIR1.',
+            'cap' => 'Tính MNDWI = (Green − SWIR1) / (Green + SWIR1) trong Raster Calculator.',
             'body' => [
-                'Mặt nạ được làm sạch trước khi trích đường bờ: mở hình thái để bỏ kênh rạch hẹp dưới khoảng 100 m, giữ vùng nước liên thông lớn nhất (sông Hậu) và lấp các lỗ nhỏ hơn 5 ha.',
-                'Việc này nhằm chỉ theo dõi bờ sông chính, không để ao nuôi, kênh nội đồng hay nhiễu nhỏ trở thành đường bờ. Năm 2026, bước này bỏ 51.918 pixel nước (khoảng 519 ha) và không thêm pixel nào.',
+                'Raster Calculator tính MNDWI từ hai ảnh trung vị. Nước có MNDWI cao, đất có MNDWI thấp. Biểu đồ phân bố (Layer Properties &gt; Histogram) có hai đỉnh, đất quanh −0,45 và nước quanh +0,65 ở năm 2026, ngưỡng nằm ở đáy giữa hai đỉnh.',
+                'QGIS 3.40 không có công cụ Otsu. Vì vậy ngưỡng của từng năm được tính trên đúng histogram của ảnh MNDWI năm đó (1.024 bin) rồi nhập vào Raster Calculator; trong QGIS vẫn mở được histogram để đối chiếu bằng mắt. Mặt nạ nước là <code>(A&gt;ngưỡng)*1</code>.',
             ],
             'more' => [
-                'io' => 'Vào: <code>water/&lt;năm&gt;_mndwi.tif</code>. Ra: mặt nạ nước đã làm sạch (trong bộ nhớ, dùng trực tiếp cho bước trích đường bờ).',
-                'params' => 'Mở hình thái với phần tử đĩa bán kính 5 pixel (50 m). Giữ thành phần liên thông lớn nhất. Lấp lỗ nhỏ hơn 500 pixel (5 ha). Cụm không dữ liệu nhỏ hơn 25 pixel (0,25 ha) được điền bằng giá trị pixel hợp lệ gần nhất; cụm từ 25 pixel trở lên coi là vùng thiếu dữ liệu thật và đoạn bờ đi qua đó bị cắt.',
-                'method' => 'Mở hình thái (binary opening) = co rồi giãn, bỏ cấu trúc hẹp hơn phần tử cấu trúc. Gắn nhãn thành phần liên thông (<code>ndimage.label</code>) và chọn thành phần có diện tích lớn nhất làm sông Hậu. Lỗ trong lòng sông (ghe tàu, bèo) được lấp nếu nhỏ hơn ngưỡng.',
-                'qa' => 'Năm 2026: trước làm sạch 206.932 pixel nước, sau làm sạch 155.014 pixel, bỏ 51.918 pixel (519,2 ha), thêm 0 pixel. Hình bên dưới là một cửa sổ 2,4 × 1,6 km, nơi kênh nội đồng và ao (đỏ) bị bỏ còn sông chính (xanh) được giữ. Hệ quả cần biết: kênh rộng dưới khoảng 100 m không được theo dõi.',
+                'io' => 'Vào: <code>green_median</code> và <code>swir16_median</code> của năm. Ra: <code>mndwi_&lt;năm&gt;.tif</code> (Float32) và mặt nạ nước <code>nuoc_&lt;năm&gt;.tif</code> (Byte, 1 nước, 0 đất, NoData 255).',
+                'params' => 'Ngưỡng nước MNDWI từng năm: 2018: 0,178; 2019: 0,081; 2020: 0,145; 2021: 0,1325; 2022: 0,1067; 2023: 0,1423; 2024: 0,039; 2025: 0,0791; 2026: 0,1149. Công thức Raster Calculator: <code>("green_median_2026@1" - "swir16_median_2026@1") / ("green_median_2026@1" + "swir16_median_2026@1")</code>. Mặt nạ năm 2026: GDAL Raster Calculator <code>(A&gt;0,1149)*1</code>, kiểu Byte.',
+                'method' => 'Ngưỡng Otsu chọn giá trị làm cực đại phương sai giữa hai lớp của histogram (công thức ở trên). Giá trị được tính ngoài giao diện QGIS vì QGIS không có công cụ này; kết quả luôn nằm trong đáy giữa hai đỉnh khi xem lại bằng Histogram. MNDWI được chọn thay NDWI và AWEI sau khi so với ground truth số hoá thủ công (xem bước 9).',
+                'qa' => 'Ngưỡng ở mọi năm nằm trong đáy histogram, từ 0,039 (2024) đến 0,178 (2018). Ngưỡng đổi theo năm nên một phần chênh lệch giữa các năm có thể do ngưỡng, không do bờ dịch chuyển (xem hạn chế bên dưới).',
             ],
             'figs' => [
-                ['p5-truoc-sau.webp', 1188, 419, 'Hai mặt nạ nước cạnh nhau: bên trái trước làm sạch gồm sông và nhiều kênh ao nhỏ, bên phải sau làm sạch các kênh ao bị tô đỏ còn sông giữ màu xanh.', 'Trước và sau làm sạch mặt nạ nước 2026 (cửa sổ 2,4 × 1,6 km). Đỏ là pixel nước bị bỏ, xanh là nước được giữ.'],
+                ['a6-histogram.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: biểu đồ phân bố MNDWI trong Layer Properties, hai đỉnh đất và nước, ngưỡng chọn ở đáy giữa hai đỉnh.', 'Histogram MNDWI trong QGIS: ngưỡng nước nằm ở đáy giữa đỉnh đất và đỉnh nước.'],
+                ['s5-mat-na-nuoc.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: hộp thoại GDAL Raster Calculator tạo mặt nạ nước từ ảnh MNDWI với ngưỡng 0,1149.', 'Tạo mặt nạ nước bằng GDAL Raster Calculator với ngưỡng 0,1149 (năm 2026).'],
             ],
         ],
         [
-            'id' => 'buoc-5', 'title' => 'Trích đường bờ từng năm', 'tag' => 'Contour dưới pixel · s3_shoreline.py',
-            'img' => 'b4-duong-bo.webp', 'w' => 688, 'h' => 485,
-            'alt' => 'Chín đường bờ từ 2018 đến 2026 vẽ chồng lên ảnh composite, mỗi năm một màu.',
-            'cap' => 'Chín đường bờ 2018–2026 chồng trên composite 2026, phóng to quanh đoạn có điểm nóng lùi bờ.',
+            'id' => 'buoc-5', 'title' => 'Mặt nạ nước, làm sạch và đường bờ', 'tag' => 'Fill NoData · Sieve · Polygonize · Buffer · Clip',
+            'img' => 'c1-ban-do-9-duong-bo.webp', 'w' => 1600, 'h' => 1131,
+            'alt' => 'Bản đồ xuất từ Print Layout của QGIS: chín đường bờ sông Hậu năm 2018 đến 2026, mỗi năm một màu, chồng trên ảnh trung vị.',
+            'cap' => 'Chín đường bờ 2018–2026 chồng trên ảnh nền, xuất bằng Print Layout của QGIS.',
             'body' => [
-                'Đường bờ là đường đồng mức 0 của trường chỉ số MNDWI trừ ngưỡng Otsu, trong vùng nước đã làm sạch. Cách này cho vị trí dưới pixel thay vì nhảy từng nửa pixel như đường đồng mức 0,5 trên mặt nạ nhị phân. Kết quả được cắt theo ranh giới xã và đơn giản hoá 5 m: chín đường, mỗi năm một đường, 2018–2026.',
-                'Độ bất định của từng đường bờ gộp từ nửa pixel (5 m), định vị ESA (6 m ở mức 1σ) và sai số phân loại đo trên ground truth (16,7 đến 21,7 m). Gộp lại, U<sub>shoreline</sub> nằm trong khoảng 18,5 đến 23,1 m. Từ bản demo lần 5, đường bờ chính do chuỗi QGIS giải đoán theo các bước của <code>s3_shoreline.py</code>; bản Python được giữ làm đối chứng.',
+                'Mặt nạ nước được làm sạch bằng GDAL Fill NoData và GDAL Sieve (500 pixel), vector hoá bằng GDAL Polygonize, rồi giữ vùng nước lớn nhất (Extract by expression). Tiếp theo mở hình thái ở dạng vector: Buffer −50 m rồi +50 m để bỏ kênh rạch hẹp dưới khoảng 100 m, giữ thành phần liên thông lớn nhất và lấp lỗ nhỏ hơn 5 ha (Delete holes).',
+                'Polygons to Lines lấy ranh giới vùng nước, Clip theo vùng bờ 100 m cho ra đường bờ của năm. Chín năm có chiều dài từ 15,10 đến 15,68 km; vùng nước liên thông lớn nhất rộng 11,69 đến 11,93 km².',
             ],
             'more' => [
-                'io' => 'Vào: mặt nạ đã làm sạch, composite và ngưỡng Otsu của năm. Ra: <code>data/shoreline/&lt;năm&gt;.json</code>, GeoJSON một MultiLineString, EPSG:32648, kèm thuộc tính năm và chỉ số nước. Mỗi năm là một đoạn liên tục dài 14,85 đến 15,37 km (2018: 15,37 km; 2026: 14,92 km).',
-                'params' => 'Đơn giản hoá: 5 m (nửa pixel). Cắt theo ranh giới xã nới 100 m để không mất đoạn bờ sát ranh. Bỏ mảnh ngắn hơn 200 m. Cụm không dữ liệu lớn bị cắt kèm đệm 2 pixel (20 m). Hệ số eps = 0,001 dùng ở chỗ hình thái học đã sửa mặt nạ.',
-                'method' => 'Trường có dấu f (công thức ở trên) giữ nguyên giá trị liên tục ở nơi mặt nạ sạch khớp ngưỡng, còn chỗ mặt nạ bị sửa thì rơi về ±eps. Đường bờ là contour f = 0 (<code>skimage.measure.find_contours</code>, nội suy tuyến tính dưới pixel) rồi nối mảnh, lọc mảnh ngắn, đơn giản hoá. Nếu thiếu composite hoặc ngưỡng, pipeline lùi về contour mức 0,5 trên mặt nạ nhị phân (độ phân giải nửa pixel).',
-                'qa' => 'Sai số đường bờ so với đường số hoá tay đo ở bước 9 (RMSE MNDWI 15,9 m năm 2018, 18,15 m năm 2022, 21,30 m năm 2026). Cả chín năm đều ra đúng một đường liên tục trong ranh giới xã, không bị đứt đoạn.',
-            ],
-            'figs' => [],
-        ],
-        [
-            'id' => 'buoc-6', 'title' => 'Baseline và transect', 'tag' => '266 transect · s4_transects.py',
-            'img' => 'b5-transect.webp', 'w' => 688, 'h' => 485,
-            'alt' => 'Các transect vuông góc với baseline đỏ nét đứt, tô màu theo mức biến động: nhiều đoạn xám, vài đoạn xanh dương và cam, một đoạn đỏ.',
-            'cap' => 'Baseline (đỏ nét đứt) và transect cách 50 m, tô theo mức biến động: xanh dương bồi, xám ổn định, cam lùi nhẹ, đỏ lùi mạnh.',
-            'body' => [
-                'Baseline là đường bờ năm đầu làm trơn, dịch 250 m vào phía đất. Từ đó sinh transect vuông góc mỗi 50 m, dài 600 m ra phía sông; transect cắt nhau ở chỗ bờ cong gắt bị bỏ. Kết quả có 266 transect.',
-                'Tại mỗi transect, pipeline đo khoảng cách từ baseline tới giao điểm đường bờ của từng năm. Năm nào không có số đo hợp lệ thì để trống, không nội suy.',
-            ],
-            'more' => [
-                'io' => 'Vào: chín đường bờ và mặt nạ nước năm đầu (để biết phía đất). Ra: <code>data/baseline.json</code> (1 LineString, dài 13,76 km) và <code>data/transects.json</code>: mỗi transect có mã (T0001…), <code>chainage_m</code> và <code>distances</code> = {năm: mét hoặc null}.',
-                'params' => 'Khoảng cách transect 50 m, chiều dài 600 m, baseline cách đường bờ 250 m về phía đất. Làm trơn baseline: đơn giản hoá 150 m rồi Chaikin 4 vòng. Hướng transect lấy trên cửa sổ ±100 m. Sinh 275 vị trí (lý trình 25 đến 13.725 m), bỏ 9 transect cắt nhau, còn 266.',
-                'method' => 'Phương pháp DSAS: transect vuông góc baseline, khoảng cách = từ gốc transect đến giao điểm gần nhất với đường bờ (tuỳ chọn closest intersection). Phía sông chọn bằng cách thử hai hướng pháp tuyến, hướng nào có nhiều điểm rơi vào nước hơn. Transect cắt nhiều transect khác nhất bị bỏ lần lượt cho đến khi hết giao cắt.',
-                'qa' => 'Cả 266 transect đều có đủ 9 năm lúc đo (2.394 quan sát), không nội suy chỗ trống. Hình bên dưới phóng to đoạn 1.000 × 600 m quanh điểm nóng: pixel 10 m hiện rõ, 17 transect cắt các đường bờ, mỗi chấm màu là giao điểm của một năm.',
+                'io' => 'Vào: <code>nuoc_&lt;năm&gt;.tif</code>. Ra: <code>nuoc_polygon</code>, <code>nuoc_lon_nhat</code>, <code>song_lien_thong</code>, <code>song_lap_lo</code>, <code>bien_nuoc</code> và đường bờ cuối <code>shoreline_&lt;năm&gt;.gpkg</code> (EPSG:32648) trong <code>pipeline/data/qgis_gui/&lt;năm&gt;/</code>.',
+                'params' => 'GDAL Fill NoData: khoảng cách tìm 10 pixel. GDAL Sieve: ngưỡng 500 pixel, liên thông 4. Extract by expression: <code>"DN" = 1 AND $area = maximum($area, filter:="DN" = 1)</code>. Buffer −50 m rồi +50 m (8 đoạn mỗi góc). Multipart to singleparts rồi Extract by expression <code>$area = maximum($area)</code>. Delete holes: diện tích nhỏ hơn 50.000 m² (5 ha). Clip theo <code>vung_bo_dem100m</code>. Độ dài đường bờ (km): 2018: 15,28; 2019: 15,35; 2020: 15,12; 2021: 15,37; 2022: 15,68; 2023: 15,10; 2024: 15,62; 2025: 15,12; 2026: 15,22.',
+                'method' => 'Mở hình thái học dạng vector (Buffer âm rồi dương) bỏ cấu trúc hẹp hơn 100 m, nên ao nuôi, kênh nội đồng và nhiễu nhỏ không thành đường bờ; hệ quả là kênh rộng dưới khoảng 100 m không được theo dõi. Lần thử đầu của năm 2024 (không mở hình thái, không lấp lỗ) cho đường bờ dài 44,9 km vì còn bờ các kênh nối vào sông, nên chuỗi cuối đã thêm các bước này.',
+                'qa' => 'So với đường bờ tính trước đó, đường bờ dựng bằng giao diện nằm trong 20 m ở 96,8% (2024) đến 100% (2026) chiều dài; chỉ số này chỉ ghi cho các năm 2018–2020 và 2024–2026. Chiều dài chênh bản trước từ −0,15 đến +0,77 km tuỳ năm.',
             ],
             'figs' => [
-                ['p6-phong-to-transect.webp', 778, 471, 'Cận cảnh một đoạn bờ 1.000 m: các transect vuông góc cắt chín đường bờ nhiều màu, mỗi giao điểm là một chấm, pixel 10 m nhìn thấy rõ trên ảnh nền.', 'Phóng to một đoạn bờ (1.000 × 600 m, ảnh nền giữ nguyên pixel 10 m). Mỗi chấm là giao điểm transect với đường bờ một năm; màu transect theo nhóm biến động.'],
+                ['a7-polygonize.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: hộp thoại GDAL Polygonize vector hoá mặt nạ nước thành vùng nước.', 'Vector hoá mặt nạ nước bằng GDAL Polygonize.'],
+                ['s6-sieve-500.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: hộp thoại GDAL Sieve với ngưỡng 500 pixel để lọc đốm nhỏ trên mặt nạ nước.', 'Lọc đốm nhỏ bằng GDAL Sieve, ngưỡng 500 pixel.'],
+                ['s6-buffer-am50.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: hộp thoại Buffer với khoảng cách âm 50 m, bước đầu của mở hình thái học dạng vector.', 'Buffer −50 m, bước đầu của mở hình thái học dạng vector (sau đó Buffer +50 m).'],
+                ['s6-delete-holes.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: hộp thoại Delete holes lấp các lỗ nhỏ hơn 50.000 mét vuông trong vùng nước.', 'Lấp lỗ nhỏ hơn 5 ha trong vùng nước bằng Delete holes.'],
+                ['s6-clip-vung-bo.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: hộp thoại Clip cắt đường bờ theo vùng bờ đệm 100 mét.', 'Cắt đường bờ theo vùng bờ đệm 100 m bằng Clip.'],
+                ['a8-duong-bo-2026.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: đường bờ năm 2026 màu đỏ trên ảnh trung vị xanh lục, kết quả cuối của chuỗi giải đoán.', 'Đường bờ năm 2026 (đỏ) trên ảnh trung vị, kết quả cuối của chuỗi giải đoán.'],
             ],
         ],
         [
-            'id' => 'buoc-7', 'title' => 'Tốc độ biến động theo transect', 'tag' => 'NSM · EPR · LRR · R² · s5_stats.py',
-            'img' => 'b6-chuoi-nam.webp', 'w' => 670, 'h' => 397,
-            'alt' => 'Biểu đồ khoảng cách từ baseline đến đường bờ giảm dần từ 189 m năm 2018 xuống 168 m năm 2026, kèm đường hồi quy.',
-            'cap' => 'Chuỗi vị trí đường bờ tại transect T0094 và đường hồi quy tuyến tính: LRR = −2,67 m/năm, R² = 0,80.',
+            'id' => 'buoc-6', 'title' => 'Baseline và transect', 'tag' => '270 transect · Offset lines · Geometry by expression',
+            'img' => 'b2-transect.webp', 'w' => 1600, 'h' => 894,
+            'alt' => 'Ảnh chụp màn hình QGIS: các transect vuông góc với baseline, dài 600 m, cách nhau 50 m, cắt các đường bờ.',
+            'cap' => 'Transect vuông góc baseline, cách nhau 50 m, dài 600 m, dựng bằng Points along geometry và Geometry by expression.',
             'body' => [
-                'Với chuỗi khoảng cách theo năm, pipeline tính NSM (dịch chuyển giữa đầu và cuối), EPR (NSM chia số năm), LRR (hệ số góc hồi quy tuyến tính), sai số chuẩn SE và R². Quan sát lệch quá 50 m so với trung vị chuỗi được loại trước (9 quan sát trên toàn bộ dữ liệu).',
-                'Ở T0094, khoảng cách giảm từ 189,43 m (2018) xuống 168,20 m (2026), tức bờ lùi 21,23 m. LRR là −2,67 m/năm với khoảng tin cậy 95% là ±1,21 m, không chứa 0.',
+                'Baseline lấy từ đường bờ 2018: giữ đoạn dài nhất, Simplify 150 m, Smooth 4 lần, rồi Offset lines +250 m sang phía đất (phía đất xác định bằng cách xem bản đồ). Points along geometry đặt 270 điểm cách nhau 50 m, bắt đầu lệch 25 m.',
+                'Từ mỗi điểm, Geometry by expression dựng đoạn thẳng dài 600 m vuông góc hướng baseline, hướng ra sông. Extract by expression với <code>overlay_crosses</code> kiểm tra transect cắt nhau: không có transect nào phải bỏ, nên còn 270 transect.',
             ],
             'more' => [
-                'io' => 'Vào: <code>data/transects.json</code> và chín đường bờ. Ra: <code>output/transects.json</code> (EPSG:4326, mỗi transect có <code>distances</code> đã khử đột biến và khối <code>stats</code>), <code>output/summary.json</code>. Sau khử đột biến còn 2.385 trên 2.394 quan sát.',
-                'params' => 'Độ tin cậy 95%. Ngưỡng khử đột biến 50 m so với trung vị chuỗi. Tối thiểu 3 điểm để tính. Hệ số t hai phía với bậc tự do n − 2: n = 9 thì t = 2,365; transect thiếu năm dùng t tương ứng với n của nó. Z<sub>95</sub> = 1,959964 cho độ bất định EPR.',
-                'method' => 'LRR là hệ số góc hồi quy bình phương tối thiểu (OLS) của khoảng cách d theo năm t; phần dư e<sub>i</sub> = d<sub>i</sub> − (a + LRR·t<sub>i</sub>). Các đại lượng tính theo công thức ở trên; Z<sub>95</sub> = 1,96 và t là hệ số Student hai phía 95% với n − 2 bậc tự do.',
-                'qa' => 'T0094: NSM −21,23 m, EPR −2,654 m/năm, LRR −2,674 m/năm, SE 0,5108, t = 2,365, R² = 0,797, 5 giai đoạn giảm liên tục, không điểm nào bị khử. Trên toàn bộ 266 transect, 85 có LRR khác 0 có ý nghĩa thống kê; 140 transect có R² dưới 0,3 và bị gắn cờ cảnh báo (cờ chỉ để lưu ý, không đổi nhóm).',
-            ],
-            'figs' => [],
-        ],
-        [
-            'id' => 'buoc-8', 'title' => 'Phân loại mức biến động', 'tag' => 'Mục 2.5 đề cương · s5_stats.py',
-            'img' => 'phan_loai.webp', 'w' => 1600, 'h' => 1131,
-            'alt' => 'Bản đồ phân loại mức biến động bờ sông Hậu tại Bình Mỹ theo bốn mức: bồi, ổn định, lùi nhẹ, lùi mạnh.',
-            'cap' => 'Bản đồ phân loại 266 transect: 71 bồi, 181 ổn định, 10 lùi nhẹ, 4 lùi mạnh.',
-            'body' => [
-                'Một transect có biến động thực sự khi |LRR| lớn hơn t × SE(LRR) (t = 2,365 với 9 năm, tin cậy 95%). Lùi mạnh cần thêm LRR ≤ −2 m/năm và khoảng cách giảm liên tục ở ít nhất 3 mốc năm liền nhau. Tiêu chí được chốt trước khi chạy lại, không chỉnh theo kết quả.',
-                'Kết quả: 71 transect bồi, 181 ổn định, 10 lùi nhẹ và 4 lùi mạnh (T0020, T0094, T0200, T0201), tạo thành 3 điểm nóng dài khoảng 50, 50 và 100 m. Đa số đoạn bờ không có biến động đủ lớn so với độ bất định của ảnh 10 m.',
-            ],
-            'more' => [
-                'io' => 'Vào: khối <code>stats</code> của bước 7. Ra: <code>change_class</code> và <code>low_r2_caution</code> trong từng transect; <code>output/hotspots.json</code> (3 điểm nóng) và <code>output/summary.json</code> (số transect mỗi nhóm).',
-                'params' => 'Ngưỡng lùi mạnh LRR ≤ −2,0 m/năm. Số mốc năm liên tiếp tối thiểu 3 (tức 2 giai đoạn liền nhau). Cờ R² dưới 0,3. Điểm nóng: gom các transect lùi mạnh liền kề cách nhau không quá 1,5 lần khoảng cách transect.',
-                'method' => 'Bồi: có ý nghĩa và LRR &gt; 0. Ổn định: không có ý nghĩa. Lùi: có ý nghĩa và LRR &lt; 0; trong đó lùi mạnh nếu LRR ≤ −2 và có đủ chuỗi giảm liên tục, còn lại là lùi nhẹ. Trung bình và độ lệch chuẩn của LRR các transect lùi có ý nghĩa (−1,91 và 0,74 m/năm) chỉ để mô tả, không dùng làm ngưỡng.',
-                'qa' => 'Tổng 71 + 181 + 10 + 4 = 266. Ngưỡng −2 m/năm và số mốc 3 là quy ước của đồ án, tham chiếu khoảng phân lớp trong tài liệu nhưng không có nguồn nào dùng đúng ngưỡng này; kết quả phân nhóm nhạy với hai quy ước đó. Ba điểm nóng có mức lùi trung bình 2,68 (T0020), 2,67 (T0094) và 3,09 m/năm (T0200–T0201) giai đoạn 2018–2026.',
-            ],
-            'figs' => [],
-        ],
-        [
-            'id' => 'buoc-9', 'title' => 'Độ chính xác và độ bất định', 'tag' => 'Ground truth · s7_evaluate.py',
-            'img' => 'p7-do-chinh-xac.webp', 'w' => 968, 'h' => 394,
-            'alt' => 'Hai biểu đồ cột so sánh ba chỉ số nước NDWI, MNDWI, AWEI: F1 trung bình gần bằng nhau, còn sai số đường bờ của MNDWI thấp nhất, 18,45 m.',
-            'cap' => 'F1 trung bình và RMSE đường bờ của ba chỉ số trên ground truth. MNDWI (xanh) được chọn vì RMSE thấp nhất khi F1 hoà với AWEI.',
-            'body' => [
-                'Ground truth là mặt nước số hoá thủ công trong 5 ô mẫu ở 3 năm (2018, 2022, 2026). Pipeline so mặt nạ nước từng chỉ số với ground truth theo pixel (precision, recall, F1, IoU) và so đường bờ tự động với đường bờ số hoá tay dọc các transect.',
-                'Với MNDWI, RMSE đường bờ là 15,9 m (2018), 18,15 m (2022), 21,30 m (2026). U<sub>classify</sub> lấy RMSE trên đường bờ chính sau khử đột biến (16,73; 17,82; 21,69 m), rồi gộp với nửa pixel và sai số định vị thành U<sub>shoreline</sub> từng năm (18,5 đến 23,1 m).',
-            ],
-            'more' => [
-                'io' => 'Vào: <code>data/ground_truth/ground_truth.gpkg</code> (lớp <code>windows</code> và <code>water_&lt;năm&gt;</code>, trường <code>loai</code> = song | khac) và các mặt nạ nước ba chỉ số. Ra: <code>output/evaluation.json</code>. Đối chiếu chéo: <code>output/crosscheck.json</code>.',
-                'params' => 'Ngưỡng hoà F1 0,005. 5 ô mẫu (W1–W5), mỗi năm 18.000 pixel. Số transect so được: 59 mỗi năm (2018, 2022, 2026). U<sub>pixel</sub> = 5 m (nửa pixel), U<sub>georef</sub> = 12 m / 2 = 6 m (ESA, 95,5% quy về 1σ), U<sub>classify</sub> = RMSE sau khử đột biến nêu trên; năm không có ground truth lấy 21,7 m, giá trị lớn nhất đã đo làm tròn lên.',
-                'method' => 'Các thước đo tính theo công thức ở trên (TP, FP, FN đếm pixel nước trên các ô mẫu). Chọn chỉ số: F1 trung bình cao nhất, nếu chênh không quá 0,005 thì chọn RMSE thấp nhất. Độ bất định đường bờ gộp từ ba thành phần ở công thức trên, mọi thành phần cùng chuẩn 1σ.',
-                'qa' => 'F1 trung bình: NDWI 0,9398; MNDWI 0,9456; AWEI 0,9457. RMSE đường bờ trung bình: NDWI 27,83 m; MNDWI 18,45 m; AWEI 60,01 m. U<sub>shoreline</sub>: 18,46 m (2018), 19,46 m (2022), 23,05 m (2026), 23,06 m ở các năm còn lại. Đối chiếu chéo với ESA WorldCover (2020–2021) và Impact Observatory (2018–2023): F1 trung bình MNDWI 0,8765, thấp hơn ground truth; theo ghi chú của pipeline, hai sản phẩm này là ảnh cả năm nên chỉ là kiểm tra thô, không dùng để chỉnh U.',
+                'io' => 'Vào: <code>shoreline_2018.gpkg</code>. Ra: <code>bl_1…bl_4_*.gpkg</code>, <code>baseline.gpkg</code> và <code>transects.gpkg</code> (270 transect, mã T0001…T0270, <code>chainage_m</code> từ 25 đến 13.475 m) trong <code>pipeline/data/qgis_gui/giai_doan2/</code>.',
+                'params' => 'Baseline: Simplify Douglas-Peucker 150 m; Smooth 4 lần, offset 0,25; Offset lines +250 m (dương là lệch sang trái hướng vẽ). Transect: Points along geometry cách 50 m, lệch đầu 25 m; chiều dài 600 m; hướng đo trên cửa sổ ±100 m dọc baseline; <code>transect_code = \'T\'||lpad(to_string(to_int(("distance"-25)/50)+1),4,\'0\')</code>.',
+                'method' => 'Biểu thức Geometry by expression dùng <code>azimuth</code> giữa hai điểm cách ±100 m trên baseline, rồi <code>make_line($geometry, project($geometry, 600, @az + pi()/2))</code>. Hướng ra sông xác định bằng quy tắc hình học (phía phải hướng vẽ baseline vì baseline offset sang trái) và kiểm tra bằng mắt trên ảnh, không dùng mặt nạ nước.',
+                'qa' => 'Overlay kiểm tra không có cặp transect nào cắt nhau (kiểm lại bằng truy vấn không gian ngoài QGIS cũng ra 0). Baseline của QGIS khác bản tính trước (Smooth khác thuật toán làm trơn trước đó), nên khoảng cách baseline đến bờ khoảng 340–380 m ở đoạn giữa; chỉ so sánh được xu hướng theo thời gian, không so tuyệt đối. Ở đầu tuyến phía tây bắc (T0001–T0007) đường bờ gấp khúc song song transect nên số đo nhảy giữa các năm.',
             ],
             'figs' => [
-                ['p8-bat-dinh.webp', 745, 375, 'Biểu đồ cột độ bất định đường bờ từng năm từ 18,5 đến 23,1 mét, kèm các thành phần định vị 6 mét, nửa pixel 5 mét và sai số phân loại.', 'Độ bất định đường bờ từng năm (1σ): cột là U gộp, chấm đỏ là U phân loại, hai đường ngang là U định vị 6 m và nửa pixel 5 m.'],
+                ['b1-baseline.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: baseline được dựng bằng cách dịch đường bờ đã làm trơn vào phía đất 250 mét.', 'Dựng baseline: làm trơn đường bờ rồi Offset lines +250 m vào phía đất.'],
+                ['g2-baseline-pha-dat.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: bản đồ cho thấy baseline nằm phía đất liền, sông Hậu ở phía đông và bắc.', 'Kiểm tra bằng mắt: baseline nằm phía đất, sông Hậu ở phía đông và bắc.'],
+                ['g2-transect-bieu-thuc.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: hộp thoại Geometry by expression với biểu thức dựng transect dài 600 mét vuông góc baseline.', 'Biểu thức Geometry by expression dựng transect 600 m vuông góc baseline.'],
             ],
         ],
         [
-            'id' => 'buoc-10', 'title' => 'Đối chiếu và giới hạn', 'tag' => 'Kiểm chứng · s9_validate.py',
-            'img' => 'doi_chieu_2021.webp', 'w' => 1600, 'h' => 1131,
-            'alt' => 'Bản đồ đối chiếu vùng cảnh báo sạt lở 2019–2020 với kết quả phân loại của pipeline.',
-            'cap' => 'Vùng cảnh báo sạt lở 2019–2020 dọc QL91 đặt cạnh kết quả phân loại.',
+            'id' => 'buoc-7', 'title' => 'Khoảng cách và tốc độ biến động theo transect', 'tag' => 'Field Calculator · NSM · EPR · LRR · R²',
+            'img' => 'b3-lrr.webp', 'w' => 1600, 'h' => 894,
+            'alt' => 'Ảnh chụp màn hình QGIS: Field Calculator tính tốc độ biến động LRR bằng biểu thức hồi quy tuyến tính.',
+            'cap' => 'Tính tốc độ biến động LRR bằng Field Calculator.',
             'body' => [
-                'Kết quả được đối chiếu với hai sự kiện sạt lở đã công bố (01/08/2019 và 27/05/2020). Nguồn chỉ nêu lý trình Km nên vùng cảnh báo dài khoảng 3,4 km và hai sự kiện dùng chung một hình học, không độc lập.',
-                'Pipeline khớp theo tiêu chí khoảng cách nhưng khớp yếu: điểm nóng gần nhất cách vùng cảnh báo 355 m (ngưỡng khớp 500 m), nên 2/2 sự kiện khớp. Trong vùng đệm 100 m có 70 transect (38 bồi, 32 ổn định), không transect nào lùi có ý nghĩa thống kê, nên khớp là do điểm nóng nằm gần chứ không phải vùng cảnh báo lùi. Bản Python trước đó không khớp (5.234 m, 0/2). Ngưỡng 500 m không được chỉnh; thứ thay đổi giữa hai bản là cách giải đoán đường bờ.',
+                'Với mỗi năm, Field Calculator tính cột <code>d&lt;năm&gt;</code> là khoảng cách từ gốc transect đến giao điểm gần nhất với đường bờ năm đó; transect không cắt đường bờ thì để trống. Quan sát lệch quá 50 m so với trung vị chuỗi của transect bị loại (22 quan sát), phần còn lại nằm ở các cột <code>c&lt;năm&gt;</code>.',
+                'Từ chuỗi c, các cột NSM, EPR, LRR (hồi quy bình phương tối thiểu viết bằng hàm mảng), R², sai số chuẩn SE và hệ số Student t được tính. Trên 270 transect, LRR trung bình 0,389 m/năm, trung vị 0,269 m/năm; 61 transect có LRR khác 0 có ý nghĩa thống kê.',
             ],
             'more' => [
-                'io' => 'Vào: <code>output/reference.json</code> (vùng cảnh báo, EPSG:4326), <code>output/hotspots.json</code>, <code>output/transects.json</code>. Ra: <code>output/validation.json</code>: mỗi sự kiện một dòng gồm khoảng cách tới điểm nóng gần nhất, số transect trong vùng, phân bố nhóm, LRR trung bình.',
-                'params' => 'Bán kính khớp 500 m. Vùng đệm thống kê 100 m quanh vùng cảnh báo. Mọi phép đo trong EPSG:32648. Độ dài vùng cảnh báo 3.377 m.',
-                'method' => 'Hai phép đo: (1) khoảng cách từ vùng cảnh báo đến điểm nóng gần nhất, khớp khi ≤ 500 m; (2) thống kê các transect cách vùng ≤ 100 m, không phụ thuộc việc có điểm nóng hay không, để biết ảnh có thấy xu hướng lùi bờ trong vùng cảnh báo dù chưa vượt ngưỡng lùi mạnh.',
-                'qa' => 'Trong 70 transect của vùng: LRR trung bình +1,15 m/năm (bồi), chỉ 2,9% (2/70) có LRR âm, 0% lùi có ý nghĩa. Đây là dữ liệu kiểm chứng, không dùng để huấn luyện hay chỉnh ngưỡng; vùng cảnh báo là đoạn dài chứ không phải điểm sạt nên không đánh giá được độ chính xác vị trí.',
+                'io' => 'Vào: <code>transects.gpkg</code> và chín <code>shoreline_&lt;năm&gt;.gpkg</code>. Ra: bảng thuộc tính transect có <code>d2018…d2026</code> (giá trị thô), <code>med_d</code>, <code>c2018…c2026</code> (đã khử đột biến), <code>n_obs</code>, <code>n_despiked</code>, <code>first_year</code>, <code>last_year</code>, <code>nsm</code>, <code>epr</code>, <code>lrr</code>, <code>r2</code>, <code>se_lrr</code>, <code>t_crit</code>. Tổng 2.426 số đo, sau khử đột biến còn 2.404.',
+                'params' => 'Giao điểm gần gốc transect nhất: <code>distance(start_point($geometry), closest_point(@p, start_point($geometry)))</code> với <code>@p</code> là giao của transect với đường bờ. Ngưỡng khử đột biến 50 m so với trung vị chuỗi. Tối thiểu 3 điểm để tính. Hệ số t hai phía 95% với n − 2 bậc tự do, tra bảng nhúng trong biểu thức (12,706; 4,303; 3,182; 2,776; 2,571; 2,447; 2,365 cho n = 3…9). Z<sub>95</sub> = 1,959964 cho độ bất định EPR.',
+                'method' => 'Mỗi cột là một lần Field Calculator. LRR là hệ số góc hồi quy bình phương tối thiểu của khoảng cách d theo năm t, R² = S<sub>xy</sub>²/(S<sub>xx</sub>·S<sub>yy</sub>), SE như công thức ở trên. Các đại lượng tính theo công thức ở trên; t là hệ số Student hai phía 95% với n − 2 bậc tự do.',
+                'qa' => 'Trong 2.430 số đo (270 × 9) chỉ 4 ô trống; 259 transect có đủ 9 năm, ít nhất một transect còn 3 năm. Ba transect T0005, T0006 và T0194 bị khử từ 3 quan sát trở lên (4, 6 và 3). T0089: NSM −24,91 m, EPR −3,114 m/năm, LRR −2,827 m/năm, SE 0,518, t = 2,365, R² = 0,810. Có 160 trong 270 transect có R² dưới 0,3 (đều thuộc nhóm ổn định); cờ này chỉ để lưu ý.',
             ],
-            'figs' => [],
+            'figs' => [
+                ['g2-khoang-cach-d2018.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: Field Calculator tính khoảng cách từ gốc transect đến đường bờ năm 2018, cột d2018.', 'Field Calculator tính khoảng cách từ gốc transect đến đường bờ năm 2018 (cột d2018).'],
+                ['b4-bang-thuoc-tinh.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: bảng thuộc tính transect với khoảng cách theo năm, NSM, EPR, LRR và R².', 'Bảng thuộc tính transect với khoảng cách theo năm và các thống kê biến động.'],
+            ],
         ],
         [
-            'id' => 'buoc-11', 'title' => 'Xuất ra GeoServer và web', 'tag' => 'webgis:import · provision.sh',
-            'img' => 'p9-xuat-geoserver.webp', 'w' => 863, 'h' => 315,
-            'alt' => 'Sơ đồ năm khối nối tiếp: thư mục output của pipeline, lệnh nạp webgis:import, PostGIS, GeoServer phục vụ WMS và WFS, rồi web Leaflet.',
-            'cap' => 'Luồng dữ liệu từ pipeline đến trình duyệt: GeoJSON, UPSERT vào PostGIS, GeoServer phát WMS/WFS, web Leaflet đọc lại.',
+            'id' => 'buoc-8', 'title' => 'Độ bất định, phân loại và hotspot', 'tag' => 'Mục 2.5 đề cương · Field Calculator',
+            'img' => 'c2-ban-do-transect-lrr.webp', 'w' => 1600, 'h' => 1131,
+            'alt' => 'Bản đồ xuất từ Print Layout của QGIS: các transect tô màu theo tốc độ biến động LRR, từ lùi bờ đến bồi.',
+            'cap' => 'Bản đồ 270 transect tô màu theo LRR (5 lớp phân vị, bảng màu Spectral).',
             'body' => [
-                'Pipeline ghi bốn lớp kết quả (baseline, đường bờ, transect, điểm nóng) cùng lớp sạt lở tham chiếu ra GeoJSON EPSG:4326. Lệnh nạp đưa chúng vào PostGIS bằng UPSERT trong một giao dịch, nên chạy lại không làm mất mã định danh đang được tham chiếu.',
-                'GeoServer đọc thẳng các bảng PostGIS và phát thành lớp WMS và WFS với kiểu SLD riêng cho từng lớp. Web hiển thị lớp WMS, đọc số liệu qua API và cho tải xuống; web không tính lại chỉ số nào.',
+                'Một transect có biến động thực sự khi |LRR| lớn hơn t × SE(LRR) (t = 2,365 với 9 năm). Lùi mạnh cần thêm LRR ≤ −2 m/năm và khoảng cách giảm liên tục ít nhất 2 giai đoạn liền nhau (3 mốc năm). Tiêu chí chốt trước, không chỉnh theo kết quả.',
+                'Kết quả: 209 ổn định, 52 bồi, 8 lùi nhẹ và 1 lùi mạnh (T0089). Đoạn lùi mạnh duy nhất tạo thành 1 hotspot dài khoảng 50 m, mức lùi 2,83 m/năm giai đoạn 2018–2026. Đa số đoạn bờ không có biến động đủ lớn so với độ bất định của ảnh 10 m.',
             ],
             'more' => [
-                'io' => 'Vào: <code>pipeline/output/*.json</code> (baseline, shorelines, transects, hotspots, reference). Ra: các bảng <code>shorelines</code>, <code>transects</code>, <code>erosion_hotspots</code>, <code>reference_landslide_events</code> trong PostGIS và các lớp tương ứng trên GeoServer.',
-                'params' => 'Lệnh: <code>php artisan webgis:import ../pipeline/output</code> (thêm <code>--dry-run</code> để chỉ kiểm tra, không ghi). GeoServer: <code>web/geoserver/provision.sh songhau &lt;csdl&gt;</code> tạo workspace <code>songhau</code>, kho PostGIS, bốn kiểu SLD (<code>change_class</code>, <code>shoreline</code>, <code>hotspot</code>, <code>reference</code>), publish lớp ở EPSG:4326, bật WFS (tối đa 5.000 đối tượng mỗi yêu cầu) và nhóm lớp nền <code>nen_ban_do</code>. Lớp transect lấy từ view <code>transects_styled</code>.',
-                'method' => 'UPSERT theo khoá riêng của từng bảng: đường bờ theo (năm, chỉ số nước), transect theo mã transect, khoảng cách theo (transect, năm), thay vì xoá rồi tạo lại. Lớp nền và lớp chuyên đề cùng một workspace nên web gọi một địa chỉ WMS. Nếu không cấu hình GeoServer, web vẽ GeoJSON từ API bằng Leaflet.',
-                'qa' => 'Lệnh nạp chạy trong một giao dịch: lỗi ở lớp nào thì cả đợt được hoàn tác. Script GeoServer chạy lặp được (idempotent) và nạp lại cấu hình sau khi cập nhật để cột mới như <code>unc_lrr</code> xuất hiện trong WFS.',
+                'io' => 'Vào: bảng thuộc tính transect ở bước 7. Ra: các cột <code>n_years</code>, <code>unc_lrr</code>, <code>is_significant</code>, <code>unc_epr</code>, <code>u_shoreline_avg</code>, <code>consecutive_erosion_periods</code>, <code>low_r2_caution</code>, <code>change_class</code>; lớp hotspot <code>hs_*.gpkg</code> với <code>severity</code>, <code>period_start_year</code>, <code>period_end_year</code>, <code>n_transect</code>, <code>notes</code>.',
+                'params' => 'Ngưỡng lùi mạnh LRR ≤ −2,0 m/năm. Số mốc năm liên tiếp tối thiểu 3 (tức 2 giai đoạn liền nhau). Cờ R² dưới 0,3. Độ bất định đường bờ U<sub>shoreline</sub> = √(5² + 6² + U<sub>classify</sub>²) với U<sub>classify</sub> = 16,73 (2018), 17,82 (2022), 21,69 (2026), các năm khác 21,7. Hotspot: gom các transect lùi mạnh cách nhau không quá 75 m; mỗi nhóm một đoạn nối các giao điểm với đường bờ 2026 (nhóm một transect thì đoạn dài 50 m dọc bờ).',
+                'method' => 'Bồi: có ý nghĩa và LRR &gt; 0. Ổn định: không có ý nghĩa. Có ý nghĩa và LRR &lt; 0: lùi mạnh nếu LRR ≤ −2 và có đủ chuỗi giảm liên tục, còn lại là lùi nhẹ. Công thức nhóm viết bằng một biểu thức <code>if</code> lồng trong Field Calculator. Hotspot dựng bằng Extract by expression, Field calculator của Processing và Geometry by expression (Line).',
+                'qa' => 'Tổng 209 + 52 + 8 + 1 = 270. LRR trung bình theo nhóm (m/năm): ổn định 0,109, bồi 1,945, lùi nhẹ −2,010, lùi mạnh −2,827. T0089 (chainage 4.425 m): khoảng cách giảm từ 184,78 m (2018) xuống 159,87 m (2026); khoảng tin cậy LRR ±1,225 m/năm, độ bất định EPR 7,236 m/năm. Ngưỡng −2 m/năm và số mốc 3 là quy ước của đồ án; kết quả phân nhóm nhạy với hai quy ước đó.',
             ],
-            'figs' => [],
+            'figs' => [
+                ['g2-change-class.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: Field Calculator gán nhóm biến động change_class bằng biểu thức if lồng nhau.', 'Gán nhóm biến động change_class bằng Field Calculator.'],
+                ['g3-unc-lrr.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: Field Calculator tính độ bất định LRR bằng tích của hệ số t và sai số chuẩn.', 'Tính độ bất định của LRR (t × SE) bằng Field Calculator.'],
+                ['g3-thong-ke-theo-lop.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: kết quả Statistics by categories, LRR theo từng nhóm biến động.', 'Statistics by categories: LRR theo từng nhóm biến động.'],
+                ['g3-ban-do-hotspot.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: đoạn hotspot lùi bờ mạnh tại transect T0089 tô màu trên ảnh nền.', 'Hotspot duy nhất, đoạn lùi mạnh tại transect T0089 (khoảng 50 m).'],
+            ],
+        ],
+        [
+            'id' => 'buoc-9', 'title' => 'Kiểm chứng, bản đồ và xuất cho web', 'tag' => 'Join attributes · Print Layout · Save Features As',
+            'img' => 'c3-ban-do-so-sanh-lrr.webp', 'w' => 1600, 'h' => 1131,
+            'alt' => 'Bản đồ xuất từ Print Layout của QGIS: transect tô màu theo chênh lệch LRR giữa kết quả dựng bằng giao diện QGIS và bản tính trước đó.',
+            'cap' => 'Bản đồ chênh lệch LRR giữa bản dựng bằng giao diện QGIS và bản tính trước đó.',
+            'body' => [
+                'Kết quả được kiểm chứng ba cách: so với ground truth số hoá thủ công (5 ô mẫu, 3 năm 2018, 2022, 2026) để lấy U<sub>classify</sub>; so với bản tính trước bằng Join attributes by field value theo <code>transect_code</code>; và đối chiếu với vùng cảnh báo sạt lở 2019–2020.',
+                'Bản đồ làm bằng Print Layout (xuất PNG 300 dpi và PDF). Dữ liệu xuất sang GeoJSON EPSG:4326 bằng Layer &gt; Save As: đường bờ, baseline, 270 transect và hotspot, rồi web nạp để hiển thị; web không tính lại chỉ số nào.',
+            ],
+            'more' => [
+                'io' => 'Vào: bảng thuộc tính transect, <code>transects.json</code> của bản trước (đổi tên lớp <code>transects_cu</code>) và vùng cảnh báo sạt lở. Ra: <code>so_sanh_ban_cu.gpkg</code>, <code>thong_ke_chenh_lrr.gpkg</code>, <code>thong_ke_lrr_chung.gpkg</code>, ba bản đồ <code>ban_do_*.png/pdf</code> và thư mục <code>pipeline/data/qgis_gui/giai_doan2/export/</code>: <code>shorelines.geojson</code>, <code>baseline.geojson</code>, <code>transects.geojson</code>, <code>hotspots.geojson</code>.',
+                'params' => 'GeoJSON: EPSG:4326, <code>COORDINATE_PRECISION=7</code>, bỏ tuỳ chọn ghi metadata. Đường bờ gộp bằng Merge vector layers, thêm cột <code>year</code> từ tên lớp và <code>water_index = \'mndwi\'</code>. 59 transect mỗi năm được so với đường bờ số hoá tay. Bán kính khớp sự kiện sạt lở 500 m; vùng đệm thống kê 100 m quanh vùng cảnh báo.',
+                'method' => 'Sai số đường bờ RMSE = căn bậc hai của trung bình bình phương chênh lệch d(tự động) − d(tham chiếu) dọc transect. Chọn chỉ số nước: F1 trung bình cao nhất, nếu chênh không quá 0,005 thì chọn RMSE thấp nhất. Bản đồ dùng map theme và ba layout, chú giải lọc theo bản đồ, thước tỉ lệ và mũi tên Bắc.',
+                'qa' => 'F1 trung bình: NDWI 0,9398; MNDWI 0,9456; AWEI 0,9457. RMSE đường bờ trung bình: NDWI 27,83 m; MNDWI 18,45 m; AWEI 60,01 m. Với đường bờ chính, RMSE 16,73 m (2018), 17,82 m (2022), 21,69 m (2026); các số này đo trên đường bờ do chuỗi QGIS chạy bằng script trước khi dựng lại bằng giao diện, chưa đo riêng cho bản dựng bằng giao diện. So với bản tính trước: chênh LRR có RMSE 1,389 m/năm, cùng nhóm biến động ở 164 trong 261 transect ghép được (62,8%). Vùng cảnh báo sạt lở dài 3.377 m: hotspot T0089 cách vùng này 5.183 m, nhiều hơn bán kính khớp 500 m nên 0/2 sự kiện khớp; 70 transect trong vùng đệm 100 m (49 ổn định, 21 bồi) có LRR trung bình +1,09 m/năm, không transect nào lùi có ý nghĩa thống kê. Khoảng cách và số transect trong vùng được đếm bằng truy vấn không gian ngoài QGIS; trong QGIS làm lại được bằng Select by Location.',
+            ],
+            'figs' => [
+                ['b5-rmse.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: tính RMSE của chênh lệch LRR và EPR giữa bản dựng bằng giao diện và bản tính trước đó.', 'Tính RMSE của chênh lệch LRR và EPR so với bản tính trước đó.'],
+                ['g3-thong-ke-lrr-chung.webp', 1600, 894, 'Ảnh chụp màn hình QGIS: nhật ký Basic statistics for fields trên LRR của 270 transect, trung bình 0,389 và trung vị 0,269.', 'Basic statistics for fields trên LRR của 270 transect: trung bình 0,389, trung vị 0,269 m/năm.'],
+            ],
         ],
     ];
 
     $limits = [
-        'Đối chiếu sạt lở khớp 2/2 sự kiện theo tiêu chí khoảng cách, nhưng khớp yếu: điểm nóng gần nhất cách vùng cảnh báo 355 m (ngưỡng 500 m), còn trong 70 transect của vùng đệm 100 m (38 bồi, 32 ổn định) không transect nào lùi có ý nghĩa thống kê (LRR trung bình +1,15 m/năm). Hai sự kiện dùng chung một vùng nên không độc lập.',
-        'Kết quả nhạy với cách giải đoán đường bờ. Đường bờ chính hiện do chuỗi QGIS giải đoán (SHORELINE_ENGINE = qgis). Cùng ảnh, bản Python trước đó cho 0/2 sự kiện (điểm nóng gần nhất cách 5.234 m), 267 transect và 1 transect lùi mạnh thay vì 4. Chuỗi QGIS được chọn làm đường bờ chính sau khi đã có kết quả bản Python; đây là quyết định của đồ án, không phải kết quả khách quan.',
-        'Chọn chỉ số có yếu tố chủ quan: AWEI có F1 trung bình cao hơn MNDWI 0,0001 (0,9457 so với 0,9456). Hai chỉ số được coi là hoà nhờ ngưỡng 0,005 đặt sau khi đã thấy kết quả, rồi chọn MNDWI vì RMSE đường bờ thấp hơn (18,45 m so với 60,01 m). Thử đổi ngưỡng hoà: từ 0,00007 trở lên vẫn chọn MNDWI, kể cả khi bỏ lần lượt từng năm ground truth; chỉ khi ngưỡng bằng 0 mới chọn AWEI.',
-        'Ground truth nhỏ: 5 ô mẫu và chỉ 3 năm (2018, 2022, 2026). Sáu năm còn lại dùng U<sub>classify</sub> = 21,7 m, là giá trị lớn nhất đã đo làm tròn lên chứ không phải số đo riêng. Ước lượng riêng từng năm từ độ nhạy theo ngưỡng (hiệu chuẩn bằng 3 năm có ground truth) cho 18,1 đến 24,3 m ở sáu năm đó; riêng 2019 là 24,3 m, cao hơn mức 21,7 m đang dùng. Đây là ước lượng của đồ án, không phải số đo.',
-        'Độ bất định lớn hơn tín hiệu ở nhiều nơi: U<sub>shoreline</sub> 18,5 đến 23,1 m, trong khi LRR của các transect chỉ từ −3,76 đến +4,73 m/năm. Ở T0094, |EPR| = 2,65 m/năm nhỏ hơn độ bất định EPR 7,24 m/năm (95%), trong khi khoảng tin cậy của LRR (±1,21) chỉ tính từ độ lệch quanh đường hồi quy, không cộng sai số của từng đường bờ. Hai cách tính độ bất định cho kết luận khác nhau về cùng một transect. Nếu cộng sai số từng đường bờ vào khoảng tin cậy thì khoảng này thành ±6,70 m/năm và không transect nào trong 266 còn có ý nghĩa (T0094 chuyển từ lùi mạnh sang ổn định), trong khi cách đang dùng cho 85 transect có ý nghĩa. Phép cộng có thể phóng đại vì sai số giữa các năm không độc lập (χ² rút gọn trung vị 0,027). Vì vậy LRR nên đọc là xu hướng, không phải kết luận thống kê cho từng transect.',
+        'Đối chiếu sạt lở không khớp (0/2 sự kiện theo tiêu chí khoảng cách): hotspot duy nhất (T0089) cách vùng cảnh báo 5.183 m, xa hơn ngưỡng 500 m. Trong 70 transect của vùng đệm 100 m (49 ổn định, 21 bồi) không transect nào lùi có ý nghĩa thống kê (LRR trung bình +1,09 m/năm). Hai sự kiện dùng chung một vùng nên không độc lập.',
+        'Kết quả nhạy với cách giải đoán đường bờ. Cùng ảnh, bản tính trước đó cho 266 transect và 4 transect lùi mạnh, còn bản dựng bằng giao diện QGIS cho 270 transect và 1 transect lùi mạnh; chỉ 62,8% transect (164 trong 261 ghép được) cùng nhóm biến động, chênh LRR có RMSE 1,389 m/năm (lớn nhất 8,6 m/năm ở đầu tuyến T0001–T0007). Bản dựng bằng giao diện được chọn làm dữ liệu chính sau khi đã có bản trước; đây là quyết định của đồ án, không phải kết quả khách quan.',
+        'Ngưỡng nước không do QGIS tính: QGIS 3.40 không có công cụ Otsu, nên giá trị được tính trên histogram của ảnh MNDWI mỗi năm bên ngoài giao diện rồi nhập vào Raster Calculator. Histogram trong QGIS chỉ để đối chiếu bằng mắt.',
+        'Chọn chỉ số có yếu tố chủ quan: AWEI có F1 trung bình cao hơn MNDWI 0,0001 (0,9457 so với 0,9456). Hai chỉ số được coi là hoà nhờ ngưỡng 0,005 đặt sau khi đã thấy kết quả, rồi chọn MNDWI vì RMSE đường bờ thấp hơn (18,45 m so với 60,01 m). Phép so này làm trên bản tính trước đó, chưa làm lại bằng giao diện.',
+        'Ground truth nhỏ: 5 ô mẫu và chỉ 3 năm (2018, 2022, 2026). Sáu năm còn lại dùng U<sub>classify</sub> = 21,7 m, là giá trị lớn nhất đã đo làm tròn lên chứ không phải số đo riêng. Các RMSE trên đo ở đường bờ chạy bằng script QGIS, chưa đo cho bản dựng bằng giao diện.',
+        'Độ bất định lớn hơn tín hiệu ở nhiều nơi: U<sub>shoreline</sub> 18,5 đến 23,1 m, trong khi LRR của các transect nằm từ −7,36 đến +6,31 m/năm. Ở T0089, |EPR| = 3,11 m/năm nhỏ hơn độ bất định EPR 7,24 m/năm (95%), trong khi khoảng tin cậy của LRR (±1,23) chỉ tính từ độ lệch quanh đường hồi quy, không cộng sai số của từng đường bờ. Hai cách tính độ bất định cho kết luận khác nhau về cùng một transect, nên LRR nên đọc là xu hướng, không phải kết luận thống kê cho từng transect.',
         'Sai số định vị 12 m ở mức 95,5% được quy về 6 m ở 1σ, nửa pixel được coi là 1σ, và công thức gộp U<sub>shoreline</sub> là suy luận của đồ án, không gán cho nguồn nào.',
-        'Đối chiếu chéo cho sai lệch lớn hơn ground truth: so với ESA WorldCover và Impact Observatory, đường bờ pipeline nằm lệch về phía sông trung bình 24,6 đến 34,3 m, RMSE 47,4 đến 68,4 m. Hai sản phẩm đó là ảnh cả năm, không cùng mùa với ảnh tháng 1–3, nên chỉ là kiểm tra thô. Khoảng 87 đến 93% tổng bình phương độ lệch đến từ một số ít transect lệch trên 50 m, tập trung ở cùng vài đoạn qua các năm; bỏ chúng thì RMSE còn 15,1 đến 19,6 m. Dựng lại composite theo từng cửa sổ hai tháng của 2020–2021 (các cửa sổ có từ 3 cảnh) thì độ lệch vẫn 20 đến 30 m, nên mùa không giải thích được. Mực nước và thuỷ triều lúc chụp chưa kiểm tra được vì không có số liệu trạm đo; nguyên nhân của các đoạn lệch lớn vẫn chưa rõ.',
-        'Mỗi năm chỉ một composite mùa khô, từ 4 đến 13 cảnh tuỳ năm, chưa hiệu chỉnh mực nước. Ngưỡng Otsu đổi theo năm từ 0,0404 (2024) đến 0,1633 (2018) nên một phần chênh lệch giữa các năm có thể do ngưỡng, không do bờ dịch chuyển. Chạy thử với ngưỡng cố định (dựng đường bờ bằng chuỗi Python), LRR tương quan 0,89 (ngưỡng 0,0) đến 0,94 (ngưỡng bằng trung vị Otsu) với kết quả chính, nhưng 55 đến 61 transect đổi nhóm và số transect lùi mạnh giảm từ 4 xuống 1 đến 2. Ngày ảnh hiển thị trên web là ngày của cảnh dùng cuối, không phải ngày của cả composite.',
-        'Các quy ước do đồ án đặt: khử đột biến 50 m (9 quan sát bị loại), lùi mạnh khi LRR ≤ −2 m/năm và giảm liên tục từ 3 mốc năm. 140 trong 266 transect có R² dưới 0,3 (đều thuộc nhóm ổn định). Kênh rộng dưới khoảng 100 m không được theo dõi do bước làm sạch mặt nạ.',
+        'Mỗi năm chỉ một composite mùa khô, từ 4 đến 13 cảnh tuỳ năm, chưa hiệu chỉnh mực nước. Ngưỡng nước đổi theo năm từ 0,039 (2024) đến 0,178 (2018) nên một phần chênh lệch giữa các năm có thể do ngưỡng, không do bờ dịch chuyển.',
+        'Các quy ước do đồ án đặt: khử đột biến 50 m (22 quan sát bị loại), lùi mạnh khi LRR ≤ −2 m/năm và giảm liên tục từ 3 mốc năm. 160 trong 270 transect có R² dưới 0,3 (đều thuộc nhóm ổn định). Kênh rộng dưới khoảng 100 m không được theo dõi do bước mở hình thái. Hướng ra sông của transect xác định bằng quy tắc hình học và kiểm tra bằng mắt, và đầu tuyến T0001–T0007 có đường bờ gấp khúc làm số đo kém ổn định.',
+        'Hotspot ở bản dựng bằng giao diện là một đoạn đường dài 50 m (không phải vùng đệm 25 m quanh điểm như bản trước), vì một lớp chỉ nên có một kiểu hình học; chỉ có một hotspot nên chưa thử được trường hợp nhiều transect liền nhau.',
     ];
     /* Công thức: MathML gốc của trình duyệt (không cần JS hay thư viện). Mỗi mục = [tên, MathML, giải thích ký hiệu]. */
     $i = fn ($x) => "<mi>$x</mi>";
@@ -229,25 +215,14 @@
     $bar = fn ($x) => "<mover><mi>$x</mi><mo>¯</mo></mover>";
     $minus = '<mo>−</mo>';
     $maths = [
-        0 => [
-            ['Tỉ lệ pixel bị che', $sb('m', 'cảnh').$o('=').$fr($sb('N', 'che'), $sb('N', 'tổng')),
-                'N<sub>che</sub>: số pixel của vùng tải có lớp SCL thuộc {0, 1, 3, 8, 9, 10, 11}; N<sub>tổng</sub>: tổng số pixel của vùng tải. Cảnh bị loại khi m<sub>cảnh</sub> &gt; 0,30.'],
-        ],
-        1 => [
-            ['Phản xạ bề mặt', $i('ρ').$o('=').$fr($pa($i('DN').$minus.$i('offset')), $n('10000')),
-                'DN: giá trị số của ảnh L2A; offset = 1000 với processing baseline từ 4,0 trở lên, 0 với bản cũ; DN = 0 là không dữ liệu.'],
-            ['Composite theo pixel', $sb('ρ', 'comp').$pa($i('x').$o(',').$i('y')).$o('=').'<munder><mi mathvariant="normal">median</mi><mi>t</mi></munder><mspace width="0.25em"></mspace>'.$sb('ρ', 't').$pa($i('x').$o(',').$i('y')),
-                'ρ<sub>t</sub>: phản xạ của cảnh thứ t tại pixel (x, y); chỉ lấy các quan sát không bị che.'],
-        ],
         2 => [
-            ['NDWI (McFeeters 1996)', $i('NDWI').$o('=').$fr($i('B03').$minus.$i('B08'), $i('B03').$o('+').$i('B08')), 'B03: kênh xanh lục; B08: cận hồng ngoại (NIR).'],
-            ['MNDWI (Xu 2006)', $i('MNDWI').$o('=').$fr($i('B03').$minus.$i('B11'), $i('B03').$o('+').$i('B11')), 'B11: hồng ngoại sóng ngắn 1 (SWIR1). Chỉ số được chọn cho đường bờ.'],
-            ['AWEI<sub>nsh</sub> (Feyisa et al. 2014)', $sb('AWEI', 'nsh').$o('=').$n('4').$pa($i('B03').$minus.$i('B11')).$minus.$pa($n('0,25').'<mo>·</mo>'.$i('B08').$o('+').$n('2,75').'<mo>·</mo>'.$i('B12')), 'B12: hồng ngoại sóng ngắn 2 (SWIR2).'],
+            ['Composite theo pixel', $sb('ρ', 'comp').$pa($i('x').$o(',').$i('y')).$o('=').'<munder><mi mathvariant="normal">median</mi><mi>t</mi></munder><mspace width="0.25em"></mspace>'.$sb('ρ', 't').$pa($i('x').$o(',').$i('y')),
+                'ρ<sub>t</sub>: giá trị của cảnh thứ t tại pixel (x, y); chỉ lấy các quan sát không bị che (Cell Statistics, Median, bỏ NoData).'],
+        ],
+        3 => [
+            ['MNDWI (Xu 2006)', $i('MNDWI').$o('=').$fr($i('B03').$minus.$i('B11'), $i('B03').$o('+').$i('B11')), 'B03: kênh xanh lục; B11: hồng ngoại sóng ngắn 1 (SWIR1). Là tỉ số nên không cần nhân hệ số 10.000.'],
             ['Ngưỡng Otsu', "<msup><mi>t</mi><mo>*</mo></msup>".$o('=').'<munder><mi mathvariant="normal">arg max</mi><mi>t</mi></munder>'.'<mo>[</mo>'.$sb('ω', '0').$pa($i('t')).'<mo>·</mo>'.$sb('ω', '1').$pa($i('t')).'<mo>·</mo>'.$sq($pa($sb('μ', '0').$pa($i('t')).$minus.$sb('μ', '1').$pa($i('t')))).'<mo>]</mo>',
                 'ω<sub>0</sub>, ω<sub>1</sub>: tỉ lệ pixel ở hai lớp (đất, nước) khi cắt tại ngưỡng t; μ<sub>0</sub>, μ<sub>1</sub>: giá trị trung bình của hai lớp. Ngưỡng t* làm phương sai giữa hai lớp lớn nhất.'],
-        ],
-        4 => [
-            ['Trường có dấu', $i('f').$o('=').$i('MNDWI').$minus.$i('t'), 't: ngưỡng Otsu của năm đó. Đường bờ là tập điểm có f = 0 (nước ở phía f &gt; 0).'],
         ],
         6 => [
             ['Dịch chuyển ròng (NSM)', $i('NSM').$o('=').$sb('d', 'cuối').$minus.$sb('d', 'đầu'), 'd: khoảng cách từ gốc transect đến đường bờ (m).'],
@@ -257,26 +232,24 @@
             ['Sai số chuẩn của LRR', $i('SE').$o('=').$rt($fr('<mo>∑</mo>'.$sq($sb('e', 'i')), $pa($i('n').$minus.$n('2')).'<mo>∑</mo>'.$sq($pa($sb('t', 'i').$minus.$bar('t'))))),
                 'e<sub>i</sub> = d<sub>i</sub> − (a + LRR·t<sub>i</sub>): phần dư của mốc thứ i.'],
             ['Hệ số xác định', $sq($i('R')).$o('=').$n('1').$minus.$fr('<mo>∑</mo>'.$sq($sb('e', 'i')), '<mo>∑</mo>'.$sq($pa($sb('d', 'i').$minus.$bar('d')))), 'Không dùng làm ngưỡng loại trừ.'],
+        ],
+        7 => [
             ['Nửa bề rộng khoảng tin cậy của LRR', $sb('CI', '95').$o('=').$i('t').'<mo>·</mo>'.$i('SE'), 't: hệ số Student hai phía 95% với n − 2 bậc tự do. Transect có ý nghĩa thống kê khi |LRR| &gt; CI<sub>95</sub>.'],
             ['Độ bất định của EPR', $sb('U', 'EPR').$o('=').$fr($sb('Z', '95').'<mo>·</mo>'.$rt($sq($sb('U', 'đầu')).$o('+').$sq($sb('U', 'cuối'))), '<mi mathvariant="normal">Δ</mi><mi>t</mi>'), 'Z<sub>95</sub> = 1,96; U<sub>đầu</sub>, U<sub>cuối</sub>: độ bất định đường bờ ở hai mốc.'],
-        ],
-        8 => [
-            ['Precision', $i('P').$o('=').$fr($i('TP'), $i('TP').$o('+').$i('FP')), 'TP, FP, FN: số pixel nước đúng, nước thừa, nước thiếu so với ground truth.'],
-            ['Recall', $i('R').$o('=').$fr($i('TP'), $i('TP').$o('+').$i('FN')), ''],
-            ['F1', $n('F1').$o('=').$fr($n('2').$i('P').$i('R'), $i('P').$o('+').$i('R')), ''],
-            ['IoU', $i('IoU').$o('=').$fr($i('TP'), $i('TP').$o('+').$i('FP').$o('+').$i('FN')), ''],
-            ['Sai số đường bờ (RMSE)', $i('RMSE').$o('=').$rt($fr($n('1'), $i('n')).'<mo>∑</mo>'.$sq($pa($sb('d', 'tự động').$minus.$sb('d', 'tham chiếu')))), 'd: khoảng cách đo dọc transect; tham chiếu là đường bờ số hoá thủ công.'],
             ['Độ bất định đường bờ', $sb('U', 'shoreline').$o('=').$rt($sq($sb('U', 'pixel')).$o('+').$sq($sb('U', 'georef')).$o('+').$sq($sb('U', 'classify'))),
                 'U<sub>pixel</sub> = 5 m (nửa pixel 10 m); U<sub>georef</sub> = 6 m (12 m ở 95,5% quy về 1σ); U<sub>classify</sub> = RMSE so với đường bờ số hoá.'],
+        ],
+        8 => [
+            ['Sai số đường bờ (RMSE)', $i('RMSE').$o('=').$rt($fr($n('1'), $i('n')).'<mo>∑</mo>'.$sq($pa($sb('d', 'tự động').$minus.$sb('d', 'tham chiếu')))), 'd: khoảng cách đo dọc transect; tham chiếu là đường bờ số hoá thủ công.'],
         ],
     ];
 @endphp
 <section class="steps" id="giai-doan-anh" aria-labelledby="steps-title">
     <div class="steps-inner">
         <header class="steps-head">
-            <p class="eyebrow">Quy trình giải đoán ảnh</p>
+            <p class="eyebrow">Quy trình giải đoán ảnh bằng QGIS</p>
             <h2 id="steps-title">Từ ảnh vệ tinh đến đường bờ và tốc độ biến động</h2>
-            <p class="lead">Mười một bước dưới đây đúng với những gì pipeline Python đã chạy trong repo, từ thu thập ảnh đến xuất lên GeoServer. Hình minh hoạ vẽ lại từ dữ liệu trung gian thật của pipeline, không phải ảnh mô phỏng. Mỗi bước có phần chi tiết kỹ thuật bấm để mở; cuối quy trình là các hạn chế chưa giải quyết được.</p>
+            <p class="lead">Chín bước dưới đây đều làm bằng giao diện QGIS 3.40 (menu, hộp thoại, Processing Toolbox, Field Calculator, Print Layout), từ nạp ảnh Sentinel-2 đến xuất GeoJSON cho web. Hình minh hoạ là ảnh chụp màn hình và bản đồ xuất từ chính dự án QGIS, không phải ảnh mô phỏng. Mỗi bước có phần chi tiết kỹ thuật bấm để mở; cuối quy trình là các hạn chế chưa giải quyết được.</p>
         </header>
         <ol class="step-list">
             @foreach ($steps as $i => $s)

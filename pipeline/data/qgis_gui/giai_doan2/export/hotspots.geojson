@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "hotspots",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"xy_coordinate_resolution": 1e-07,
+"features": [
+{ "type": "Feature", "properties": { "severity": 2.83, "period_start_year": 2018, "period_end_year": 2026, "notes": "Lùi bờ mạnh T0089–T0089 (1 transect, ~50 m)" }, "geometry": { "type": "LineString", "coordinates": [ [ 105.3285387, 10.5180391 ], [ 105.328404, 10.5184712 ] ] } }
+]
+}
