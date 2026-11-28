@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    @include('partials.head', ['title' => 'Quản trị ngưỡng — WebGIS Sông Hậu', 'description' => 'Quản trị ngưỡng hiển thị hotspot sạt lở.'])
+    @include('partials.head', ['title' => 'Quản trị ngưỡng — WebGIS Sông Hậu', 'description' => 'Quản trị ngưỡng hiển thị hotspot và cấu hình lớp bản đồ mặc định.'])
     @vite(['resources/css/app.css', 'resources/js/admin.js', 'resources/js/admin-map.js'])
     <script>window.WEBGIS = @json(['geoserver' => $geoserver, 'years' => $years, 'vietmapKey' => $vietmapKey]);</script>
 </head>
@@ -10,7 +10,7 @@
 <main class="admin admin-split" id="main-content" tabindex="-1">
     <aside class="admin-side" aria-label="Quản trị">
         <h1>Quản trị</h1>
-        <p class="lead">Web chỉ đọc: kết quả do pipeline tính sẵn. Tài khoản admin chỉ chỉnh ngưỡng hiển thị hotspot.</p>
+        <p class="lead">Web chỉ đọc: kết quả (9 đường bờ 2018–2026, 270 transect, hotspot) được dựng sẵn bằng QGIS và nạp vào PostGIS. Tài khoản admin chỉ chỉnh ngưỡng hiển thị hotspot và cấu hình lớp bản đồ mặc định; quy trình dựng dữ liệu xem ở trang <a href="/quy-trinh-qgis">Quy trình QGIS</a>.</p>
         <p id="admin-message" role="status"></p>
 
         <section id="admin-panel">
