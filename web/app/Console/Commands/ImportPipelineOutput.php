@@ -6,9 +6,9 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Nạp output pipeline Python vào PostGIS bằng UPSERT (Mục 10: không xoá-tạo-lại ID đang tham chiếu).
+ * Nạp output (GeoJSON do QGIS xuất, hoặc output của script đối chiếu) vào PostGIS bằng UPSERT (Mục 10: không xoá-tạo-lại ID đang tham chiếu).
  *
- * Thư mục nguồn chứa các file GeoJSON (EPSG:4326):
+ * Thư mục nguồn chứa các file GeoJSON (EPSG:4326), đuôi .json hoặc .geojson (.json được ưu tiên nếu có cả hai):
  *   baseline.json   1 feature LineString
  *   shorelines.json properties: year, water_index, source_image_date?
  *   transects.json  properties: transect_code, distances{"2018": m,...}, stats{nsm_m, epr_m_per_year,
@@ -84,7 +84,8 @@ class ImportPipelineOutput extends Command
         $d = [];
         foreach ($p as $k => $v) {
             if (preg_match('/^d(\d{4})$/', $k, $m)) {
-                $d[$m[1]] = $v === null ? null : (float) $v;
+                // Rỗng/không phải số = thiếu dữ liệu (null), không được ép thành 0 m.
+                $d[$m[1]] = is_numeric($v) ? (float) $v : null;
             }
         }
         ksort($d);
@@ -144,7 +145,7 @@ class ImportPipelineOutput extends Command
                  VALUES (?, ?, ?, ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)))
                  ON CONFLICT (year, water_index) DO UPDATE
                  SET source_image_date = COALESCE(EXCLUDED.source_image_date, shorelines.source_image_date), geom = EXCLUDED.geom',
-                [$p['year'], strtoupper($p['water_index']), $p['source_image_date'] ?? null, json_encode($f['geometry'])]
+                [$p['year'], strtoupper((string) $p['water_index']), $p['source_image_date'] ?? null, json_encode($f['geometry'])]
             );
             $n++;
         }
@@ -180,7 +181,8 @@ class ImportPipelineOutput extends Command
                 [$p['transect_code'], $baselineId, json_encode($f['geometry'])]
             )->id;
 
-            $years = array_map('intval', array_keys($p['distances'] ?? []));
+            // Chỉ các năm CÓ giá trị: năm null trong output mới phải bị xoá khỏi chuỗi cũ.
+            $years = array_map('intval', array_keys(array_filter($p['distances'] ?? [], fn ($d) => $d !== null)));
             foreach ($p['distances'] ?? [] as $year => $d) {
                 if ($d === null) {
                     continue; // năm thiếu dữ liệu: không ghi, không nội suy
