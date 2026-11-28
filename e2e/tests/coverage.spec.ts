@@ -55,8 +55,8 @@ test.describe('Điều hướng & trang tĩnh', () => {
         await expect(page.locator('td[data-layer="transects"]')).toHaveText('10 bản ghi');
         const shore = (await (await page.request.get('/api/export/shorelines.geojson')).json()).features.length;
         await expect(page.locator('td[data-layer="shorelines"]')).toContainText(String(shore));
-        await expect(page.getByRole('heading', { name: 'Độ bất định' })).toBeVisible();
-        await expect(page.getByRole('heading', { name: /Hạn chế/ })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Độ bất định', exact: true })).toBeVisible();
+        await expect(page.getByRole('heading', { name: /Hạn chế & lưu ý/ })).toBeVisible();
     });
 });
 
