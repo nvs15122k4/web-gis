@@ -68,6 +68,10 @@ for spec in shorelines:shorelines:shoreline transects:transects_styled:change_cl
   echo "   $WS:$name ← $native (style $sld)"
 done
 
+# Dọn dấu vết bản provision cũ: bộ lọc CQL theo cột `source` (cột đã gỡ, làm lớp shorelines báo lỗi khi vẽ) và lớp shorelines_alt.
+json -X PUT -d '{"featureType":{"cqlFilter":""}}' "$GS/rest/workspaces/$WS/datastores/$STORE/featuretypes/shorelines" >/dev/null || true
+rest -X DELETE "$GS/rest/workspaces/$WS/layers/shorelines_alt" >/dev/null || true
+
 # WFS (đề cương hứa WMS + WFS): các lớp trên cũng phục vụ qua WFS (GeoJSON, lọc CQL/bbox). Bật dịch vụ WFS riêng cho workspace
 # và nạp lại cấu hình để cột mới của view/bảng (vd. unc_lrr) xuất hiện trong schema lớp.
 echo "→ dịch vụ WFS"
