@@ -87,6 +87,24 @@ class ImportCommandTest extends TestCase
         $this->assertTrue((bool) $st->is_significant);
     }
 
+    public function test_reimport_flat_qgis_drops_year_that_became_null(): void
+    {
+        $line = ['type' => 'LineString', 'coordinates' => [[105.2, 10.6], [105.21, 10.6]]];
+        $write = fn (array $props) => file_put_contents("{$this->dir}/transects.geojson",
+            json_encode(['type' => 'FeatureCollection', 'features' => [$this->feature($line, $props)]]));
+        $write(['transect_code' => 'Q02', 'd2018' => 100.0, 'd2019' => 95.0, 'd2020' => 90.0]);
+        $this->artisan('webgis:import', ['dir' => $this->dir])->assertSuccessful();
+        // nạp đè: 2019 nay thiếu (null), 2020 là chuỗi rỗng — cả hai phải bị xoá, không được thành 0 m
+        $write(['transect_code' => 'Q02', 'd2018' => 101.0, 'd2019' => null, 'd2020' => '']);
+        $this->artisan('webgis:import', ['dir' => $this->dir])->assertSuccessful();
+
+        $pg = DB::connection('pgsql');
+        $id = $pg->table('transects')->where('transect_code', 'Q02')->value('id');
+        $rows = $pg->table('transect_shoreline_distances')->where('transect_id', $id)->get();
+        $this->assertSame([2018], $rows->pluck('year')->map(fn ($y) => (int) $y)->all());
+        $this->assertEquals(101.0, $rows->first()->distance_m);
+    }
+
     public function test_import_reference_with_danger_level(): void
     {
         $point = ['type' => 'Point', 'coordinates' => [105.2, 10.6]];
