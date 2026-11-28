@@ -67,6 +67,26 @@ class ImportCommandTest extends TestCase
         $this->assertSame(1, $pg->table('shorelines')->where('year', 2030)->count());
     }
 
+    public function test_import_reads_flat_qgis_geojson(): void
+    {
+        $line = ['type' => 'LineString', 'coordinates' => [[105.2, 10.6], [105.21, 10.6]]];
+        $props = ['transect_code' => 'Q01', 'd2018' => 100.0, 'd2019' => null, 'd2020' => 90.0,
+            'nsm' => -10, 'epr' => -5, 'lrr' => -4.5, 'r2' => 0.8, 'unc_lrr' => 1.2, 'se_lrr' => 0.4,
+            'is_significant' => 1, 'change_class' => 'mild_erosion', 'consecutive_erosion_periods' => 2];
+        file_put_contents("{$this->dir}/transects.geojson", json_encode(['type' => 'FeatureCollection', 'features' => [$this->feature($line, $props)]]));
+        $this->artisan('webgis:import', ['dir' => $this->dir])->assertSuccessful();
+
+        $pg = DB::connection('pgsql');
+        $id = $pg->table('transects')->where('transect_code', 'Q01')->value('id');
+        $this->assertNotNull($id);
+        $this->assertSame([2018, 2020], $pg->table('transect_shoreline_distances')->where('transect_id', $id)->orderBy('year')->pluck('year')->map(fn ($y) => (int) $y)->all());
+        $st = $pg->table('shoreline_change_stats')->where('transect_id', $id)->first();
+        $this->assertEquals(-4.5, $st->lrr_m_per_year);
+        $this->assertEquals(0.8, $st->r_squared);
+        $this->assertSame('mild_erosion', $st->change_class);
+        $this->assertTrue((bool) $st->is_significant);
+    }
+
     public function test_import_reference_with_danger_level(): void
     {
         $point = ['type' => 'Point', 'coordinates' => [105.2, 10.6]];
