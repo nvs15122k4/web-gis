@@ -17,6 +17,7 @@
     <nav class="topnav" aria-label="Điều hướng chính">
         <a href="/" @class(['active' => request()->is('/')]) @if (request()->is('/')) aria-current="page" @endif>Bản đồ</a>
         <a href="/gioi-thieu" @class(['active' => request()->is('gioi-thieu')]) @if (request()->is('gioi-thieu')) aria-current="page" @endif>Phương pháp</a>
+        <a href="/quy-trinh-qgis" @class(['active' => request()->is('quy-trinh-qgis')]) @if (request()->is('quy-trinh-qgis')) aria-current="page" @endif>Quy trình QGIS</a>
         <a href="/huong-dan" @class(['active' => request()->is('huong-dan')]) @if (request()->is('huong-dan')) aria-current="page" @endif>Hướng dẫn</a>
         @if (auth()->user()?->isAdmin())
             <a href="/bao-cao" @class(['active' => request()->is('bao-cao')]) @if (request()->is('bao-cao')) aria-current="page" @endif>Báo cáo</a>

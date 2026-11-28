@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    @include('partials.head', ['title' => 'Giới thiệu & phương pháp — WebGIS Sông Hậu', 'description' => 'Cách làm bằng QGIS: ảnh Sentinel-2, giải đoán đường bờ, transect kiểu DSAS và phân loại biến động bờ sông Hậu, xã Bình Mỹ.'])
-    @vite(['resources/css/app.css', 'resources/js/steps.js', 'resources/js/back-to-top.js'])
+    @include('partials.head', ['title' => 'Phương pháp — WebGIS Sông Hậu', 'description' => 'Cách làm bằng QGIS: ảnh Sentinel-2, giải đoán đường bờ, transect kiểu DSAS và phân loại biến động bờ sông Hậu, xã Bình Mỹ.'])
+    @vite(['resources/css/app.css', 'resources/js/back-to-top.js'])
 </head>
 <body class="page">
 @include('partials.nav')
@@ -14,6 +14,8 @@
         <p class="lead">WebGIS giám sát biến động bờ sông Hậu tại xã Bình Mỹ, tỉnh An Giang, giai đoạn
         {{ $years[0] }}–{{ end($years) }}. Toàn bộ dữ liệu được dựng bằng giao diện QGIS 3.40 từ ảnh vệ tinh Sentinel-2; web chỉ đọc và hiển thị,
         không tính lại các chỉ số.</p>
+        <p class="lead">Từng bước dựng dữ liệu bằng QGIS (nạp ảnh, MNDWI, đường bờ, transect, thống kê) nằm ở trang riêng
+        <a href="/quy-trinh-qgis">Quy trình giải đoán ảnh bằng QGIS</a>.</p>
         <dl class="page-stamp" aria-label="Thông tin dữ liệu">
             <div><dt>Ảnh</dt><dd>Sentinel-2 L2A</dd></div>
             <div><dt>Phương pháp</dt><dd>QGIS · DSAS</dd></div>
@@ -21,11 +23,10 @@
         </dl>
     </div>
 </header>
-@include('partials.giai-doan-anh')
 <div class="doc-layout">
 <nav class="doc-toc" aria-label="Mục lục">
     <p class="doc-toc-title">Mục lục</p>
-    <a href="#giai-doan-anh">Giải đoán ảnh</a>
+    <a href="/quy-trinh-qgis">Giải đoán ảnh ↗</a>
     <a href="#muc-tieu">Mục tiêu</a>
     <a href="#du-lieu">Dữ liệu</a>
     <a href="#phuong-phap">Phương pháp</a>

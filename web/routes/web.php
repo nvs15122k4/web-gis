@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MapController::class, 'index']);
 Route::get('/gioi-thieu', [MapController::class, 'about']);
+Route::get('/quy-trinh-qgis', [MapController::class, 'workflow']);
 Route::get('/huong-dan', [MapController::class, 'guide']);
 // Quản trị: khách -> chuyển tới /dang-nhap; không phải admin -> 403.
 Route::get('/admin', [MapController::class, 'admin'])->middleware(['auth', 'admin']);

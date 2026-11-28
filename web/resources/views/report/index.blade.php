@@ -7,9 +7,9 @@
         ['2.4', 'Đánh giá độ chính xác và kiểm chứng', 'done', 'Ground truth số hoá 5 ô mẫu (2018, 2022, 2026), RMSE đường bờ 16,73–21,69 m đưa vào U_classify; chọn MNDWI vì sai số đường bờ thấp nhất (18,45 m, so với NDWI 27,83 m và AWEI 60,01 m); đối chiếu chéo ESA WorldCover và Impact Observatory LULC.'],
         ['2.5', 'Tiêu chí phân loại và độ bất định', 'done', 'NSM/EPR/LRR/R² tính bằng Field Calculator của QGIS, kiểm định |LRR| > t × SE (t Student 95%, n − 2 bậc tự do; chuỗi 9 năm t = 2,365), bốn mức biến động, lùi mạnh khi LRR ≤ −2 m/năm và giảm liên tục ≥ 3 mốc năm, U_georef 12 m (2σ) quy về 6 m (1σ).'],
         ['2.6', 'Kiến trúc, cơ sở dữ liệu và giao diện WebGIS', 'done', 'MySQL (người dùng, cấu hình) + PostGIS (không gian), GeoServer WMS (tuỳ chọn, một lớp chung tô màu đường bờ theo năm), Leaflet + Chart.js; giao diện sáng thiết kế v3 theo hệ Transect, hỗ trợ bàn phím và cảm ứng.'],
-        ['3.5', 'Đối chiếu với sạt lở tham chiếu 2019–2020', 'part', 'Nguồn công khai chỉ có lý trình Km, chưa có toạ độ nên dùng vùng cảnh báo ~3,3 km; kết quả hiện không phát hiện đoạn lùi bờ trong vùng này (đã ghi rõ ở trang Phương pháp).'],
+        ['3.5', 'Đối chiếu với sạt lở tham chiếu 2019–2020', 'part', 'Nguồn công khai chỉ có lý trình Km, chưa có toạ độ nên dùng vùng cảnh báo ~3,3 km; kết quả hiện không phát hiện đoạn lùi bờ trong vùng này (đã ghi rõ ở trang Phương pháp, mục Sạt lở tham chiếu).'],
         ['3.6.2', 'REST API và bảo mật', 'done', 'Sanctum, khoá đăng nhập sau 5 lần sai theo email + IP, token hết hạn sau 480 phút, kiểm tra đầu vào, ghi nhật ký thay đổi ngưỡng; tài khoản demo tạo từ biến môi trường DEMO_*, không để mật khẩu trong mã nguồn.'],
-        ['3.6.3', 'Giao diện người dùng', 'done', 'Bản đồ, biểu đồ transect, hotspot, so sánh hai năm, chia sẻ liên kết, tải GeoJSON/CSV, trang Phương pháp (kèm 9 bước giải đoán ảnh có hình và chi tiết kỹ thuật), Quản trị ngưỡng, Hướng dẫn và Báo cáo; icon thống nhất ở mọi trang, gợi ý lần đầu vào bản đồ, cài được như ứng dụng (manifest, icon).'],
+        ['3.6.3', 'Giao diện người dùng', 'done', 'Bản đồ, biểu đồ transect, hotspot, so sánh hai năm, chia sẻ liên kết, tải GeoJSON/CSV, trang Phương pháp và trang Quy trình QGIS (9 bước giải đoán ảnh có hình và chi tiết kỹ thuật), Quản trị ngưỡng, Hướng dẫn và Báo cáo; icon thống nhất ở mọi trang, gợi ý lần đầu vào bản đồ, cài được như ứng dụng (manifest, icon).'],
         ['—', 'Hiệu năng tải trang và API', 'done', 'Gộp mọi năm đường bờ vào một lớp WMS (126 xuống 14 request tile), nhớ tạm 60 giây và gộp yêu cầu GET /api, lớp transect/hotspot và Chart.js chỉ tải khi cần, truy vấn GeoJSON bỏ cột geom nguyên bản, cache asset và nén trên Apache.'],
         ['3.7', 'Kiểm thử', 'done', 'Unit/Feature PHP, Vitest, pytest cho bản đối chiếu bằng Python và Playwright E2E (xem số liệu bên dưới); CI trên GitHub Actions.'],
         ['—', 'Báo cáo đồ án (docx) và hình minh chứng', 'part', 'Đã có bản báo cáo, bản đồ QGIS, sơ đồ và ảnh minh chứng trong docs/; cần rà lại số liệu sau mỗi lần chạy lại pipeline.'],
@@ -34,10 +34,10 @@
         <p class="eyebrow">Trang nội bộ, chỉ quản trị viên</p>
         <h1>Báo cáo công việc đã làm</h1>
         <p class="lead">Tổng hợp từ lịch sử git và các tính năng đã hoàn thành của đề tài “WebGIS giám sát biến động bờ sông Hậu, xã Bình Mỹ, An Giang”,
-        đối chiếu với đề cương. Trang nội bộ, chỉ tài khoản admin xem được. Số liệu chốt ngày 27/11/2026.</p>
+        đối chiếu với đề cương. Trang nội bộ, chỉ tài khoản admin xem được. Số liệu chốt ngày 28/11/2026.</p>
         <dl class="page-stamp" aria-label="Thông tin tài liệu">
             <div><dt>Phạm vi</dt><dd>Nội bộ · admin</dd></div>
-            <div><dt>Số liệu</dt><dd>27/11/2026</dd></div>
+            <div><dt>Số liệu</dt><dd>28/11/2026</dd></div>
             <div><dt>Hạng mục</dt><dd>{{ $done }}/{{ $total }} hoàn thành</dd></div>
         </dl>
     </div>
@@ -58,9 +58,9 @@
     <section id="so-lieu">
         <h2>Số liệu chung</h2>
         <table class="stats">
-            <caption>Các con số chính của đề tài tính đến ngày 27/11/2026.</caption>
+            <caption>Các con số chính của đề tài tính đến ngày 28/11/2026.</caption>
             <tbody>
-                <tr><th scope="row">Commit trên nhánh chính</th><td class="v">1.378</td><td class="n">9 ngày có commit, từ 27/09 đến 27/11/2026</td></tr>
+                <tr><th scope="row">Commit trên nhánh chính</th><td class="v">2.132</td><td class="n">từ 27/09 đến 28/11/2026</td></tr>
                 <tr><th scope="row">Transect phân tích</th><td class="v">{{ $transectCount }}</td><td class="n">mặt cắt vuông góc với bờ</td></tr>
                 <tr><th scope="row">Hotspot lùi mạnh</th><td class="v">{{ $hotspotCount }}</td><td class="n">gộp từ {{ $severeCount }} transect lùi mạnh</td></tr>
                 <tr><th scope="row">Năm đường bờ</th><td class="v">9</td><td class="n">giai đoạn 2018–2026</td></tr>
@@ -115,10 +115,12 @@
                 Giao diện v3: tìm kiếm, bảng thuộc tính và cây lớp theo phong cách atlas, phông hệ thống; nạp đường bờ chính từ bản QGIS giải đoán; cấu hình lớp lưu ở cơ sở dữ liệu.</li>
             <li><time datetime="2026-11-27">27/11/2026 — 123 commit</time>
                 Tăng tốc tải trang (một lớp WMS cho mọi năm, nhớ tạm API, tải chậm lớp và biểu đồ); icon cho các trang phụ, icon tab và manifest; gợi ý lần đầu vào bản đồ;
-                9 bước giải đoán ảnh ở trang Phương pháp; tài khoản demo qua biến môi trường; README và ảnh giao diện v3.</li>
+                9 bước giải đoán ảnh ở trang Phương pháp (nay tách thành trang riêng); tài khoản demo qua biến môi trường; README và ảnh giao diện v3.</li>
             <li><time datetime="2026-11-28">28/11/2026</time>
                 Làm lại toàn bộ chuỗi dữ liệu bằng giao diện QGIS 3.40 (9 năm đường bờ, baseline, 270 transect, độ bất định, hotspot) và chụp ảnh từng bước làm minh chứng;
                 web chuyển sang dùng dữ liệu QGIS làm dữ liệu chính, bản tính bằng Python giữ làm đối chiếu; trang Giới thiệu chỉ mô tả cách làm bằng QGIS.</li>
+            <li><time datetime="2026-11-28">28/11/2026, cập nhật tiếp</time>
+                Tách trang Phương pháp làm hai: <a href="/gioi-thieu">Phương pháp</a> (mục tiêu, dữ liệu, phân loại, độ bất định, hạn chế, tải dữ liệu) và <a href="/quy-trinh-qgis">Quy trình QGIS</a> (9 bước giải đoán ảnh, mở bằng tab mới trên thanh điều hướng); làm lại Hướng dẫn, Báo cáo và Quản trị theo dữ liệu QGIS (270 transect, 1 hotspot, 9 đường bờ).</li>
         </ol>
     </section>
 
@@ -147,7 +149,7 @@
         <h3>Transect và thống kê biến động</h3>
         <p class="hint">Có hai bản để so: <strong>bản Python</strong> là chuỗi script chạy trọn từ đầu (đường bờ contour dưới pixel, bảng dưới đây),
             và <strong>bản hiển thị trước đó trên web</strong> (266 transect, 4 lùi mạnh) dùng đường bờ giải đoán bằng script QGIS với transect dựng bằng Python.
-            Bản QGIS so với bản hiển thị trước đó: RMSE LRR 1,39 m/năm, 164 trong 261 transect ghép được cùng nhóm (trang Giới thiệu dùng so sánh này).</p>
+            Bản QGIS so với bản hiển thị trước đó: RMSE LRR 1,39 m/năm, 164 trong 261 transect ghép được cùng nhóm (trang Phương pháp dùng so sánh này).</p>
         <div class="table-wrap"><table>
             <caption>Kết quả transect của hai bản.</caption>
             <tr><th>Chỉ tiêu</th><th>QGIS (dữ liệu chính)</th><th>Python (đối chiếu)</th></tr>
@@ -221,14 +223,14 @@
             <tr><td>Pipeline</td><td>pytest</td><td>hơn 190 hàm kiểm thử</td></tr>
             <tr><td>Đầu–cuối</td><td>Playwright (Chromium, Firefox, WebKit)</td><td>167 kịch bản (501 lượt chạy trên 3 trình duyệt)</td></tr>
         </table></div>
-        <p class="hint">Số liệu đếm theo mã nguồn ngày 27/11/2026 (Vitest đo bằng lần chạy thực), chưa tính ca sinh từ data provider. WebKit không chạy được trên Ubuntu mới nên có script <code>test:no-webkit</code>.</p>
+        <p class="hint">Số liệu đếm theo mã nguồn ngày 28/11/2026 (Vitest đo bằng lần chạy thực), chưa tính ca sinh từ data provider. WebKit không chạy được trên Ubuntu mới nên có script <code>test:no-webkit</code>.</p>
     </section>
 
     <section id="con-lai">
         <h2>Việc còn lại và rủi ro</h2>
         <ul>
             <li>Toạ độ chính xác của điểm sạt lở tham chiếu (Km 89+272 / 89+076) chưa có; các số quyết định lấy từ báo chí, chưa đối chiếu bản gốc.</li>
-            <li>Dữ liệu QGIS chưa phát hiện đoạn lùi bờ quanh vùng sạt lở 2019–2020 (74 transect trong 300 m: 22 bồi, 52 ổn định; hotspot gần nhất cách khoảng 5,2 km); cần trình bày như hạn chế của phương pháp, không như bằng chứng khớp thực tế.</li>
+            <li>Dữ liệu QGIS chưa phát hiện đoạn lùi bờ quanh vùng sạt lở 2019–2020 (70 transect trong vùng đệm 100 m: 21 bồi, 49 ổn định; hotspot duy nhất T0089 cách khoảng 5,2 km); cần trình bày như hạn chế của phương pháp, không như bằng chứng khớp thực tế.</li>
             <li>Mỗi năm chỉ có một đường bờ mùa khô và số cảnh dùng chênh nhiều giữa các năm (4 đến 13 cảnh), nên chất lượng composite không đồng đều.</li>
             <li>Ground truth mới có 5 ô mẫu; nếu bổ sung thêm ô và năm thì cần đánh giá lại và cập nhật U_classify.</li>
             <li>Rà lại số liệu trong báo cáo docx: dữ liệu chính đã chuyển sang bản QGIS (270 transect, 1 hotspot), nhiều số trong báo cáo cũ cần cập nhật.</li>
